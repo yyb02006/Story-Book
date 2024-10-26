@@ -1,3 +1,4 @@
+import plugin from 'tailwindcss/plugin'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -14,6 +15,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      const newUtilities = { '.universe-box-shadow': { boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' } }
+      addUtilities(newUtilities)
+    }),
+  ],
 }
 export default config
