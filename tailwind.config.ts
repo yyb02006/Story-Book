@@ -17,7 +17,12 @@ const config: Config = {
   },
   plugins: [
     plugin(function ({ addUtilities }) {
-      const newUtilities = { '.universe-box-shadow': { boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' } }
+      const newUtilities = {
+        '.universe-box-shadow': {
+          boxShadow:
+            '1000px 2000px white, 1500px 3000px white, 2500px 1000px white, 3500px 1500px white, 2000px 2500px white, 4500px 3500px white',
+        },
+      }
       addUtilities(newUtilities)
     }),
   ],
