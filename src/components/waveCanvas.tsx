@@ -9,8 +9,9 @@ export default function WaveCanvas() {
     x: 50,
     y: 50,
     radius: 20,
-    dx: 2,
+    dx: 0,
     dy: 2,
+    max: Math.random() * 100 + 150,
   }
 
   const drawBall = (ctx: CanvasRenderingContext2D) => {
@@ -21,16 +22,15 @@ export default function WaveCanvas() {
     ctx.fillStyle = 'blue'
     ctx.fill()
     ctx.closePath()
-    if (ball.x + ball.radius > canvasRef.current.width || ball.x - ball.radius < 0) {
-      ball.dx = -ball.dx
-    }
-    if (ball.y + ball.radius > canvasRef.current.height || ball.y - ball.radius < 0) {
+    console.log(ball.y, ball.dx)
+    if (ball.y < 20) {
       ball.dy = -ball.dy
     }
   }
 
   const updateBallPosition = () => {
-    ball.y += ball.dy
+    ball.dx += 0.05
+    ball.y = 50 + 50 * Math.sin(ball.dx)
   }
 
   useEffect(() => {
