@@ -2,19 +2,23 @@
 
 import { useEffect, useRef } from 'react'
 
+interface Ball {
+  x: number
+  y: number
+  fixedY: number
+  radius: number
+  dx: number
+  max: number
+}
+
 export default function WaveCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const ball = {
-    x: 50,
-    y: 50,
-    radius: 20,
-    dx: 0,
-    dy: 2,
-    max: Math.random() * 100 + 150,
+  const createBall = (x: number, y: number) => {
+    return { x, y, fixedY: y, radius: 20, dx: 0, max: 150 }
   }
 
-  const drawBall = (ctx: CanvasRenderingContext2D) => {
+  const drawBall = (ctx: CanvasRenderingContext2D, ball: Ball) => {
     if (!canvasRef.current) return
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     ctx.beginPath()
@@ -22,27 +26,28 @@ export default function WaveCanvas() {
     ctx.fillStyle = 'blue'
     ctx.fill()
     ctx.closePath()
-    console.log(ball.y, ball.dx)
-    if (ball.y < 20) {
-      ball.dy = -ball.dy
-    }
   }
 
-  const updateBallPosition = () => {
+  const updateBallPosition = (ball: Ball) => {
     ball.dx += 0.05
-    ball.y = 50 + 50 * Math.sin(ball.dx)
+    ball.x = ball.max + ball.fixedY * Math.sin(ball.dx)
   }
 
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (!ctx || !canvas) return
-    const animate = () => {
-      updateBallPosition()
-      drawBall(ctx)
-      requestAnimationFrame(animate)
+    const animateWrapper = (x: number, y: number) => {
+      const ball: Ball = createBall(x, y)
+      const animate = () => {
+        updateBallPosition(ball)
+        drawBall(ctx, ball)
+        requestAnimationFrame(animate)
+      }
+      animate()
     }
-    animate()
+    animateWrapper(50, 50)
   }, [])
-  return <canvas className="relative bg-red-500" ref={canvasRef}></canvas>
+
+  return <canvas className="relative bg-red-500" ref={canvasRef} width={480} height={270}></canvas>
 }
