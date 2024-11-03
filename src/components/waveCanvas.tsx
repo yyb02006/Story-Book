@@ -11,21 +11,24 @@ interface Point {
   phaseShift: number
 }
 
-export default function WaveCanvas() {
+interface WaveCanvasProps {
+  width: number
+  colors: string[]
+  pointCountEachWave: number
+  speed: number
+}
+
+export default function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const waveConfig = {
-    width: 30,
-    colors: ['blue', 'crimson', 'purple'],
-    pointCount: 20,
-    speed: 0.05,
-  }
 
   const clearCanvas = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   }
 
   const createPoint = (x: number, y: number, phaseShift: number): Point => {
-    return { x, y, initialX: x, radius: 20, phaseX: 0, phaseShift }
+    const min = Math.round(width / 8)
+    const initialX = Math.random() * (x - min) + min
+    return { x, y, initialX, radius: 20, phaseX: 0, phaseShift }
   }
 
   const updateWaves = (wave: Point[]) => {
@@ -34,7 +37,7 @@ export default function WaveCanvas() {
         const { initialX, phaseShift } = point
         const offset = initialX
         const amplitudeScale = initialX * Math.sin(point.phaseX + phaseShift)
-        point.phaseX += waveConfig.speed
+        point.phaseX += speed
         point.x = offset + amplitudeScale
       }
     })
@@ -113,7 +116,6 @@ export default function WaveCanvas() {
     ctx.lineTo(0, canvasHeight)
     ctx.lineTo(0, 0)
     ctx.fillStyle = color
-    ctx.globalAlpha = 0.3
     ctx.fill()
     ctx.closePath()
   }
@@ -125,14 +127,14 @@ export default function WaveCanvas() {
     canvas.height = window.innerHeight
 
     // 여러개의 웨이브를 각자 생성하는 방법
-    const waves = waveConfig.colors.map((color, waveIdx, originalArray) => {
+    const waves = colors.map((color, waveIdx, originalArray) => {
       const shiftFactor = (2 * Math.PI * waveIdx) / (originalArray.length * 2)
       return {
         color,
-        wave: Array.from({ length: waveConfig.pointCount }, (_, pointIdx) =>
+        wave: Array.from({ length: pointCountEachWave }, (_, pointIdx) =>
           createPoint(
             canvas.width / 2,
-            (canvas.height * pointIdx) / (waveConfig.pointCount - 1),
+            (canvas.height * pointIdx) / (pointCountEachWave - 1),
             pointIdx + shiftFactor,
           ),
         ),
@@ -160,11 +162,6 @@ export default function WaveCanvas() {
   }, [])
 
   return (
-    <canvas
-      className="relative"
-      ref={canvasRef}
-      width={waveConfig.width}
-      height={canvasRef.current?.height}
-    />
+    <canvas className="relative" ref={canvasRef} width={width} height={canvasRef.current?.height} />
   )
 }
