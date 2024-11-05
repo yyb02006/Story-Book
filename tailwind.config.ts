@@ -13,6 +13,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: { 'patrick-hand': ['var(--font-patrick-hand)'] },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
