@@ -19,7 +19,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <GlobalNav />
-        <div className="pl-20">{children}</div>
+        <div className="bg-gradient-to-br from-[#000428] to-[#004e92] pl-gnb-left universe-box-shadow">
+          {children}
+        </div>
       </body>
     </html>
   )

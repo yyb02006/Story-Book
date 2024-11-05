@@ -16,7 +16,7 @@ export default function GlobalNav() {
       initial={{ x: -10, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ ease: 'easeOut', duration: 0.2 }}
-      className="fixed h-screen w-20"
+      className="fixed h-screen w-gnb"
     >
       {wave.colors.map((color) => (
         <div key={color} className={cls('absolute size-full')} style={{ backgroundColor: color }} />
