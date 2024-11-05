@@ -9,6 +9,7 @@
   "rules": {
     "prettier/prettier": ["error", { "endOfLine": "auto" }], // plugin:prettier/recommended(eslint-plugin-prettier)
     "@typescript-eslint/explicit-function-return-type": "off", // 함수의 반환 타입 명시 요구 off
-    "@typescript-eslint/no-unused-vars": "warn" // 사용되지 않는 변수를 허용하지 않음 off
+    "@typescript-eslint/no-unused-vars": "warn", // 사용되지 않는 변수를 허용하지 않음 off
+    "tailwindcss/classname-order": "off"
   }
 }
