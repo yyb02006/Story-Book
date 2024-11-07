@@ -21,9 +21,12 @@ export default function GlobalNav() {
       {wave.colors.map((color) => (
         <div key={color} className={cls('absolute size-full')} style={{ backgroundColor: color }} />
       ))}
-      <ul className="relative">
-        <h1>myname</h1>
-        <li></li>
+      <h1 className="relative text-center font-patrick-hand text-2xl">MEMOISM</h1>
+      <ul className="relative flex h-full flex-col p-4 text-sm">
+        <li>myname</li>
+        <li>favorite</li>
+        <li>post</li>
+        <li>management</li>
       </ul>
       <WaveWithInitAnim {...wave} />
     </motion.nav>
