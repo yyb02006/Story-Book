@@ -1,5 +1,7 @@
 'use client'
 
+import { cls } from '#/libs/client/utils'
+import { motion } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 
 interface Point {
@@ -8,7 +10,7 @@ interface Point {
   initialX: number
   radius: number
   phaseX: number
-  phaseShift: number
+  phaseXShift: number
 }
 
 interface WaveCanvasProps {
@@ -18,25 +20,25 @@ interface WaveCanvasProps {
   speed: number
 }
 
-export default function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCanvasProps) {
+export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const clearCanvas = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   }
 
-  const createPoint = (x: number, y: number, phaseShift: number): Point => {
+  const createPoint = (x: number, y: number, phaseXShift: number): Point => {
     const min = Math.round(width / 8)
     const initialX = Math.random() * (x - min) + min
-    return { x, y, initialX, radius: 20, phaseX: 0, phaseShift }
+    return { x, y, initialX, radius: 20, phaseX: 0, phaseXShift }
   }
 
   const updateWaves = (wave: Point[]) => {
     wave.forEach((point, index, originalArray) => {
       if (index > 0 && index < originalArray.length - 1) {
-        const { initialX, phaseShift } = point
+        const { initialX, phaseXShift } = point
         const offset = initialX
-        const amplitudeScale = initialX * Math.sin(point.phaseX + phaseShift)
+        const amplitudeScale = initialX * Math.sin(point.phaseX + phaseXShift)
         point.phaseX += speed
         point.x = offset + amplitudeScale
       }
@@ -61,7 +63,7 @@ export default function WaveCanvas({ colors, pointCountEachWave, speed, width }:
       const currentOffset = point.initialX
       const shiftFactor = (2 * Math.PI * waveIdx) / waveCount
       const currentAmplitudeScale =
-        point.initialX * Math.sin(point.phaseX + point.phaseShift + shiftFactor)
+        point.initialX * Math.sin(point.phaseX + point.phaseXShift + shiftFactor)
       return currentOffset + currentAmplitudeScale
     } 
       
@@ -121,10 +123,16 @@ export default function WaveCanvas({ colors, pointCountEachWave, speed, width }:
   }
 
   useEffect(() => {
+    const breakPoint = 1080
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (!ctx || !canvas) return
-    canvas.height = window.innerHeight
+
+    const setCanvasHeight = (breakPoint: number) => {
+      canvas.height = window.innerHeight > breakPoint ? window.innerHeight : breakPoint
+    }
+
+    setCanvasHeight(breakPoint)
 
     // 여러개의 웨이브를 각자 생성하는 방법
     const waves = colors.map((color, waveIdx, originalArray) => {
@@ -152,7 +160,12 @@ export default function WaveCanvas({ colors, pointCountEachWave, speed, width }:
     animate()
 
     const handleResize = () => {
-      canvas.height = window.innerHeight
+      setCanvasHeight(breakPoint)
+      waves.map((wave) =>
+        wave.wave.map(
+          (point, index) => (point.y = (canvas.height * index) / (pointCountEachWave - 1)),
+        ),
+      )
     }
     window.addEventListener('resize', handleResize)
 
@@ -163,5 +176,19 @@ export default function WaveCanvas({ colors, pointCountEachWave, speed, width }:
 
   return (
     <canvas className="relative" ref={canvasRef} width={width} height={canvasRef.current?.height} />
+  )
+}
+
+export const WaveWithInitAnim = (wave: WaveCanvasProps) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scaleX: 0, originX: 0 }}
+      animate={{ opacity: 1, scaleX: 1 }}
+      transition={{ ease: 'easeOut', duration: 0.2 }}
+      className={cls('absolute top-0')}
+      style={{ right: -wave.width }}
+    >
+      <WaveCanvas {...wave} />
+    </motion.div>
   )
 }
