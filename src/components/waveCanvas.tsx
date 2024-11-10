@@ -2,7 +2,7 @@
 
 import { cls } from '#/libs/client/utils'
 import { motion } from 'framer-motion'
-import { useEffect, useRef } from 'react'
+import { MouseEvent, SyntheticEvent, useEffect, useRef } from 'react'
 
 interface Point {
   x: number
@@ -11,6 +11,7 @@ interface Point {
   radius: number
   phaseX: number
   phaseXShift: number
+  mouseDistance: number
 }
 
 interface WaveCanvasProps {
@@ -30,15 +31,15 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
   const createPoint = (x: number, y: number, phaseXShift: number): Point => {
     const min = Math.round(width / 8)
     const initialX = Math.random() * (x - min) + min
-    return { x, y, initialX, radius: 20, phaseX: 0, phaseXShift }
+    return { x, y, initialX, radius: 20, phaseX: 0, phaseXShift, mouseDistance: 0 }
   }
 
   const updateWaves = (wave: Point[]) => {
     wave.forEach((point, index, originalArray) => {
       if (index > 0 && index < originalArray.length - 1) {
-        const { initialX, phaseXShift } = point
-        const offset = initialX
-        const amplitudeScale = initialX * Math.sin(point.phaseX + phaseXShift)
+        const { initialX, phaseXShift, mouseDistance } = point
+        const offset = initialX + mouseDistance
+        const amplitudeScale = (initialX + mouseDistance) * Math.sin(point.phaseX + phaseXShift)
         point.phaseX += speed
         point.x = offset + amplitudeScale
       }
@@ -167,9 +168,25 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
         ),
       )
     }
+
+    const onMouseMove = (e: MouseEvent) => {
+      /*       const { clientY } = e
+      const value = clientY / (window.innerHeight / 59)
+      const currentYIndex = Math.floor(value)
+      console.log(Math.floor(clientY / (window.innerHeight / 59)))
+      waves[2].wave[currentYIndex + 1].mouseDistance = (value - currentYIndex) * 10
+      waves[2].wave[currentYIndex + 0].mouseDistance = 10 - (value - currentYIndex) * 10 */
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      onMouseMove(e as unknown as MouseEvent)
+    })
     window.addEventListener('resize', handleResize)
 
     return () => {
+      canvas.removeEventListener('mousemove', (e) => {
+        onMouseMove(e as unknown as MouseEvent)
+      })
       window.removeEventListener('resize', handleResize)
     }
   }, [])
