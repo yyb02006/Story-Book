@@ -2,7 +2,7 @@
 
 import { cls } from '#/libs/client/utils'
 import { motion } from 'framer-motion'
-import { MouseEvent, SyntheticEvent, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface Point {
   x: number
@@ -169,24 +169,9 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
       )
     }
 
-    const onMouseMove = (e: MouseEvent) => {
-      /*       const { clientY } = e
-      const value = clientY / (window.innerHeight / 59)
-      const currentYIndex = Math.floor(value)
-      console.log(Math.floor(clientY / (window.innerHeight / 59)))
-      waves[2].wave[currentYIndex + 1].mouseDistance = (value - currentYIndex) * 10
-      waves[2].wave[currentYIndex + 0].mouseDistance = 10 - (value - currentYIndex) * 10 */
-    }
-
-    canvas.addEventListener('mousemove', (e) => {
-      onMouseMove(e as unknown as MouseEvent)
-    })
     window.addEventListener('resize', handleResize)
 
     return () => {
-      canvas.removeEventListener('mousemove', (e) => {
-        onMouseMove(e as unknown as MouseEvent)
-      })
       window.removeEventListener('resize', handleResize)
     }
   }, [])
