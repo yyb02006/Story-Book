@@ -13,7 +13,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: { 'patrick-hand': ['var(--font-patrick-hand)'] },
+      fontFamily: {
+        'patrick-hand': ['var(--font-patrick-hand)'],
+        pretendard: ['Pretendard-Regular', 'sans-serif'],
+        'S-CoreDream-200': ['S-CoreDream-200', 'sans-serif'],
+        'S-CoreDream-400': ['S-CoreDream-400', 'sans-serif'],
+        'S-CoreDream-500': ['S-CoreDream-500', 'sans-serif'],
+        'S-CoreDream-700': ['S-CoreDream-700', 'sans-serif'],
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
