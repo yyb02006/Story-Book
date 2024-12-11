@@ -2,7 +2,7 @@ import plugin from 'tailwindcss/plugin'
 import type { Config } from 'tailwindcss'
 
 const designTokens = {
-  gnb: { Width: '100px' },
+  gnb: { Width: '80px' },
 }
 
 const config: Config = {
@@ -30,6 +30,10 @@ const config: Config = {
       },
       padding: {
         'gnb-left': designTokens.gnb.Width,
+      },
+      colors: {
+        'smooth-white': '#eaeaea',
+        'smooth-black': '#101010',
       },
     },
   },
