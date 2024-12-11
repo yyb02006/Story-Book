@@ -6,8 +6,8 @@ type StrokeColor = `#${string}`
 type StrokeWidth = number
 
 const getStyleObject = (
-  strokeColor: StrokeColor,
-  strokeWidth: StrokeWidth,
+  strokeColor?: StrokeColor,
+  strokeWidth?: StrokeWidth,
 ): CSSProperties | undefined => ({
   fill: 'none',
   stroke: strokeColor,
@@ -53,7 +53,7 @@ interface IconProps {
   strokeWidth?: StrokeWidth
 }
 
-export const Search = ({ width, height, strokeColor = '#eaeaea', strokeWidth = 2 }: IconProps) => {
+export const Search = ({ width, height, strokeColor, strokeWidth }: IconProps) => {
   const styleObject = getStyleObject(strokeColor, strokeWidth)
   return createIconSVG({
     drawing: (
@@ -70,12 +70,7 @@ export const Search = ({ width, height, strokeColor = '#eaeaea', strokeWidth = 2
   })
 }
 
-export const BookMark = ({
-  width,
-  height,
-  strokeColor = '#eaeaea',
-  strokeWidth = 2,
-}: IconProps) => {
+export const BookMark = ({ width, height, strokeColor, strokeWidth }: IconProps) => {
   const styleObject = getStyleObject(strokeColor, strokeWidth)
   return createIconSVG({
     drawing: (
@@ -92,12 +87,7 @@ export const BookMark = ({
   })
 }
 
-export const CreateMemo = ({
-  width,
-  height,
-  strokeColor = '#eaeaea',
-  strokeWidth = 2,
-}: IconProps) => {
+export const CreateMemo = ({ width, height, strokeColor, strokeWidth }: IconProps) => {
   const styleObject = getStyleObject(strokeColor, strokeWidth)
   return createIconSVG({
     drawing: (
@@ -122,12 +112,7 @@ export const CreateMemo = ({
   })
 }
 
-export const Calendar = ({
-  width,
-  height,
-  strokeColor = '#eaeaea',
-  strokeWidth = 2,
-}: IconProps) => {
+export const Calendar = ({ width, height, strokeColor, strokeWidth }: IconProps) => {
   const styleObject = getStyleObject(strokeColor, strokeWidth)
   return createIconSVG({
     drawing: (
@@ -148,7 +133,7 @@ export const Calendar = ({
   })
 }
 
-export const Chat = ({ width, height, strokeColor = '#eaeaea', strokeWidth = 2 }: IconProps) => {
+export const Chat = ({ width, height, strokeColor, strokeWidth }: IconProps) => {
   const styleObject = getStyleObject(strokeColor, strokeWidth)
   return createIconSVG({
     drawing: (
