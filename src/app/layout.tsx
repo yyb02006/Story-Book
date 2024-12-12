@@ -25,9 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cls(inter.className, patrick_hand.variable)}>
         <GlobalNav />
-        <div className="bg-gradient-to-br from-[#000428] to-[#004e92] pl-gnb-left universe-box-shadow">
-          {children}
-        </div>
+        <div className="bg-smooth-black pl-gnb-left universe-box-shadow">{children}</div>
       </body>
     </html>
   )
