@@ -53,7 +53,7 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
     canvasHeight: number,
     wave: Point[],
     color: string,
-    // waveCount: number,
+    idx: number,
   ) => {
     const [firstPoint, lastPoint] = [wave[0], wave[wave.length - 1]]
 
@@ -116,9 +116,22 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
       if (pointIdx === originalArray.length - 1) ctx.lineTo(lastPoint.x, lastPoint.y)
     })
 
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    const gradient = ctx.createLinearGradient(0, 0, 20, 0)
+    gradient.addColorStop(0, 'rgba(32,32,32,1)')
+    gradient.addColorStop(0.5, 'rgba(32,32,32,0.4)')
+    gradient.addColorStop(1, 'rgba(32,32,32,0.2)')
+
     ctx.lineTo(0, canvasHeight)
     ctx.lineTo(0, 0)
-    ctx.fillStyle = color
+    if (idx === 2) {
+      ctx.fillStyle = gradient
+    } else {
+      ctx.fillStyle = 'rgba(32,32,32,0.8)'
+    }
     ctx.fill()
     ctx.closePath()
   }
@@ -152,8 +165,8 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
 
     const animate = () => {
       clearCanvas(ctx)
-      waves.forEach(({ color, wave }) => {
-        drawWave(ctx, canvas.height, wave, color)
+      waves.forEach(({ color, wave }, idx) => {
+        drawWave(ctx, canvas.height, wave, color, idx)
         updateWaves(wave)
       })
       requestAnimationFrame(animate)
