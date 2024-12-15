@@ -3,30 +3,67 @@
 import { WaveWithInitAnim } from '#/components/waveCanvas'
 import { cls } from '#/libs/client/utils'
 import { motion } from 'framer-motion'
+import { BookMark, Calendar, Chat, CreateMemo, Search } from '../../../public/icons/ui'
+import { cloneElement } from 'react'
+import Link from 'next/link'
+
+const MenuLink = ({
+  children,
+  title,
+  href,
+}: {
+  children: JSX.Element
+  title: string
+  href: string
+}) => {
+  return (
+    <Link href={href}>
+      <li className="group flex aspect-square w-full flex-col items-center justify-center space-y-1 stroke-smooth-white stroke-2">
+        <div className="rounded-md p-2 group-hover:bg-[#474e79]">{cloneElement(children)}</div>
+        <div className="text-xs">{title}</div>
+      </li>
+    </Link>
+  )
+}
 
 export default function GlobalNav() {
   const wave = {
-    colors: ['rgba(29, 42, 120, 0.8)', 'rgba(44, 62, 80, 0.3)', 'rgba(236, 240, 241, 0.3)'],
+    colors: ['rgba(81, 106, 252, 0.8)', 'rgba(118, 170, 223, 0.3)', 'rgba(236, 240, 241, 0.3)'],
     width: 20,
     pointCountEachWave: 60,
     speed: 0.05,
   }
+  const linkList = [
+    { icon: <Search width={24} height={24} />, title: '검색', href: '/search' },
+    { icon: <CreateMemo width={24} height={24} />, title: '새 메모', href: '/' },
+    { icon: <BookMark width={24} height={24} />, title: '관심 메모', href: '/search' },
+    { icon: <Calendar width={24} height={24} />, title: '캘린더', href: '/search' },
+    { icon: <Chat width={24} height={24} />, title: '대화하기', href: '/search' },
+  ]
   return (
     <motion.nav
       initial={{ x: -10, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ ease: 'easeOut', duration: 0.2 }}
-      className="fixed h-screen w-gnb"
+      className="fixed h-screen w-gnb bg-[#202020]"
     >
-      {wave.colors.map((color) => (
+      {/*       {wave.colors.map((color) => (
         <div key={color} className={cls('absolute size-full')} style={{ backgroundColor: color }} />
-      ))}
-      <h1 className="relative text-center font-patrick-hand text-2xl">MEMOISM</h1>
-      <ul className="relative flex h-full flex-col p-4 text-sm">
-        <li>myname</li>
-        <li>favorite</li>
-        <li>post</li>
-        <li>management</li>
+      ))} */}
+      <h1 className="relative text-center font-patrick-hand text-[1.25rem]">MEMOISM</h1>
+      <div className="relative mt-2 w-full p-4">
+        <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-fuchsia-300 font-[#eaeaea]">
+          most
+        </div>
+        <div className="m-auto mt-2 size-0 border-x-[6px] border-t-[6px] border-x-transparent border-t-smooth-white"></div>
+        <div className="m-auto mt-2 w-3/4 rounded-full border-b border-[#999999]"></div>
+      </div>
+      <ul className="relative flex h-auto flex-col items-center space-y-6 font-S-CoreDream-400 text-sm">
+        {linkList.map(({ icon, title, href }) => (
+          <MenuLink key={title} title={title} href={href}>
+            {icon}
+          </MenuLink>
+        ))}
       </ul>
       <WaveWithInitAnim {...wave} />
     </motion.nav>
