@@ -127,10 +127,10 @@ export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCan
 
     ctx.lineTo(0, canvasHeight)
     ctx.lineTo(0, 0)
-    if (idx === 2) {
-      ctx.fillStyle = gradient
-    } else {
+    if (idx === 0) {
       ctx.fillStyle = 'rgba(32,32,32,0.8)'
+    } else {
+      ctx.fillStyle = gradient
     }
     ctx.fill()
     ctx.closePath()
