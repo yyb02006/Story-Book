@@ -42,7 +42,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'focus:border-palettered w-full border border-[#606060] bg-[#101010] font-light placeholder:text-[#bababa] focus:ring-0',
+            'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
           {...rest}
@@ -57,7 +57,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'focus:border-palettered w-full border border-[#606060] bg-[#101010] font-light placeholder:text-[#bababa] focus:ring-0',
+            'w-full border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
           {...rest}
@@ -72,7 +72,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'focus:border-palettered w-full border border-[#606060] bg-[#101010] font-light placeholder:text-[#bababa] focus:ring-0',
+            'w-full border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
           {...rest}
@@ -112,7 +112,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'focus:border-palettered block w-full resize-none border border-[#606060] bg-[#101010] font-light placeholder:text-[#bababa] focus:ring-0',
+            'block w-full resize-none border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
           )}
           {...rest}
         />
