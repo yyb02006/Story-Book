@@ -45,6 +45,7 @@ export default function Input({
             'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
+          // size={20} default
           {...rest}
         />
       ) : null}
@@ -57,7 +58,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'w-full border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
+            'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
           {...rest}
@@ -72,7 +73,7 @@ export default function Input({
           spellCheck="false"
           className={cls(
             css ? css : '',
-            'w-full border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
+            'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
           {...rest}
