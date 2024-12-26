@@ -5,12 +5,18 @@ interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
   setSearchWord: (value: SetStateAction<string>) => void
   searchWord: string
+  w?: number
 }
 
-export default function SearchForm({ onSearch, setSearchWord, searchWord }: SearchFormProps) {
+export default function SearchForm({
+  onSearch,
+  setSearchWord,
+  searchWord,
+  w = 500,
+}: SearchFormProps) {
   return (
-    <form onSubmit={onSearch} className="flex h-8 space-x-2">
-      <div className="flex rounded-full bg-red-500">
+    <form onSubmit={onSearch} className="flex h-10 space-x-2">
+      <div className="flex rounded-full bg-red-500" style={{ width: w }}>
         <div className="aspect-square rounded-s-full bg-amber-500"></div>
         <Input
           name="search"
