@@ -1,7 +1,7 @@
 import { cls } from '#/libs/client/utils'
 
 interface InputProps {
-  type: 'text' | 'number' | 'email' | 'textarea' | 'radio'
+  type: 'text' | 'number' | 'email' | 'textarea' | 'radio' | 'search'
   name: string
   placeholder?: string
   onChange?:
@@ -33,6 +33,22 @@ export default function Input({
 }: InputProps) {
   return (
     <>
+      {type === 'search' ? (
+        <input
+          onChange={onChange}
+          name={name}
+          placeholder={placeholder}
+          type="search"
+          spellCheck="false"
+          className={cls(
+            css ? css : '',
+            'w-full border border-[#606060] bg-[#101010] font-bold text-smooth-white placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
+          )}
+          value={value ? value : ''}
+          // size={20} default
+          {...rest}
+        />
+      ) : null}
       {type === 'text' ? (
         <input
           onChange={onChange}
