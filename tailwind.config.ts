@@ -2,7 +2,7 @@ import plugin from 'tailwindcss/plugin'
 import type { Config } from 'tailwindcss'
 
 const designTokens = {
-  gnb: { Width: '80px' },
+  gnb: { Width: 80, waveWidth: 20 },
 }
 
 const config: Config = {
@@ -26,10 +26,10 @@ const config: Config = {
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       width: {
-        gnb: designTokens.gnb.Width,
+        gnb: `${designTokens.gnb.Width}px`,
       },
       padding: {
-        'gnb-left': designTokens.gnb.Width,
+        'gnb-left': `${designTokens.gnb.Width + designTokens.gnb.waveWidth}px`,
       },
       colors: {
         'smooth-white': '#eaeaea',
