@@ -15,10 +15,10 @@ interface Point {
 }
 
 interface WaveCanvasProps {
-  width: number
-  colors: string[]
-  pointCountEachWave: number
-  speed: number
+  readonly width: number
+  readonly colors: readonly string[]
+  readonly pointCountEachWave: number
+  readonly speed: number
 }
 
 export function WaveCanvas({ colors, pointCountEachWave, speed, width }: WaveCanvasProps) {
