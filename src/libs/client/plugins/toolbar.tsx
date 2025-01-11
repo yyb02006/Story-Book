@@ -1,3 +1,7 @@
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { HeadingTagType, $createHeadingNode } from '@lexical/rich-text'
+import { $setBlocksType } from '@lexical/selection'
+import { $getSelection, $isRangeSelection } from 'lexical'
 import { useState } from 'react'
 
 const SupportedBlockType = {
@@ -14,6 +18,19 @@ type BlockType = keyof typeof SupportedBlockType
 
 export const Toolbar = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
+  const [editor] = useLexicalComposerContext()
+
+  const formatHeading = (type: HeadingTagType) => {
+    if (blockType !== type) {
+      editor.update(() => {
+        const selection = $getSelection()
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createHeadingNode(type))
+        }
+      })
+    }
+  }
+
   return (
     <div>
       <button
@@ -22,8 +39,35 @@ export const Toolbar = () => {
         title={SupportedBlockType['h1']}
         aria-label={SupportedBlockType['h1']}
         aria-checked={blockType === 'h1'}
+        onClick={() => {
+          formatHeading('h1')
+        }}
       >
         H1
+      </button>
+      <button
+        type="button"
+        role="checkbox"
+        title={SupportedBlockType['h2']}
+        aria-label={SupportedBlockType['h2']}
+        aria-checked={blockType === 'h2'}
+        onClick={() => {
+          formatHeading('h2')
+        }}
+      >
+        H2
+      </button>
+      <button
+        type="button"
+        role="checkbox"
+        title={SupportedBlockType['h3']}
+        aria-label={SupportedBlockType['h3']}
+        aria-checked={blockType === 'h3'}
+        onClick={() => {
+          formatHeading('h3')
+        }}
+      >
+        H3
       </button>
     </div>
   )
