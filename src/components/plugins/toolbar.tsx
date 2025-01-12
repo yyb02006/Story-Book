@@ -20,7 +20,7 @@ export const Toolbar = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
 
-  const formatHeading = (type: HeadingTagType) => {
+  const createHeading = (type: HeadingTagType) => {
     if (blockType !== type) {
       editor.update(() => {
         const selection = $getSelection()
@@ -40,7 +40,7 @@ export const Toolbar = () => {
         aria-label={SupportedBlockType['h1']}
         aria-checked={blockType === 'h1'}
         onClick={() => {
-          formatHeading('h1')
+          createHeading('h1')
         }}
       >
         H1
@@ -52,7 +52,7 @@ export const Toolbar = () => {
         aria-label={SupportedBlockType['h2']}
         aria-checked={blockType === 'h2'}
         onClick={() => {
-          formatHeading('h2')
+          createHeading('h2')
         }}
       >
         H2
@@ -64,7 +64,7 @@ export const Toolbar = () => {
         aria-label={SupportedBlockType['h3']}
         aria-checked={blockType === 'h3'}
         onClick={() => {
-          formatHeading('h3')
+          createHeading('h3')
         }}
       >
         H3

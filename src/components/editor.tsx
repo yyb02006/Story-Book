@@ -6,6 +6,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ComponentProps } from 'react'
 import { nodes } from '#/libs/client/nodes'
+import { Toolbar } from '#/components/plugins/toolbar'
 
 const theme = {
   // Theme styling goes here
@@ -29,6 +30,7 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <Toolbar />
       <div className="relative">
         <RichTextPlugin
           contentEditable={<ContentEditable />}
