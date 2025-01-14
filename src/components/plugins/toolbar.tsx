@@ -69,6 +69,18 @@ export const Toolbar = () => {
       >
         H3
       </button>
+      <button
+        type="button"
+        role="checkbox"
+        title={SupportedBlockType['h4']}
+        aria-label={SupportedBlockType['h4']}
+        aria-checked={blockType === 'h4'}
+        onClick={() => {
+          createHeading('h4')
+        }}
+      >
+        H4
+      </button>
     </div>
   )
 }
