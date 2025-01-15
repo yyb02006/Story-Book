@@ -31,9 +31,9 @@ export function Editor() {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <Toolbar />
-      <div className="relative">
+      <div className="relative h-40 bg-[#202020]">
         <RichTextPlugin
-          contentEditable={<ContentEditable />}
+          contentEditable={<ContentEditable className="h-full" />}
           placeholder={<div className="absolute left-0 top-0">Enter some text...</div>}
           ErrorBoundary={LexicalErrorBoundary}
         />

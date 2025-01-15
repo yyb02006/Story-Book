@@ -1,6 +1,6 @@
 'use client'
 
-import { Editor } from '#/libs/client/Editor'
+import { Editor } from '#/components/editor'
 
 export default function Write() {
   return (
