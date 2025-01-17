@@ -1,8 +1,8 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { HeadingTagType, $createHeadingNode } from '@lexical/rich-text'
+import { HeadingTagType, $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { $getSelection, $isRangeSelection } from 'lexical'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const SupportedBlockType = {
   paragraph: 'Paragraph',
@@ -30,6 +30,22 @@ export const Toolbar = () => {
       })
     }
   }
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const selection = $getSelection()
+        console.log($isRangeSelection(selection))
+        if (!$isRangeSelection(selection)) return
+        const anchorNode = selection.anchor.getNode()
+        const targetNode =
+          anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
+        if (!$isHeadingNode(targetNode)) return
+        const tag = targetNode.getTag()
+        setBlockType(tag)
+      })
+    })
+  }, [editor])
 
   return (
     <div>
