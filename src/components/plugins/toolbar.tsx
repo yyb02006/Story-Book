@@ -40,9 +40,19 @@ export const Toolbar = () => {
         const anchorNode = selection.anchor.getNode()
         const targetNode =
           anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
-        if (!$isHeadingNode(targetNode)) return
-        const tag = targetNode.getTag()
-        setBlockType(tag)
+        if ($isHeadingNode(targetNode)) {
+          const tag = targetNode.getTag()
+          console.log('tag', tag)
+          setBlockType(tag)
+        } else {
+          const nodeType = targetNode.getType()
+          console.log('nodeType', nodeType)
+          if (nodeType in SupportedBlockType) {
+            setBlockType(nodeType as BlockType)
+          } else {
+            setBlockType('paragraph')
+          }
+        }
       })
     })
   }, [editor])
