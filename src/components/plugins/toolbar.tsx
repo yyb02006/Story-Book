@@ -1,3 +1,4 @@
+import { cfl } from '#/libs/client/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { HeadingTagType, $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
@@ -16,6 +17,30 @@ const SupportedBlockType = {
 
 type BlockType = keyof typeof SupportedBlockType
 
+const availableHeadings = ['h1', 'h2', 'h3', 'h4'] as const
+
+interface HeadingButtonProps {
+  blockType: BlockType
+  headingLevel: BlockType
+  callback: () => void
+}
+
+const HeadingButton = ({ blockType, headingLevel, callback }: HeadingButtonProps) => {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      title={SupportedBlockType[headingLevel]}
+      aria-label={SupportedBlockType[headingLevel]}
+      aria-checked={blockType === headingLevel}
+      onClick={callback}
+      className={blockType === headingLevel ? 'text-rose-400' : ''}
+    >
+      {cfl(headingLevel)}
+    </button>
+  )
+}
+
 export const Toolbar = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
@@ -24,6 +49,7 @@ export const Toolbar = () => {
     if (blockType !== type) {
       editor.update(() => {
         const selection = $getSelection()
+        console.log(selection)
         if ($isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createHeadingNode(type))
         }
@@ -59,54 +85,18 @@ export const Toolbar = () => {
 
   return (
     <div>
-      <button
-        type="button"
-        role="checkbox"
-        title={SupportedBlockType['h1']}
-        aria-label={SupportedBlockType['h1']}
-        aria-checked={blockType === 'h1'}
-        onClick={() => {
-          createHeading('h1')
-        }}
-      >
-        H1
-      </button>
-      <button
-        type="button"
-        role="checkbox"
-        title={SupportedBlockType['h2']}
-        aria-label={SupportedBlockType['h2']}
-        aria-checked={blockType === 'h2'}
-        onClick={() => {
-          createHeading('h2')
-        }}
-      >
-        H2
-      </button>
-      <button
-        type="button"
-        role="checkbox"
-        title={SupportedBlockType['h3']}
-        aria-label={SupportedBlockType['h3']}
-        aria-checked={blockType === 'h3'}
-        onClick={() => {
-          createHeading('h3')
-        }}
-      >
-        H3
-      </button>
-      <button
-        type="button"
-        role="checkbox"
-        title={SupportedBlockType['h4']}
-        aria-label={SupportedBlockType['h4']}
-        aria-checked={blockType === 'h4'}
-        onClick={() => {
-          createHeading('h4')
-        }}
-      >
-        H4
-      </button>
+      {availableHeadings.map((heading) => {
+        return (
+          <HeadingButton
+            blockType={blockType}
+            headingLevel={heading}
+            callback={() => {
+              createHeading(heading)
+            }}
+            key={heading}
+          ></HeadingButton>
+        )
+      })}
     </div>
   )
 }
