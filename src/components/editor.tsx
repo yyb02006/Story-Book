@@ -34,7 +34,9 @@ export function Editor() {
       <div className="relative h-40 bg-[#202020]">
         <RichTextPlugin
           contentEditable={<ContentEditable className="h-full" />}
-          placeholder={<div className="absolute left-0 top-0">Enter some text...</div>}
+          placeholder={
+            <div className="pointer-events-none absolute left-0 top-0">Enter some text...</div>
+          }
           ErrorBoundary={LexicalErrorBoundary}
         />
       </div>
