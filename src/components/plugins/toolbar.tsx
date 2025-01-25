@@ -1,6 +1,12 @@
 import { cfl } from '#/libs/client/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { HeadingTagType, $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
+import {
+  HeadingTagType,
+  QuoteNode,
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+} from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
@@ -13,6 +19,7 @@ const SupportedBlockType = {
   h4: 'Heading 4',
   h5: 'Heading 5',
   h6: 'Heading 6',
+  quote: 'Quote',
 } as const
 
 type BlockType = keyof typeof SupportedBlockType
@@ -49,9 +56,19 @@ export const Toolbar = () => {
     if (blockType !== type) {
       editor.update(() => {
         const selection = $getSelection()
-        console.log(selection)
         if ($isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createHeadingNode(type))
+        }
+      })
+    }
+  }
+
+  const createQuote = () => {
+    if (blockType !== 'quote') {
+      editor.update(() => {
+        const selection = $getSelection()
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createQuoteNode())
         }
       })
     }
@@ -61,18 +78,15 @@ export const Toolbar = () => {
     return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection()
-        console.log($isRangeSelection(selection))
         if (!$isRangeSelection(selection)) return
         const anchorNode = selection.anchor.getNode()
         const targetNode =
           anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
         if ($isHeadingNode(targetNode)) {
           const tag = targetNode.getTag()
-          console.log('tag', tag)
           setBlockType(tag)
         } else {
           const nodeType = targetNode.getType()
-          console.log('nodeType', nodeType)
           if (nodeType in SupportedBlockType) {
             setBlockType(nodeType as BlockType)
           } else {
@@ -94,9 +108,17 @@ export const Toolbar = () => {
               createHeading(heading)
             }}
             key={heading}
-          ></HeadingButton>
+          />
         )
       })}
+      <button
+        type="button"
+        role="checkbox"
+        title={SupportedBlockType['quote']}
+        aria-label={SupportedBlockType['quote']}
+        aria-checked={blockType === 'quote'}
+        onClick={createQuote}
+      ></button>
     </div>
   )
 }
