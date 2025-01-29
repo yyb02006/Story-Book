@@ -7,11 +7,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ComponentProps } from 'react'
 import { nodes } from '#/libs/client/nodes'
 import { Toolbar } from '#/components/plugins/toolbar'
-
-const theme = {
-  // Theme styling goes here
-  //...
-}
+import { theme } from '#/components/editorTheme'
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -21,11 +17,13 @@ function onError(error: unknown) {
 }
 
 export function Editor() {
+  console.log(theme)
+
   const initialConfig: ComponentProps<typeof LexicalComposer>['initialConfig'] = {
     namespace: 'MyEditor',
     theme,
     onError,
-    nodes: nodes,
+    nodes,
   }
 
   return (
