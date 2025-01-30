@@ -2,7 +2,6 @@ import { cfl } from '#/libs/client/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   HeadingTagType,
-  QuoteNode,
   $createHeadingNode,
   $createQuoteNode,
   $isHeadingNode,
@@ -24,26 +23,29 @@ const SupportedBlockType = {
 
 type BlockType = keyof typeof SupportedBlockType
 
-const availableHeadings = ['h1', 'h2', 'h3', 'h4'] as const
-
-interface HeadingButtonProps {
-  blockType: BlockType
-  headingLevel: BlockType
+interface ToolButtonProps {
+  currentBlockType: BlockType
+  nodeName: BlockType
   callback: () => void
 }
 
-const HeadingButton = ({ blockType, headingLevel, callback }: HeadingButtonProps) => {
+const availableNodes = {
+  heading: ['h1', 'h2', 'h3', 'h4'] as const,
+  quote: 'quote',
+} as const
+
+const ToolButton = ({ currentBlockType, nodeName, callback }: ToolButtonProps) => {
   return (
     <button
       type="button"
       role="checkbox"
-      title={SupportedBlockType[headingLevel]}
-      aria-label={SupportedBlockType[headingLevel]}
-      aria-checked={blockType === headingLevel}
+      title={SupportedBlockType[nodeName]}
+      aria-label={SupportedBlockType[nodeName]}
+      aria-checked={currentBlockType === nodeName}
       onClick={callback}
-      className={blockType === headingLevel ? 'text-rose-400' : ''}
+      className={currentBlockType === nodeName ? 'text-rose-400' : ''}
     >
-      {cfl(headingLevel)}
+      {cfl(nodeName)}
     </button>
   )
 }
@@ -99,11 +101,11 @@ export const Toolbar = () => {
 
   return (
     <div>
-      {availableHeadings.map((heading) => {
+      {availableNodes.heading.map((heading) => {
         return (
-          <HeadingButton
-            blockType={blockType}
-            headingLevel={heading}
+          <ToolButton
+            currentBlockType={blockType}
+            nodeName={heading}
             callback={() => {
               createHeading(heading)
             }}
@@ -111,14 +113,13 @@ export const Toolbar = () => {
           />
         )
       })}
-      <button
-        type="button"
-        role="checkbox"
-        title={SupportedBlockType['quote']}
-        aria-label={SupportedBlockType['quote']}
-        aria-checked={blockType === 'quote'}
-        onClick={createQuote}
-      ></button>
+      <ToolButton
+        currentBlockType={blockType}
+        nodeName={availableNodes.quote}
+        callback={() => {
+          createQuote()
+        }}
+      />
     </div>
   )
 }
