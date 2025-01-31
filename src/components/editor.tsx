@@ -6,7 +6,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ComponentProps } from 'react'
 import { nodes } from '#/libs/client/nodes'
-import { Toolbar } from '#/components/plugins/toolbar'
+import { Toolbar } from '#/components/plugins/toolbarPlugin'
 import { theme } from '#/components/editorTheme'
 
 // Catch any errors that occur during Lexical updates and log them

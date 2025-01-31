@@ -1,3 +1,4 @@
+import { ToolButton } from '#/components/plugins/toolbuttons'
 import { cfl } from '#/libs/client/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
@@ -10,7 +11,7 @@ import { $setBlocksType } from '@lexical/selection'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
 
-const SupportedBlockType = {
+export const SupportedBlockType = {
   paragraph: 'Paragraph',
   h1: 'Heading 1',
   h2: 'Heading 2',
@@ -21,34 +22,12 @@ const SupportedBlockType = {
   quote: 'Quote',
 } as const
 
-type BlockType = keyof typeof SupportedBlockType
-
-interface ToolButtonProps {
-  currentBlockType: BlockType
-  nodeName: BlockType
-  callback: () => void
-}
+export type BlockType = keyof typeof SupportedBlockType
 
 const availableNodes = {
   heading: ['h1', 'h2', 'h3', 'h4'] as const,
   quote: 'quote',
 } as const
-
-const ToolButton = ({ currentBlockType, nodeName, callback }: ToolButtonProps) => {
-  return (
-    <button
-      type="button"
-      role="checkbox"
-      title={SupportedBlockType[nodeName]}
-      aria-label={SupportedBlockType[nodeName]}
-      aria-checked={currentBlockType === nodeName}
-      onClick={callback}
-      className={currentBlockType === nodeName ? 'text-rose-400' : ''}
-    >
-      {cfl(nodeName)}
-    </button>
-  )
-}
 
 export const Toolbar = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
