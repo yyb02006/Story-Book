@@ -8,6 +8,7 @@ import { ComponentProps } from 'react'
 import { nodes } from '#/libs/client/nodes'
 import { Toolbar } from '#/components/plugins/toolbarPlugin'
 import { theme } from '#/components/editorTheme'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -40,6 +41,7 @@ export function Editor() {
       </div>
       <HistoryPlugin />
       <AutoFocusPlugin />
+      <ListPlugin />
     </LexicalComposer>
   )
 }
