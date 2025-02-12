@@ -1,5 +1,4 @@
 import { ToolButton } from '#/components/plugins/toolbuttons'
-import { cfl } from '#/libs/client/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   HeadingTagType,
@@ -7,9 +6,17 @@ import {
   $createQuoteNode,
   $isHeadingNode,
 } from '@lexical/rich-text'
+import {
+  $isListNode,
+  ListNode,
+  INSERT_CHECK_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+} from '@lexical/list'
 import { $setBlocksType } from '@lexical/selection'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
+import { $getNearestNodeOfType } from '@lexical/utils'
 
 export const SupportedBlockType = {
   paragraph: 'Paragraph',
@@ -20,6 +27,9 @@ export const SupportedBlockType = {
   h5: 'Heading 5',
   h6: 'Heading 6',
   quote: 'Quote',
+  number: 'Numbered List',
+  bullet: 'Bulleted List',
+  check: 'Check List',
 } as const
 
 export type BlockType = keyof typeof SupportedBlockType
@@ -29,7 +39,7 @@ const availableNodes = {
   quote: 'quote',
 } as const
 
-export const Toolbar = () => {
+export const ToolbarPlugin = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
 
@@ -55,6 +65,24 @@ export const Toolbar = () => {
     }
   }
 
+  const formatBulletList = () => {
+    if (blockType !== 'bullet') {
+      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
+    }
+  }
+
+  const formatNumberedList = () => {
+    if (blockType !== 'number') {
+      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+    }
+  }
+
+  const formatCheckList = () => {
+    if (blockType !== 'check') {
+      editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+    }
+  }
+
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
@@ -66,6 +94,9 @@ export const Toolbar = () => {
         if ($isHeadingNode(targetNode)) {
           const tag = targetNode.getTag()
           setBlockType(tag)
+        } else if ($isListNode(targetNode)) {
+          const nearestNode = $getNearestNodeOfType(anchorNode, ListNode)
+          console.log(nearestNode)
         } else {
           const nodeType = targetNode.getType()
           if (nodeType in SupportedBlockType) {
