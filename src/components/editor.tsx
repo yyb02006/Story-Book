@@ -6,7 +6,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { ComponentProps } from 'react'
 import { nodes } from '#/libs/client/nodes'
-import { Toolbar } from '#/components/plugins/toolbarPlugin'
+import { ToolbarPlugin } from '#/components/plugins/toolbarPlugin'
 import { theme } from '#/components/editorTheme'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
@@ -30,7 +30,7 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <Toolbar />
+      <ToolbarPlugin />
       <div className="relative h-40 bg-[#202020]">
         <RichTextPlugin
           contentEditable={<ContentEditable className="h-full" />}
