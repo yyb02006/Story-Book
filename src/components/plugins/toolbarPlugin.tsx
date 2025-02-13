@@ -34,9 +34,14 @@ export const SupportedBlockType = {
 
 export type BlockType = keyof typeof SupportedBlockType
 
+const headingNodes = ['h1', 'h2', 'h3', 'h4'] as const
+
+const listNodes = ['bullet', 'number', 'check'] as const
+
 const availableNodes = {
-  heading: ['h1', 'h2', 'h3', 'h4'] as const,
+  heading: headingNodes,
   quote: 'quote',
+  list: listNodes,
 } as const
 
 export const ToolbarPlugin = () => {
@@ -65,21 +70,19 @@ export const ToolbarPlugin = () => {
     }
   }
 
-  const formatBulletList = () => {
-    if (blockType !== 'bullet') {
-      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-    }
-  }
-
-  const formatNumberedList = () => {
-    if (blockType !== 'number') {
-      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-    }
-  }
-
-  const formatCheckList = () => {
-    if (blockType !== 'check') {
-      editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+  const createList = (currentListNode: (typeof listNodes)[number]) => {
+    switch (true) {
+      case blockType !== 'bullet' && currentListNode === 'bullet':
+        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
+        break
+      case blockType !== 'number' && currentListNode === 'number':
+        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+        break
+      case blockType !== 'check' && currentListNode === 'check':
+        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+        break
+      default:
+        break
     }
   }
 
@@ -130,6 +133,18 @@ export const ToolbarPlugin = () => {
           createQuote()
         }}
       />
+      {availableNodes.list.map((listType) => {
+        return (
+          <ToolButton
+            currentBlockType={blockType}
+            nodeName={listType}
+            callback={() => {
+              createList(listType)
+            }}
+            key={listType}
+          />
+        )
+      })}
     </div>
   )
 }
