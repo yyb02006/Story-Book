@@ -98,8 +98,9 @@ export const ToolbarPlugin = () => {
           const tag = targetNode.getTag()
           setBlockType(tag)
         } else if ($isListNode(targetNode)) {
-          const nearestNode = $getNearestNodeOfType(anchorNode, ListNode)
-          console.log(nearestNode)
+          const parentListNode = $getNearestNodeOfType(anchorNode, ListNode)
+          const listType = parentListNode ? parentListNode.getListType() : targetNode.getListType()
+          setBlockType(listType)
         } else {
           const nodeType = targetNode.getType()
           if (nodeType in SupportedBlockType) {
