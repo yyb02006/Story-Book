@@ -9,3 +9,17 @@
   border-left-style: solid;
   padding-left: 16px;
 }
+
+.ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+}
+
+.ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.li {
+  margin-bottom: 5px;
+}
