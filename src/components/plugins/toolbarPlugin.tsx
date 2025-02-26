@@ -1,4 +1,4 @@
-import { ToolButton } from '#/components/plugins/toolbuttons'
+import { ToolButton } from '#/components/plugins/toolbarButton'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   HeadingTagType,
