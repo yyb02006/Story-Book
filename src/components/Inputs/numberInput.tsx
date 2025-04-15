@@ -1,4 +1,5 @@
 import BaseInput from '#/components/Inputs/baseInput'
+import { parseInputValue } from '#/libs/client/utils'
 import { ChangeEvent, forwardRef, ForwardRefRenderFunction, InputHTMLAttributes } from 'react'
 
 interface NumberInputProps
@@ -21,13 +22,7 @@ const NumberInputCallback: ForwardRefRenderFunction<HTMLInputElement, NumberInpu
   ref,
 ) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!onChange) return
-    const newValue = parseFloat(event.target.value)
-    if (isNaN(newValue)) {
-      onChange(value, event)
-    } else {
-      onChange(newValue, event)
-    }
+    onChange?.(parseInputValue<number | undefined>(event.target.value, value), event)
   }
   return (
     <BaseInput
