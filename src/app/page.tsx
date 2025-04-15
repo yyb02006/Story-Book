@@ -11,8 +11,6 @@ export default function Home() {
           onSearch={(e: SyntheticEvent<HTMLFormElement>) => {
             e.preventDefault()
           }}
-          setSearchWord={() => {}}
-          searchWord=""
         />
       </div>
       <div className="size-full">notes section</div>

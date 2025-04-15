@@ -1,20 +1,14 @@
-import { SetStateAction, SyntheticEvent } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import { Search } from '../../public/icons/ui'
 import TextInput from '#/components/Inputs/textInput'
 
 interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
-  setSearchWord: (value: SetStateAction<string>) => void
-  searchWord: string
   w?: number
 }
 
-export default function SearchForm({
-  onSearch,
-  setSearchWord,
-  searchWord,
-  w = 500,
-}: SearchFormProps) {
+export default function SearchForm({ onSearch, w = 500 }: SearchFormProps) {
+  const [searchWord, setSearchWord] = useState('')
   return (
     <form onSubmit={onSearch} className="flex h-14 space-x-2">
       <div className="flex rounded-full bg-[#202020] ring-1 ring-[#707070]" style={{ width: w }}>
