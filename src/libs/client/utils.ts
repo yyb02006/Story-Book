@@ -1,5 +1,3 @@
-import { ChangeEvent } from 'react'
-
 /**
  *
  * 주어진 클래스 이름들을 공백으로 연결하여 하나의 문자열로 반환
