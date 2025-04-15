@@ -1,11 +1,11 @@
 import BaseInput from '#/components/Inputs/baseInput'
-import { ChangeEvent, forwardRef, ForwardRefRenderFunction, InputHTMLAttributes } from 'react'
+import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 
-interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'name'> {
+interface InputProps {
   name: string
-  className?: string
   value: string | undefined
+  className?: string
+  placeholder?: string
   onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void
 }
 

@@ -1,12 +1,12 @@
 import BaseInput from '#/components/Inputs/baseInput'
 import { parseInputValue } from '#/libs/client/utils'
-import { ChangeEvent, forwardRef, ForwardRefRenderFunction, InputHTMLAttributes } from 'react'
+import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 
-interface NumberInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'name'> {
+interface NumberInputProps {
   name: string
-  className?: string
   value: number | undefined
+  className?: string
+  placeholder?: string
   onChange?: (value: number | undefined, event: ChangeEvent<HTMLInputElement>) => void
 }
 

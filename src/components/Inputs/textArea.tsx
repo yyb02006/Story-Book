@@ -1,7 +1,7 @@
 import { cls } from '#/libs/client/utils'
-import { ChangeEvent, TextareaHTMLAttributes } from 'react'
+import { ChangeEvent } from 'react'
 
-interface InputProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
+interface InputProps {
   name: string
   placeholder?: string
   onChange?: (value: string, event: ChangeEvent<HTMLTextAreaElement>) => void

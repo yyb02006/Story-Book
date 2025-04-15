@@ -1,8 +1,7 @@
 import { cls } from '#/libs/client/utils'
-import { ChangeEvent, InputHTMLAttributes } from 'react'
+import { ChangeEvent } from 'react'
 
-interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'name'> {
+interface InputProps {
   name: string
   onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void
   value?: string | undefined
