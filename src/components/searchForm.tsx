@@ -1,6 +1,6 @@
-import Input from '#/components/input'
 import { SetStateAction, SyntheticEvent } from 'react'
 import { Search } from '../../public/icons/ui'
+import TextInput from '#/components/Inputs/textInput'
 
 interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
@@ -26,13 +26,12 @@ export default function SearchForm({
             <div className="mt-[2px] border-4 border-transparent border-t-smooth-white"></div>
           </div>
         </button>
-        <Input
+        <TextInput
           name="search"
-          type="search"
           placeholder="search"
           className="rounded-r-full border-none bg-transparent px-2 placeholder:font-bold"
-          onChange={(e: SyntheticEvent<HTMLInputElement>) => {
-            setSearchWord(e.currentTarget.value)
+          onChange={(value) => {
+            setSearchWord(value)
           }}
           value={searchWord}
         />
