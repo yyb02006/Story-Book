@@ -30,7 +30,7 @@ export default function SearchForm({
           name="search"
           type="search"
           placeholder="search"
-          css="border-none placeholder:font-bold bg-transparent px-2 rounded-r-full"
+          className="rounded-r-full border-none bg-transparent px-2 placeholder:font-bold"
           onChange={(e: SyntheticEvent<HTMLInputElement>) => {
             setSearchWord(e.currentTarget.value)
           }}

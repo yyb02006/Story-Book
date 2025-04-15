@@ -10,7 +10,7 @@ interface InputProps {
   value?: string | undefined
   radioId?: string
   rows?: number
-  css?: string
+  className?: string
   labelCss?: string
   labelName?: string
   radioDisabled?: boolean
@@ -25,7 +25,7 @@ export default function Input({
   value,
   radioId,
   rows,
-  css,
+  className,
   labelCss,
   labelName,
   radioDisabled,
@@ -41,7 +41,7 @@ export default function Input({
           type="search"
           spellCheck="false"
           className={cls(
-            css ? css : '',
+            className ? className : '',
             'w-full border border-[#606060] bg-[#101010] font-bold text-smooth-white placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
@@ -57,7 +57,7 @@ export default function Input({
           type="text"
           spellCheck="false"
           className={cls(
-            css ? css : '',
+            className ? className : '',
             'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
@@ -73,7 +73,7 @@ export default function Input({
           type="text"
           spellCheck="false"
           className={cls(
-            css ? css : '',
+            className ? className : '',
             'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
@@ -88,7 +88,7 @@ export default function Input({
           type="text"
           spellCheck="false"
           className={cls(
-            css ? css : '',
+            className ? className : '',
             'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0',
           )}
           value={value ? value : ''}
@@ -104,7 +104,7 @@ export default function Input({
             name={name}
             value={value}
             disabled={radioDisabled}
-            className={cls(css ? css : '', 'peer hidden')}
+            className={cls(className ? className : '', 'peer hidden')}
             {...rest}
           />
           <div
@@ -128,7 +128,7 @@ export default function Input({
           rows={rows}
           spellCheck="false"
           className={cls(
-            css ? css : '',
+            className ? className : '',
             'block w-full resize-none border border-[#606060] bg-[#101010] placeholder:text-[#bababa] focus:ring-0',
           )}
           {...rest}
