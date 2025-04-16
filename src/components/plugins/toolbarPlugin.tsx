@@ -18,9 +18,10 @@ import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
 import { $getNearestNodeOfType } from '@lexical/utils'
 import {
-  availableNodes,
   BlockType,
+  headingNodes,
   listNodes,
+  quoteNode,
   SupportedBlockType,
 } from '#/components/plugins/blockTypes'
 
@@ -95,7 +96,7 @@ export const ToolbarPlugin = () => {
 
   return (
     <div>
-      {availableNodes.heading.map((heading) => {
+      {headingNodes.map((heading) => {
         return (
           <ToolButton
             currentBlockType={blockType}
@@ -109,12 +110,12 @@ export const ToolbarPlugin = () => {
       })}
       <ToolButton
         currentBlockType={blockType}
-        nodeName={availableNodes.quote}
+        nodeName={quoteNode}
         callback={() => {
           createQuote()
         }}
       />
-      {availableNodes.list.map((listType) => {
+      {listNodes.map((listType) => {
         return (
           <ToolButton
             currentBlockType={blockType}

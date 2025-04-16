@@ -14,12 +14,10 @@ export const SupportedBlockType = {
 
 export type BlockType = keyof typeof SupportedBlockType
 
-export const headingNodes = ['h1', 'h2', 'h3', 'h4'] as const
-
-export const listNodes = ['bullet', 'number', 'check'] as const
-
-export const availableNodes = {
-  heading: headingNodes,
-  quote: 'quote',
-  list: listNodes,
+const availableNodes = {
+  headingNodes: ['h1', 'h2', 'h3', 'h4'] as const,
+  quoteNode: 'quote',
+  listNodes: ['bullet', 'number', 'check'] as const,
 } as const
+
+export const { headingNodes, listNodes, quoteNode } = availableNodes
