@@ -12,14 +12,11 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
 function onError(error: unknown) {
   console.error(error)
 }
 
-const TextEditorContainer = ({ children }: { children: JSX.Element }) => {
+const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return <div className="relative h-40 bg-[#202020]">{children}</div>
 }
 
@@ -39,10 +36,10 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <ToolbarPlugin />
       <TextEditorContainer>
+        <ToolbarPlugin />
         <RichTextPlugin
-          contentEditable={<ContentEditable className="h-full" />}
+          contentEditable={<ContentEditable className="h-full bg-red-100" />}
           placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
           ErrorBoundary={LexicalErrorBoundary}
         />
