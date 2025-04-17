@@ -5,10 +5,8 @@ import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
 import { $getNearestNodeOfType } from '@lexical/utils'
 import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
-import HeadingButton from '#/components/plugins/Buttons/headingButton'
-import QuoteButton from '#/components/plugins/Buttons/quoteButton'
-import ListButton from '#/components/plugins/Buttons/listButton'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
+import { HeadingButton, ListButton, QuoteButton } from '#/components/plugins/Buttons'
 
 export const ToolbarPlugin = () => {
   const [selectedBlockType, setBlockType] = useState<BlockType>('paragraph')
