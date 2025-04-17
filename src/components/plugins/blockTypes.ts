@@ -15,9 +15,9 @@ export const SupportedBlockType = {
 export type BlockType = keyof typeof SupportedBlockType
 
 const availableNodes = {
-  headingNodes: ['h1', 'h2', 'h3', 'h4'] as const,
+  headingNodes: ['h1', 'h2', 'h3', 'h4'],
   quoteNode: 'quote',
-  listNodes: ['bullet', 'number', 'check'] as const,
-} as const
+  listNodes: ['bullet', 'number', 'check'],
+} as const satisfies { [key: string]: BlockType[] | BlockType }
 
-export const { headingNodes, listNodes, quoteNode } = availableNodes
+export const { headingNodes, quoteNode, listNodes } = availableNodes
