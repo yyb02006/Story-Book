@@ -16,16 +16,17 @@ export const BaseToolButton = ({
   const clickHandler = (event: SyntheticEvent<HTMLButtonElement>) => {
     onClick(event)
   }
+  const isSelected = selectedBlockType === buttonBlockType
   return (
     <button
       type="button"
       role="checkbox"
       title={SupportedBlockType[buttonBlockType]}
       aria-label={SupportedBlockType[buttonBlockType]}
-      aria-checked={selectedBlockType === buttonBlockType}
+      aria-checked={isSelected}
       onClick={clickHandler}
       className={cls(
-        selectedBlockType === buttonBlockType ? 'text-rose-400' : '',
+        isSelected ? 'text-rose-400' : '',
         'aria-checked:bg-green-500',
         // aria-checked에 checked상태보다 자바스크립트로 조절하는 게 크로스브라우징 문제를 야기시키지 않음
         // 어디까지나 접근성 측면에서만 aria를 사용하도록
