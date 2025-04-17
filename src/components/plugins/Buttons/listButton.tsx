@@ -1,18 +1,13 @@
-import { BlockType, listNodes } from '#/components/plugins/blockTypes'
+import { listNodes } from '#/components/plugins/blockTypes'
 import { BaseToolButton } from '#/components/plugins/Buttons/baseToolButton'
-import { LexicalEditor } from 'lexical'
 import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list'
+import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 
-interface CustomToolButtonProps {
-  selectedBlockType: BlockType
-  editor: LexicalEditor
-}
-
-export default function ListButton({ selectedBlockType, editor }: CustomToolButtonProps) {
+export default function ListButton({ selectedBlockType, editor }: CommonToolButtonProps) {
   const createList = (listNodeType: (typeof listNodes)[number]) => {
     switch (true) {
       case selectedBlockType !== 'bullet' && listNodeType === 'bullet':

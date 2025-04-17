@@ -1,15 +1,11 @@
-import { BlockType, headingNodes } from '#/components/plugins/blockTypes'
+import { headingNodes } from '#/components/plugins/blockTypes'
 import { BaseToolButton } from '#/components/plugins/Buttons/baseToolButton'
 import { $createHeadingNode } from '@lexical/rich-text'
-import { $getSelection, $isRangeSelection, LexicalEditor } from 'lexical'
+import { $getSelection, $isRangeSelection } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
+import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 
-interface HeadingButtonProps {
-  selectedBlockType: BlockType
-  editor: LexicalEditor
-}
-
-export default function HeadingButton({ selectedBlockType, editor }: HeadingButtonProps) {
+export default function HeadingButton({ selectedBlockType, editor }: CommonToolButtonProps) {
   const createHeading = (headingNodeType: (typeof headingNodes)[number]) => {
     if (selectedBlockType !== headingNodeType) {
       editor.update(() => {

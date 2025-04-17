@@ -8,10 +8,12 @@ import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
 import HeadingButton from '#/components/plugins/Buttons/headingButton'
 import QuoteButton from '#/components/plugins/Buttons/quoteButton'
 import ListButton from '#/components/plugins/Buttons/listButton'
+import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 
 export const ToolbarPlugin = () => {
-  const [blockType, setBlockType] = useState<BlockType>('paragraph')
+  const [selectedBlockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
+  const commonToolButtonProps: CommonToolButtonProps = { selectedBlockType, editor }
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -42,9 +44,9 @@ export const ToolbarPlugin = () => {
 
   return (
     <div>
-      <HeadingButton selectedBlockType={blockType} editor={editor} />
-      <QuoteButton selectedBlockType={blockType} editor={editor} />
-      <ListButton selectedBlockType={blockType} editor={editor} />
+      <HeadingButton {...commonToolButtonProps} />
+      <QuoteButton {...commonToolButtonProps} />
+      <ListButton {...commonToolButtonProps} />
     </div>
   )
 }
