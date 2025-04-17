@@ -1,71 +1,17 @@
-import { ToolButton } from '#/components/plugins/toolbarButton'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import {
-  HeadingTagType,
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-} from '@lexical/rich-text'
-import {
-  $isListNode,
-  ListNode,
-  INSERT_CHECK_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-} from '@lexical/list'
-import { $setBlocksType } from '@lexical/selection'
+import { $isHeadingNode } from '@lexical/rich-text'
+import { $isListNode, ListNode } from '@lexical/list'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { useEffect, useState } from 'react'
 import { $getNearestNodeOfType } from '@lexical/utils'
-import {
-  BlockType,
-  headingNodes,
-  listNodes,
-  quoteNode,
-  SupportedBlockType,
-} from '#/components/plugins/blockTypes'
+import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
+import HeadingButton from '#/components/plugins/Buttons/headingButton'
+import QuoteButton from '#/components/plugins/Buttons/quoteButton'
+import ListButton from '#/components/plugins/Buttons/listButton'
 
 export const ToolbarPlugin = () => {
   const [blockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
-
-  const createHeading = (type: HeadingTagType) => {
-    if (blockType !== type) {
-      editor.update(() => {
-        const selection = $getSelection()
-        if ($isRangeSelection(selection)) {
-          $setBlocksType(selection, () => $createHeadingNode(type))
-        }
-      })
-    }
-  }
-
-  const createQuote = () => {
-    if (blockType !== 'quote') {
-      editor.update(() => {
-        const selection = $getSelection()
-        if ($isRangeSelection(selection)) {
-          $setBlocksType(selection, () => $createQuoteNode())
-        }
-      })
-    }
-  }
-
-  const createList = (currentListNode: (typeof listNodes)[number]) => {
-    switch (true) {
-      case blockType !== 'bullet' && currentListNode === 'bullet':
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-        break
-      case blockType !== 'number' && currentListNode === 'number':
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-        break
-      case blockType !== 'check' && currentListNode === 'check':
-        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
-        break
-      default:
-        break
-    }
-  }
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -96,37 +42,9 @@ export const ToolbarPlugin = () => {
 
   return (
     <div>
-      {headingNodes.map((heading) => {
-        return (
-          <ToolButton
-            currentBlockType={blockType}
-            nodeName={heading}
-            callback={() => {
-              createHeading(heading)
-            }}
-            key={heading}
-          />
-        )
-      })}
-      <ToolButton
-        currentBlockType={blockType}
-        nodeName={quoteNode}
-        callback={() => {
-          createQuote()
-        }}
-      />
-      {listNodes.map((listType) => {
-        return (
-          <ToolButton
-            currentBlockType={blockType}
-            nodeName={listType}
-            callback={() => {
-              createList(listType)
-            }}
-            key={listType}
-          />
-        )
-      })}
+      <HeadingButton selectedBlockType={blockType} editor={editor} />
+      <QuoteButton selectedBlockType={blockType} editor={editor} />
+      <ListButton selectedBlockType={blockType} editor={editor} />
     </div>
   )
 }
