@@ -38,11 +38,13 @@ export function Editor() {
     <LexicalComposer initialConfig={initialConfig}>
       <TextEditorContainer>
         <ToolbarPlugin />
-        <RichTextPlugin
-          contentEditable={<ContentEditable className="h-full bg-red-100" />}
-          placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
+        <div className="relative h-full">
+          <RichTextPlugin
+            contentEditable={<ContentEditable className="h-full bg-red-100" />}
+            placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+        </div>
       </TextEditorContainer>
       <HistoryPlugin />
       <AutoFocusPlugin />
