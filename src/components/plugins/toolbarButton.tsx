@@ -1,5 +1,5 @@
-import { BlockType, SupportedBlockType } from '#/components/plugins/toolbarPlugin'
-import { cfl } from '#/libs/client/utils'
+import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
+import { cfl, cls } from '#/libs/client/utils'
 
 interface ToolButtonProps {
   currentBlockType: BlockType
@@ -16,7 +16,10 @@ export const ToolButton = ({ currentBlockType, nodeName, callback }: ToolButtonP
       aria-label={SupportedBlockType[nodeName]}
       aria-checked={currentBlockType === nodeName}
       onClick={callback}
-      className={currentBlockType === nodeName ? 'text-rose-400' : ''}
+      className={cls(
+        currentBlockType === nodeName ? 'text-rose-400' : '',
+        'aria-checked:bg-green-500',
+      )}
     >
       {cfl(nodeName)}
     </button>
