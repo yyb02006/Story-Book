@@ -1,9 +1,9 @@
 import { headingNodes } from '#/components/plugins/blockTypes'
-import { BaseToolButton } from '#/components/plugins/Buttons/baseToolButton'
 import { $createHeadingNode } from '@lexical/rich-text'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
+import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 
 export default function HeadingButton({ selectedBlockType, editor }: CommonToolButtonProps) {
   const createHeading = (headingNodeType: (typeof headingNodes)[number]) => {
