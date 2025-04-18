@@ -12,6 +12,7 @@ export const ToolbarPlugin = () => {
   const [selectedBlockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
   const commonToolButtonProps: CommonToolButtonProps = { selectedBlockType, editor }
+  const ToolbarButtons = [HeadingButton, QuoteButton, ListButton]
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -42,9 +43,9 @@ export const ToolbarPlugin = () => {
 
   return (
     <div>
-      <HeadingButton {...commonToolButtonProps} />
-      <QuoteButton {...commonToolButtonProps} />
-      <ListButton {...commonToolButtonProps} />
+      {ToolbarButtons.map((Button) => (
+        <Button key={Button.name} {...commonToolButtonProps} />
+      ))}
     </div>
   )
 }
