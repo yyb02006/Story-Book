@@ -19,7 +19,7 @@ const MenuLink = ({
   return (
     <Link href={href}>
       <li className="group flex aspect-square w-full flex-col items-center justify-center space-y-1 stroke-smooth-white stroke-2">
-        <div className="rounded-md p-2 group-hover:bg-[#474e79]">{cloneElement(children)}</div>
+        <div className="rounded-md p-2 group-hover:bg-slate-blue">{cloneElement(children)}</div>
         <div className="text-xs">{title}</div>
       </li>
     </Link>
@@ -39,7 +39,7 @@ export default function GlobalNav() {
       initial={{ x: -10, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ ease: 'easeOut', duration: 0.2 }}
-      className="fixed z-[1000] h-screen w-gnb bg-[#202020]"
+      className="fixed z-[1000] h-screen w-gnb bg-dark-gray"
     >
       {/*       {wave.colors.map((color) => (
         <div key={color} className={cls('absolute size-full')} style={{ backgroundColor: color }} />
@@ -48,7 +48,7 @@ export default function GlobalNav() {
         <Link href="/">MEMOISM</Link>
       </h1>
       <div className="relative mt-2 w-full p-4">
-        <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-[#516afc] font-[#eaeaea]">
+        <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-bright-blue font-[#eaeaea]">
           most
         </div>
         <div className="m-auto mt-2 size-0 border-x-[6px] border-t-[6px] border-x-transparent border-t-smooth-white"></div>

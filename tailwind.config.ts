@@ -34,6 +34,11 @@ const config: Config = {
       colors: {
         'smooth-white': '#eaeaea',
         'smooth-black': '#101010',
+        'dark-gray': '#202020',
+        'charcoal-gray': '#303030',
+        'slate-blue': '#474e79',
+        'bright-blue': '#516afc',
+        'sky-blue': '#76aadf',
       },
     },
   },
