@@ -1,16 +1,13 @@
 import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
+import { buttonSizes } from '#/components/plugins/Buttons/buttonTypes'
 import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
 import { cls } from '#/libs/client/utils'
 import { SyntheticEvent } from 'react'
 
 interface ToolButtonProps {
-  selectedBlockType: BlockType
+  selectedBlockType?: BlockType
   buttonBlockType: BlockType
   onClick: (event?: SyntheticEvent<HTMLButtonElement>) => void
-}
-
-const buttonSizes = { sm: 'size-[16px]', md: 'size-[24px]', lg: 'size-[32px]' } satisfies {
-  [key: string]: `size-[${number}px]`
 }
 
 export default function BaseToolButton({
@@ -21,7 +18,7 @@ export default function BaseToolButton({
   const clickHandler = (event: SyntheticEvent<HTMLButtonElement>) => {
     onClick(event)
   }
-  const isSelected = selectedBlockType === buttonBlockType
+  const isSelected = selectedBlockType ? selectedBlockType === buttonBlockType : false
   return (
     <button
       type="button"
