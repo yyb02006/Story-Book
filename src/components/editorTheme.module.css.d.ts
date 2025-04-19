@@ -1,11 +1,11 @@
-declare const styles: Readonly<{
-  h1: string
-  h2: string
-  h3: string
-  h4: string
-  quote: string
-  ol: string
-  ul: string
-  li: string
-}>
+declare const styles: {
+  readonly h1: string
+  readonly h2: string
+  readonly h3: string
+  readonly h4: string
+  readonly quote: string
+  readonly ol: string
+  readonly ul: string
+  readonly li: string
+}
 export = styles
