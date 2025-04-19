@@ -49,7 +49,7 @@ export const ToolbarPlugin = () => {
   }, [editor])
 
   return (
-    <div className="flex space-x-3">
+    <div className="relative z-10 flex space-x-3">
       {ToolbarButtons.map((Button) => (
         <div key={Button.name} className="flex items-center">
           <Button {...commonToolButtonProps} />
