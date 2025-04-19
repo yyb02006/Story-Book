@@ -2,17 +2,24 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $isListNode, ListNode } from '@lexical/list'
 import { $getSelection, $isRangeSelection } from 'lexical'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { $getNearestNodeOfType } from '@lexical/utils'
 import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
-import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
+import { buttonSizes, CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 import { HeadingButton, ListButton, QuoteButton } from '#/components/plugins/Buttons'
 
 export const ToolbarPlugin = () => {
   const [selectedBlockType, setBlockType] = useState<BlockType>('paragraph')
   const [editor] = useLexicalComposerContext()
-  const commonToolButtonProps: CommonToolButtonProps = { selectedBlockType, editor }
-  const ToolbarButtons = [HeadingButton, QuoteButton, ListButton]
+  const ToolbarButtons = [HeadingButton, ListButton, QuoteButton]
+  const commonToolButtonProps: CommonToolButtonProps = useMemo(
+    () => ({
+      selectedBlockType,
+      editor,
+      buttonSize: buttonSizes['md'],
+    }),
+    [selectedBlockType, editor],
+  )
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -42,9 +49,11 @@ export const ToolbarPlugin = () => {
   }, [editor])
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex space-x-3">
       {ToolbarButtons.map((Button) => (
-        <Button key={Button.name} {...commonToolButtonProps} />
+        <div key={Button.name} className="flex items-center">
+          <Button {...commonToolButtonProps} />
+        </div>
       ))}
     </div>
   )

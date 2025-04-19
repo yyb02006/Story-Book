@@ -1,5 +1,5 @@
 import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
-import { buttonSizes } from '#/components/plugins/Buttons/buttonTypes'
+import { ButtonSize } from '#/components/plugins/Buttons/buttonTypes'
 import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
 import { cls } from '#/libs/client/utils'
 import { SyntheticEvent } from 'react'
@@ -7,12 +7,14 @@ import { SyntheticEvent } from 'react'
 interface ToolButtonProps {
   selectedBlockType?: BlockType
   buttonBlockType: BlockType
+  buttonSize: ButtonSize
   onClick: (event?: SyntheticEvent<HTMLButtonElement>) => void
 }
 
 export default function BaseToolButton({
   selectedBlockType,
   buttonBlockType,
+  buttonSize,
   onClick,
 }: ToolButtonProps) {
   const clickHandler = (event: SyntheticEvent<HTMLButtonElement>) => {
@@ -30,7 +32,7 @@ export default function BaseToolButton({
     >
       <ToolbarIcon<BlockType>
         svgId={buttonBlockType}
-        size={buttonSizes['md']}
+        size={buttonSize}
         className={cls(isSelected ? 'text-rose-400' : 'text-[#777777]')}
       />
     </button>

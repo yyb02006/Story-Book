@@ -7,7 +7,11 @@ import {
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 
-export default function ListButton({ selectedBlockType, editor }: CommonToolButtonProps) {
+export default function ListButton({
+  selectedBlockType,
+  editor,
+  buttonSize,
+}: CommonToolButtonProps) {
   const createList = (listNodeType: (typeof listNodes)[number]) => {
     switch (true) {
       case selectedBlockType !== 'bullet' && listNodeType === 'bullet':
@@ -24,17 +28,18 @@ export default function ListButton({ selectedBlockType, editor }: CommonToolButt
     }
   }
   return (
-    <div>
+    <>
       {listNodes.map((listNode) => (
         <BaseToolButton
           selectedBlockType={selectedBlockType}
           buttonBlockType={listNode}
+          buttonSize={buttonSize}
           onClick={() => {
             createList(listNode)
           }}
           key={listNode}
         />
       ))}
-    </div>
+    </>
   )
 }

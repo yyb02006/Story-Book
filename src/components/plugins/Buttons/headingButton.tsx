@@ -7,7 +7,11 @@ import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 
 type HeadingNode = (typeof headingNodes)[number]
 
-export default function HeadingButton({ selectedBlockType, editor }: CommonToolButtonProps) {
+export default function HeadingButton({
+  selectedBlockType,
+  editor,
+  buttonSize,
+}: CommonToolButtonProps) {
   const createHeading = (headingNodeType: HeadingNode) => {
     if (selectedBlockType !== headingNodeType) {
       editor.update(() => {
@@ -20,15 +24,19 @@ export default function HeadingButton({ selectedBlockType, editor }: CommonToolB
   }
 
   return (
-    <div>
+    <>
       {headingNodes.map((headingNode) => (
         <BaseToolButton
           buttonBlockType={headingNode}
           onClick={() => createHeading(headingNode)}
           selectedBlockType={selectedBlockType}
+          buttonSize={buttonSize}
           key={headingNode}
         />
       ))}
-    </div>
+      <svg className="size-[12px] text-[#777777]">
+        <use href={`icons/toolbarButtons.svg#arrow-down`} />
+      </svg>
+    </>
   )
 }

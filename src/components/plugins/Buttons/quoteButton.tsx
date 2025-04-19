@@ -5,7 +5,11 @@ import { $setBlocksType } from '@lexical/selection'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 
-export default function QuoteButton({ selectedBlockType, editor }: CommonToolButtonProps) {
+export default function QuoteButton({
+  selectedBlockType,
+  editor,
+  buttonSize,
+}: CommonToolButtonProps) {
   const createQuote = () => {
     if (selectedBlockType !== quoteNode) {
       editor.update(() => {
@@ -21,6 +25,7 @@ export default function QuoteButton({ selectedBlockType, editor }: CommonToolBut
     <BaseToolButton
       selectedBlockType={selectedBlockType}
       buttonBlockType={quoteNode}
+      buttonSize={buttonSize}
       onClick={() => {
         createQuote()
       }}
