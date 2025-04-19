@@ -1,6 +1,6 @@
 import { SyntheticEvent, useState } from 'react'
 import { Search } from '../../public/icons/ui'
-import { TextInput } from '#/components/Inputs'
+import TextInput from '#/components/Inputs/textInput'
 
 interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
