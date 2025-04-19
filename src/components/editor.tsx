@@ -39,8 +39,10 @@ export function Editor() {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <TextEditorContainer>
-        <ToolbarPlugin />
-        <div className="relative h-full">
+        <div className="relative z-[1]">
+          <ToolbarPlugin />
+        </div>
+        <div className="relative z-0 size-full">
           <RichTextPlugin
             contentEditable={<ContentEditable className="h-full bg-red-100" />}
             placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
