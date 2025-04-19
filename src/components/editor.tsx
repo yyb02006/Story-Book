@@ -19,7 +19,7 @@ function onError(error: unknown) {
 }
 
 const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
-  return <div className="relative h-40 bg-[#202020]">{children}</div>
+  return <div className="relative flex h-60 flex-col bg-[#303030]">{children}</div>
 }
 
 const PlaceHolder = ({ children }: { children: ReactNode }) => {
@@ -44,7 +44,7 @@ export function Editor() {
         </div>
         <div className="relative z-0 size-full">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="h-full bg-red-100" />}
+            contentEditable={<ContentEditable className="h-full" />}
             placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
             ErrorBoundary={LexicalErrorBoundary}
           />
