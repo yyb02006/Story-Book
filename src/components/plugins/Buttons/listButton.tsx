@@ -24,7 +24,7 @@ export default function ListButton({ selectedBlockType, editor }: CommonToolButt
     }
   }
   return (
-    <>
+    <div>
       {listNodes.map((listNode) => (
         <BaseToolButton
           selectedBlockType={selectedBlockType}
@@ -35,6 +35,6 @@ export default function ListButton({ selectedBlockType, editor }: CommonToolButt
           key={listNode}
         />
       ))}
-    </>
+    </div>
   )
 }

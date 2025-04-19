@@ -5,8 +5,10 @@ import { $setBlocksType } from '@lexical/selection'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 
+type HeadingNode = (typeof headingNodes)[number]
+
 export default function HeadingButton({ selectedBlockType, editor }: CommonToolButtonProps) {
-  const createHeading = (headingNodeType: (typeof headingNodes)[number]) => {
+  const createHeading = (headingNodeType: HeadingNode) => {
     if (selectedBlockType !== headingNodeType) {
       editor.update(() => {
         const selection = $getSelection()
@@ -18,17 +20,15 @@ export default function HeadingButton({ selectedBlockType, editor }: CommonToolB
   }
 
   return (
-    <>
+    <div>
       {headingNodes.map((headingNode) => (
         <BaseToolButton
-          selectedBlockType={selectedBlockType}
           buttonBlockType={headingNode}
-          onClick={() => {
-            createHeading(headingNode)
-          }}
+          onClick={() => createHeading(headingNode)}
+          selectedBlockType={selectedBlockType}
           key={headingNode}
         />
       ))}
-    </>
+    </div>
   )
 }

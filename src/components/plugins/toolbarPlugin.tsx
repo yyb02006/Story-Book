@@ -42,7 +42,7 @@ export const ToolbarPlugin = () => {
   }, [editor])
 
   return (
-    <div>
+    <div className="flex space-x-4">
       {ToolbarButtons.map((Button) => (
         <Button key={Button.name} {...commonToolButtonProps} />
       ))}
