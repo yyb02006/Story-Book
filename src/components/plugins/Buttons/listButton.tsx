@@ -5,14 +5,16 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
-import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
+import DropdownButtonList from '#/components/plugins/Buttons/dropdownButtonList'
+
+type ListNode = (typeof listNodes)[number]
 
 export default function ListButton({
   selectedBlockType,
   editor,
   buttonSize,
 }: CommonToolButtonProps) {
-  const createList = (listNodeType: (typeof listNodes)[number]) => {
+  const createList = (listNodeType: ListNode) => {
     switch (true) {
       case selectedBlockType !== 'bullet' && listNodeType === 'bullet':
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
@@ -27,19 +29,16 @@ export default function ListButton({
         break
     }
   }
+
   return (
     <>
-      {listNodes.map((listNode) => (
-        <BaseToolButton
-          selectedBlockType={selectedBlockType}
-          buttonBlockType={listNode}
-          buttonSize={buttonSize}
-          onClick={() => {
-            createList(listNode)
-          }}
-          key={listNode}
-        />
-      ))}
+      <DropdownButtonList
+        List={listNodes}
+        buttonSize={buttonSize}
+        defaultButtonState="bullet"
+        onSelect={createList}
+        selectedBlockType={selectedBlockType}
+      ></DropdownButtonList>
     </>
   )
 }

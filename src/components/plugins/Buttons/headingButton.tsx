@@ -3,7 +3,7 @@ import { $createHeadingNode } from '@lexical/rich-text'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
-import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
+import DropdownButtonList from '#/components/plugins/Buttons/dropdownButtonList'
 
 type HeadingNode = (typeof headingNodes)[number]
 
@@ -25,18 +25,13 @@ export default function HeadingButton({
 
   return (
     <>
-      {headingNodes.map((headingNode) => (
-        <BaseToolButton
-          buttonBlockType={headingNode}
-          onClick={() => createHeading(headingNode)}
-          selectedBlockType={selectedBlockType}
-          buttonSize={buttonSize}
-          key={headingNode}
-        />
-      ))}
-      <svg className="size-[12px] text-[#777777]">
-        <use href={`icons/toolbarButtons.svg#arrow-down`} />
-      </svg>
+      <DropdownButtonList
+        List={headingNodes}
+        buttonSize={buttonSize}
+        defaultButtonState="h1"
+        onSelect={createHeading}
+        selectedBlockType={selectedBlockType}
+      />
     </>
   )
 }
