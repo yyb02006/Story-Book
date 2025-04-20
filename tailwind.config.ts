@@ -3,6 +3,7 @@ import type { Config } from 'tailwindcss'
 
 const designTokens = {
   gnb: { Width: 80, waveWidth: 20 },
+  gsb: { height: 88 },
 }
 
 const config: Config = {
@@ -30,12 +31,16 @@ const config: Config = {
       },
       padding: {
         'gnb-left': `${designTokens.gnb.Width + designTokens.gnb.waveWidth}px`,
+        'gsb-top': `${designTokens.gsb.height}px`,
       },
       colors: {
         'smooth-white': '#eaeaea',
         'smooth-black': '#101010',
         'dark-gray': '#202020',
         'charcoal-gray': '#303030',
+        'midnight-gray': '#404040',
+        gray: '#505050',
+        'white-gray': '#909090',
         'slate-blue': '#474e79',
         'bright-blue': '#516afc',
         'sky-blue': '#76aadf',
