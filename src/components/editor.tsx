@@ -13,6 +13,7 @@ import { theme } from '#/components/editorTheme'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
+import { TextInput } from '#/components/Inputs'
 
 function onError(error: unknown) {
   console.error(error)
@@ -23,12 +24,10 @@ const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element
 }
 
 const PlaceHolder = ({ children }: { children: ReactNode }) => {
-  return <div className="pointer-events-none absolute left-0 top-0">{children}</div>
+  return <div className="pointer-events-none absolute left-1 top-0">{children}</div>
 }
 
 export function Editor() {
-  console.log(theme)
-
   const initialConfig: ComponentProps<typeof LexicalComposer>['initialConfig'] = {
     namespace: 'MyEditor',
     theme,
@@ -38,6 +37,12 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <TextInput
+        name="title"
+        value=""
+        className="h-14 rounded-2xl bg-dark-gray p-3 font-S-CoreDream-200 text-base"
+        placeholder="제목을 입력해주세요"
+      />
       <TextEditorContainer>
         <div className="relative z-[1]">
           <ToolbarPlugin />
