@@ -20,7 +20,11 @@ function onError(error: unknown) {
 }
 
 const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
-  return <div className="relative flex h-60 flex-col bg-charcoal-gray">{children}</div>
+  return (
+    <div className="relative flex h-80 flex-col space-y-4 rounded-2xl border border-midnight-gray bg-dark-gray p-3">
+      {children}
+    </div>
+  )
 }
 
 const PlaceHolder = ({ children }: { children: ReactNode }) => {
