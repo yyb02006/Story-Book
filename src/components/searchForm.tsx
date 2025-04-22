@@ -4,14 +4,13 @@ import { TextInput } from '#/components/Inputs'
 
 interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
-  w?: number
 }
 
-export default function SearchForm({ onSearch, w = 500 }: SearchFormProps) {
+export default function SearchForm({ onSearch }: SearchFormProps) {
   const [searchWord, setSearchWord] = useState('')
   return (
-    <form onSubmit={onSearch} className="flex h-14 space-x-2">
-      <div className="flex rounded-full bg-dark-gray ring-1 ring-gray" style={{ width: w }}>
+    <form onSubmit={onSearch} className="flex h-14 w-full space-x-2">
+      <div className="flex w-full rounded-full bg-dark-gray ring-1 ring-gray">
         <button className="flex items-center p-2">
           <div className="mr-1 flex aspect-square h-full items-center justify-center rounded-full border border-gray">
             <Search width={20} height={20} strokeColor="#eaeaea" strokeWidth={3} />
