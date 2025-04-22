@@ -4,9 +4,10 @@ import { TextInput } from '#/components/Inputs'
 
 interface SearchFormProps {
   onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
+  themeMode: ThemeMode
 }
 
-export default function SearchForm({ onSearch }: SearchFormProps) {
+export default function SearchForm({ onSearch, themeMode }: SearchFormProps) {
   const [searchWord, setSearchWord] = useState('')
   return (
     <form onSubmit={onSearch} className="flex h-14 w-full space-x-2">
@@ -27,6 +28,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
             setSearchWord(value)
           }}
           value={searchWord}
+          themeMode={themeMode}
         />
       </div>
       <button type="submit" className="flex aspect-square items-center justify-center p-1">

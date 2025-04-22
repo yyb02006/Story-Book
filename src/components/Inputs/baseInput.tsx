@@ -6,6 +6,7 @@ type InputValueType = string | number
 interface InputProps {
   name: string
   inputType: 'text' | 'number'
+  themeMode: ThemeMode
   className?: string
   value?: InputValueType
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
@@ -13,11 +14,17 @@ interface InputProps {
 }
 
 const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
-  { name, placeholder, onChange, value, inputType, className = '', ...rest }: InputProps,
+  { name, placeholder, onChange, value, inputType, className = '', themeMode, ...rest }: InputProps,
   ref,
 ) => {
-  const baseInputClasses =
-    'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0 font-bold text-smooth-white placeholder:pl-1'
+  const themeStyles = {
+    dark: 'border-midnight-gray bg-dark-gray',
+    white: 'border-light-white bg-white',
+    default: '',
+  }
+
+  const baseInputStyles =
+    'w-full border placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0 font-bold text-smooth-white'
 
   return (
     <input
@@ -27,7 +34,7 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       placeholder={placeholder}
       type={inputType}
       spellCheck={false}
-      className={cls(className, baseInputClasses)}
+      className={cls(className, baseInputStyles, themeStyles[themeMode])}
       value={value}
       // size={20} default
       {...rest}
