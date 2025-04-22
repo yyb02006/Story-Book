@@ -15,6 +15,7 @@ import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
 import { cls } from '#/libs/client/utils'
+import { borderStylesByTheme } from '#/libs/client/constants'
 
 function onError(error: unknown) {
   console.error(error)
@@ -27,16 +28,11 @@ const TextEditorContainer = ({
   children: JSX.Element | JSX.Element[]
   themeMode: ThemeMode
 }) => {
-  const themeStyles = {
-    dark: 'border-midnight-gray bg-dark-gray',
-    white: 'border-light-white bg-white',
-    default: '',
-  }
   return (
     <div
       className={cls(
         'relative flex h-80 flex-col space-y-4 rounded-2xl border p-3',
-        themeStyles[themeMode],
+        borderStylesByTheme[themeMode],
       )}
     >
       {children}

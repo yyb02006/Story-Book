@@ -4,3 +4,9 @@ export const globalNavWaves = {
   pointCountEachWave: 60,
   speed: 0.05,
 } as const
+
+export const borderStylesByTheme = {
+  dark: 'border-midnight-gray bg-dark-gray',
+  white: 'border-light-white bg-white',
+  default: '',
+}
