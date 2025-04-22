@@ -4,6 +4,18 @@ import type { Config } from 'tailwindcss'
 const designTokens = {
   gnb: { Width: 80, waveWidth: 20 },
   gsb: { height: 88 },
+  colors: {
+    'smooth-white': '#eaeaea',
+    'smooth-black': '#101010',
+    'dark-gray': '#202020',
+    'charcoal-gray': '#303030',
+    'midnight-gray': '#404040',
+    gray: '#505050',
+    'white-gray': '#909090',
+    'slate-blue': '#474e79',
+    'bright-blue': '#516afc',
+    'sky-blue': '#76aadf',
+  },
 }
 
 const config: Config = {
@@ -17,6 +29,7 @@ const config: Config = {
       fontFamily: {
         'patrick-hand': ['var(--font-patrick-hand)'],
         pretendard: ['Pretendard-Regular', 'sans-serif'],
+        'S-CoreDream-100': ['S-CoreDream-100', 'sans-serif'],
         'S-CoreDream-200': ['S-CoreDream-200', 'sans-serif'],
         'S-CoreDream-400': ['S-CoreDream-400', 'sans-serif'],
         'S-CoreDream-500': ['S-CoreDream-500', 'sans-serif'],
@@ -33,18 +46,7 @@ const config: Config = {
         'gnb-left': `${designTokens.gnb.Width + designTokens.gnb.waveWidth}px`,
         'gsb-top': `${designTokens.gsb.height}px`,
       },
-      colors: {
-        'smooth-white': '#eaeaea',
-        'smooth-black': '#101010',
-        'dark-gray': '#202020',
-        'charcoal-gray': '#303030',
-        'midnight-gray': '#404040',
-        gray: '#505050',
-        'white-gray': '#909090',
-        'slate-blue': '#474e79',
-        'bright-blue': '#516afc',
-        'sky-blue': '#76aadf',
-      },
+      colors: designTokens.colors,
     },
   },
   plugins: [
