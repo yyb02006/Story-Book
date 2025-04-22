@@ -43,7 +43,7 @@ export default function DropdownButtonList<T extends BlockType>({
         </svg>
       </button>
       <div
-        className="absolute left-0 top-6 flex w-full flex-col bg-[#202020]"
+        className="absolute left-0 top-6 flex w-full flex-col bg-dark-gray"
         role="menu"
         aria-orientation="vertical"
         aria-labelledby="options-menu"
