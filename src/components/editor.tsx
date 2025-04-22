@@ -14,14 +14,31 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
+import { cls } from '#/libs/client/utils'
 
 function onError(error: unknown) {
   console.error(error)
 }
 
-const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
+const TextEditorContainer = ({
+  children,
+  themeMode,
+}: {
+  children: JSX.Element | JSX.Element[]
+  themeMode: ThemeMode
+}) => {
+  const themeStyles = {
+    dark: 'border-midnight-gray bg-dark-gray',
+    white: 'border-light-white bg-white',
+    default: '',
+  }
   return (
-    <div className="relative flex h-80 flex-col space-y-4 rounded-2xl border border-midnight-gray bg-dark-gray p-3">
+    <div
+      className={cls(
+        'relative flex h-80 flex-col space-y-4 rounded-2xl border p-3',
+        themeStyles[themeMode],
+      )}
+    >
       {children}
     </div>
   )
@@ -44,17 +61,18 @@ export function Editor() {
       <TextInput
         name="title"
         value=""
-        className="h-14 rounded-2xl bg-dark-gray p-3 font-S-CoreDream-200 text-base"
+        className="h-14 rounded-2xl bg-dark-gray p-3 font-S-CoreDream-100 text-base"
         placeholder="제목을 입력해주세요"
+        themeMode="dark"
       />
-      <TextEditorContainer>
+      <TextEditorContainer themeMode="dark">
         <div className="relative z-[1]">
           <ToolbarPlugin />
         </div>
         <div className="relative z-0 size-full">
           <RichTextPlugin
             contentEditable={<ContentEditable className="h-full" />}
-            placeholder={<PlaceHolder>Enter some text...</PlaceHolder>}
+            placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
             ErrorBoundary={LexicalErrorBoundary}
           />
         </div>
