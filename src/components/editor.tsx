@@ -15,7 +15,7 @@ import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
 import { cls } from '#/libs/client/utils'
-import { borderStylesByTheme } from '#/libs/client/constants'
+import { themeColorStyles } from '#/libs/client/constants'
 
 function onError(error: unknown) {
   console.error(error)
@@ -32,7 +32,8 @@ const TextEditorContainer = ({
     <div
       className={cls(
         'relative flex h-80 flex-col space-y-4 rounded-2xl border p-3',
-        borderStylesByTheme[themeMode],
+        themeColorStyles.border[themeMode],
+        themeColorStyles.text[themeMode],
       )}
     >
       {children}
@@ -40,8 +41,17 @@ const TextEditorContainer = ({
   )
 }
 
-const PlaceHolder = ({ children }: { children: ReactNode }) => {
-  return <div className="pointer-events-none absolute left-1 top-0">{children}</div>
+const PlaceHolder = ({ children, themeMode }: { children: ReactNode; themeMode: ThemeMode }) => {
+  return (
+    <div
+      className={cls(
+        'pointer-events-none absolute left-1 top-0 font-S-CoreDream-400',
+        themeColorStyles.placeHolderText[themeMode],
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function Editor() {
@@ -57,7 +67,7 @@ export function Editor() {
       <TextInput
         name="title"
         value=""
-        className="h-14 rounded-2xl bg-dark-gray p-3 font-S-CoreDream-100 text-base"
+        className="h-14 rounded-2xl bg-dark-gray p-3 text-base"
         placeholder="제목을 입력해주세요"
         themeMode="dark"
       />
@@ -68,7 +78,7 @@ export function Editor() {
         <div className="relative z-0 size-full">
           <RichTextPlugin
             contentEditable={<ContentEditable className="h-full" />}
-            placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
+            placeholder={<PlaceHolder themeMode="dark">내용을 입력해주세요</PlaceHolder>}
             ErrorBoundary={LexicalErrorBoundary}
           />
         </div>

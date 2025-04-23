@@ -1,4 +1,4 @@
-import { borderStylesByTheme } from '#/libs/client/constants'
+import { themeColorStyles } from '#/libs/client/constants'
 import { cls } from '#/libs/client/utils'
 import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 
@@ -18,8 +18,13 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
   { name, placeholder, onChange, value, inputType, className = '', themeMode, ...rest }: InputProps,
   ref,
 ) => {
-  const baseInputStyles =
-    'w-full border placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0 font-bold text-smooth-white'
+  const { border, placeHolder, text } = themeColorStyles
+  const baseInputStyles = cls(
+    'w-full border placeholder:pl-1 focus:ring-0 font-S-CoreDream-400',
+    border[themeMode],
+    placeHolder[themeMode],
+    text[themeMode],
+  )
 
   return (
     <input
@@ -29,7 +34,7 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       placeholder={placeholder}
       type={inputType}
       spellCheck={false}
-      className={cls(className, baseInputStyles, borderStylesByTheme[themeMode])}
+      className={cls(className, baseInputStyles)}
       value={value}
       // size={20} default
       {...rest}
