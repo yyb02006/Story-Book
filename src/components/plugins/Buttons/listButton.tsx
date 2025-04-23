@@ -4,26 +4,48 @@ import {
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list'
+import { $setBlocksType } from '@lexical/selection'
 import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
 import DropdownButtonList from '#/components/plugins/Buttons/dropdownButtonList'
+import { $createParagraphNode, $getSelection } from 'lexical'
 
 type ListNode = (typeof listNodes)[number]
 
+// 관심사 분리 필요
 export default function ListButton({
   selectedBlockType,
   editor,
   buttonSize,
 }: CommonToolButtonProps) {
+  const formatParagraph = () => {
+    editor.update(() => {
+      const selection = $getSelection()
+      $setBlocksType(selection, () => $createParagraphNode())
+    })
+  }
+
   const createList = (listNodeType: ListNode) => {
     switch (true) {
-      case selectedBlockType !== 'bullet' && listNodeType === 'bullet':
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
+      case listNodeType === 'bullet':
+        if (selectedBlockType !== 'bullet') {
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
+        } else {
+          formatParagraph()
+        }
         break
-      case selectedBlockType !== 'number' && listNodeType === 'number':
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+      case listNodeType === 'number':
+        if (selectedBlockType !== 'number') {
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+        } else {
+          formatParagraph()
+        }
         break
-      case selectedBlockType !== 'check' && listNodeType === 'check':
-        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+      case listNodeType === 'check':
+        if (selectedBlockType !== 'check') {
+          editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+        } else {
+          formatParagraph()
+        }
         break
       default:
         break
@@ -38,7 +60,7 @@ export default function ListButton({
         defaultButtonState="bullet"
         onSelect={createList}
         selectedBlockType={selectedBlockType}
-      ></DropdownButtonList>
+      />
     </>
   )
 }
