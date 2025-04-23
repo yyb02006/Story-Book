@@ -16,6 +16,7 @@ import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
 import { cls } from '#/libs/client/utils'
 import { themeColorStyles } from '#/libs/client/constants'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -88,6 +89,7 @@ export function Editor() {
       <ListPlugin />
       <CheckListPlugin />
       <CodeHighlightPlugin />
+      <TabIndentationPlugin />
     </LexicalComposer>
   )
 }
