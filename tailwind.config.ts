@@ -12,6 +12,7 @@ const designTokens = {
     'midnight-gray': '#404040',
     gray: '#505050',
     'white-gray': '#909090',
+    'light-gray': '#bababa',
     'slate-blue': '#474e79',
     'bright-blue': '#516afc',
     'sky-blue': '#76aadf',
@@ -23,6 +24,7 @@ const config: Config = {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/libs/client/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
