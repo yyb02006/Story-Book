@@ -6,6 +6,9 @@ declare const styles: Readonly<{
   quote: string
   ol: string
   ul: string
-  li: string
+  listitem: string
+  listitemChecked: string
+  listitemUnchecked: string
+  nestedListitem: string
 }>
 export = styles

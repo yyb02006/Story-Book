@@ -1,17 +1,24 @@
 import { EditorThemeClasses } from 'lexical'
 import editorTheme from '#/components/editorTheme.module.css'
 
+const { h1, h2, h3, h4, listitem, listitemChecked, listitemUnchecked, ol, quote, ul } = editorTheme
+
 export const theme: EditorThemeClasses = {
   heading: {
-    h1: editorTheme.h1,
-    h2: editorTheme.h2,
-    h3: editorTheme.h3,
-    h4: editorTheme.h4,
+    h1,
+    h2,
+    h3,
+    h4,
   },
-  quote: editorTheme.quote,
+  quote,
   list: {
-    ol: editorTheme.ol,
-    ul: editorTheme.ul,
-    listitem: editorTheme.li,
+    ol,
+    ul,
+    listitem,
+    listitemChecked,
+    listitemUnchecked,
+    nested: {
+      listitem: editorTheme.nestedListitem,
+    },
   },
 }
