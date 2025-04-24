@@ -21,3 +21,9 @@ const availableNodes = {
 } as const satisfies { [key: string]: BlockType[] | BlockType }
 
 export const { headingNodes, quoteNode, listNodes } = availableNodes
+
+export type HeadingNode = (typeof headingNodes)[number]
+
+export type QuoteNode = typeof quoteNode
+
+export type ListNode = (typeof listNodes)[number]
