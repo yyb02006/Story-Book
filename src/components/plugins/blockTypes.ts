@@ -22,8 +22,8 @@ const availableNodes = {
 
 export const { headingNodes, quoteNode, listNodes } = availableNodes
 
-export type HeadingNode = (typeof headingNodes)[number]
+export type HeadingNodeType = (typeof headingNodes)[number]
 
-export type QuoteNode = typeof quoteNode
+export type QuoteNodeType = typeof quoteNode
 
-export type ListNode = (typeof listNodes)[number]
+export type ListNodeType = (typeof listNodes)[number]
