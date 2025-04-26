@@ -33,6 +33,8 @@ export default function DropdownButtonList<T extends BlockType>({
 
   const { border, bgColor } = themeColorStyles[themeMode]
 
+  const [containerLeft, buttonPadding] = ['-left-2', 'p-2']
+
   return (
     <div className="relative flex items-center">
       <BaseToolButton
@@ -44,16 +46,13 @@ export default function DropdownButtonList<T extends BlockType>({
         }}
       />
       <button onClick={handleClick}>
-        <svg className="size-[12px] text-[#777777]">
+        <svg className="size-[12px] text-[#808080]">
           <use href={`icons/toolbarButtons.svg#chevron-down`} />
         </svg>
       </button>
       {isDropdownListOpen ? (
         <div
-          className={cls(
-            'absolute -left-2 top-6 mt-2 flex flex-col space-y-2 border p-2',
-            themeColorStyles[themeMode].border,
-          )}
+          className={cls('absolute top-6 mt-2 flex flex-col space-y-1', containerLeft)}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
@@ -67,7 +66,7 @@ export default function DropdownButtonList<T extends BlockType>({
               }}
               selectedBlockType={selectedBlockType}
               buttonSize={buttonSize}
-              className={cls('border', border, bgColor)}
+              className={cls('relative rounded-full border', border, bgColor, buttonPadding)}
             />
           ))}
         </div>
