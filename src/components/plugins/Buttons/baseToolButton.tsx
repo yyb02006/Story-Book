@@ -8,6 +8,7 @@ interface ToolButtonProps {
   selectedBlockType?: BlockType
   buttonBlockType: BlockType
   buttonSize: ButtonSize
+  className?: string
   onClick: (event?: SyntheticEvent<HTMLButtonElement>) => void
 }
 
@@ -15,6 +16,7 @@ export default function BaseToolButton({
   selectedBlockType,
   buttonBlockType,
   buttonSize,
+  className = '',
   onClick,
 }: ToolButtonProps) {
   const clickHandler = (event: SyntheticEvent<HTMLButtonElement>) => {
@@ -29,6 +31,7 @@ export default function BaseToolButton({
       aria-label={SupportedBlockType[buttonBlockType]}
       aria-checked={isSelected}
       onClick={clickHandler}
+      className={className}
     >
       <ToolbarIcon<BlockType>
         svgId={buttonBlockType}
