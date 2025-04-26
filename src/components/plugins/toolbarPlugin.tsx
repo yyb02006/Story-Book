@@ -17,6 +17,7 @@ export const ToolbarPlugin = () => {
       selectedBlockType,
       editor,
       buttonSize: buttonSizes['md'],
+      themeMode: 'dark',
     }),
     [selectedBlockType, editor],
   )
