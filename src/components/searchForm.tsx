@@ -11,11 +11,17 @@ interface SearchFormProps {
 
 export default function SearchForm({ onSearch, themeMode }: SearchFormProps) {
   const [searchWord, setSearchWord] = useState('')
+  const { border, bgColor } = themeColorStyles[themeMode]
   return (
     <form onSubmit={onSearch} className="flex h-14 w-full space-x-2">
-      <div className={cls('flex w-full rounded-full border', themeColorStyles[themeMode].border)}>
+      <div className={cls('flex w-full rounded-full border', bgColor, border)}>
         <button className="flex items-center p-2">
-          <div className="mr-1 flex aspect-square h-full items-center justify-center rounded-full border border-gray">
+          <div
+            className={cls(
+              'mr-1 flex aspect-square h-full items-center justify-center rounded-full border',
+              border,
+            )}
+          >
             <Search width={20} height={20} strokeColor="#eaeaea" strokeWidth={3} />
           </div>
           <div className="flex items-center">

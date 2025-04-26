@@ -1,6 +1,8 @@
 import { BlockType } from '#/components/plugins/blockTypes'
 import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 import { ButtonSize } from '#/components/plugins/Buttons/buttonTypes'
+import { themeColorStyles } from '#/libs/client/constants'
+import { cls } from '#/libs/client/utils'
 import { useState } from 'react'
 
 interface DropdownListProps<T> {
@@ -9,6 +11,7 @@ interface DropdownListProps<T> {
   buttonSize: ButtonSize
   onSelect: (arg: T) => void
   defaultButtonState: T
+  themeMode: ThemeMode
 }
 
 export default function DropdownButtonList<T extends BlockType>({
@@ -17,6 +20,7 @@ export default function DropdownButtonList<T extends BlockType>({
   buttonSize,
   onSelect,
   defaultButtonState,
+  themeMode,
 }: DropdownListProps<T>) {
   const [isDropdownListOpen, setIsDropdownListOpen] = useState<boolean>(false)
   const handleClick = () => {
@@ -26,6 +30,8 @@ export default function DropdownButtonList<T extends BlockType>({
   const resolvedListType = (List as string[]).includes(selectedBlockType)
     ? (selectedBlockType as (typeof List)[number])
     : defaultButtonState
+
+  const { border, bgColor } = themeColorStyles[themeMode]
 
   return (
     <div className="relative flex items-center">
@@ -42,26 +48,30 @@ export default function DropdownButtonList<T extends BlockType>({
           <use href={`icons/toolbarButtons.svg#chevron-down`} />
         </svg>
       </button>
-      <div
-        className="absolute left-0 top-6 flex w-full flex-col bg-dark-gray"
-        role="menu"
-        aria-orientation="vertical"
-        aria-labelledby="options-menu"
-      >
-        {isDropdownListOpen
-          ? List.map((node) => (
-              <BaseToolButton
-                key={node}
-                buttonBlockType={node}
-                onClick={() => {
-                  onSelect(node)
-                }}
-                selectedBlockType={selectedBlockType}
-                buttonSize={buttonSize}
-              />
-            ))
-          : null}
-      </div>
+      {isDropdownListOpen ? (
+        <div
+          className={cls(
+            'absolute -left-2 top-6 mt-2 flex flex-col space-y-2 border p-2',
+            themeColorStyles[themeMode].border,
+          )}
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="options-menu"
+        >
+          {List.map((node) => (
+            <BaseToolButton
+              key={node}
+              buttonBlockType={node}
+              onClick={() => {
+                onSelect(node)
+              }}
+              selectedBlockType={selectedBlockType}
+              buttonSize={buttonSize}
+              className={cls('border', border, bgColor)}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

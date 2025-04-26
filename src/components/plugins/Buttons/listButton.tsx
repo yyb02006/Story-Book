@@ -10,11 +10,11 @@ import { formatParagraph } from '#/components/plugins/utils'
 
 type ListNode = (typeof listNodes)[number]
 
-// 관심사 분리 필요
 export default function ListButton({
   selectedBlockType,
   editor,
   buttonSize,
+  themeMode,
 }: CommonToolButtonProps) {
   const createList = (listNodeType: ListNode) => {
     switch (true) {
@@ -52,6 +52,7 @@ export default function ListButton({
         defaultButtonState="bullet"
         onSelect={createList}
         selectedBlockType={selectedBlockType}
+        themeMode={themeMode}
       />
     </>
   )

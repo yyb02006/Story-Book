@@ -16,4 +16,5 @@ export interface CommonToolButtonProps {
   selectedBlockType: BlockType
   editor: LexicalEditor
   buttonSize: ButtonSize
+  themeMode: ThemeMode
 }
