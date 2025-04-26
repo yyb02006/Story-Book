@@ -1,7 +1,8 @@
 import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
-import { BlockType, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
+import { BlockType, codeNode, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
+import { $createCodeNode } from '@lexical/code'
 
 /**
  * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 paragraph로 변환
@@ -56,6 +57,29 @@ export const createFormatQuote = (editor: LexicalEditor, selectedBlockType: Bloc
         const selection = $getSelection()
         if ($isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createQuoteNode())
+        }
+      })
+    }
+  }
+}
+
+/**
+ * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 지정된 코드 노드 타입으로 변환하는 함수를 반환
+ *
+ * @param {LexicalEditor} editor - Lexical 에디터 인스턴스
+ * @param {BlockType} selectedBlockType - 현재 선택된 블록 타입
+ * @returns {(headingNodeType: QuoteNodeType) => void} - 헤딩 노드 타입을 인자로 받아 코드 노드 타입으로 블록을 변환하는 함수
+ * @example
+ * const formatQuote = createFormatQuote(editor, 'paragraph')
+ * formatCode('h1')
+ */
+export const createFormatCode = (editor: LexicalEditor, selectedBlockType: BlockType) => {
+  return () => {
+    if (selectedBlockType !== codeNode) {
+      editor.update(() => {
+        const selection = $getSelection()
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createCodeNode())
         }
       })
     }
