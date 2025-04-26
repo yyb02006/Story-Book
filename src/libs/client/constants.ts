@@ -6,24 +6,18 @@ export const globalNavWaves = {
 } as const
 
 export const themeColorStyles = {
-  border: {
-    dark: 'border-midnight-gray bg-dark-gray',
-    white: 'border-white-gray bg-[#bababa]',
-    default: '',
+  dark: {
+    border: 'border-midnight-gray',
+    bgColor: 'bg-dark-gray',
+    placeHolder: 'placeholder:text-light-gray',
+    placeHolderText: 'text-light-gray',
+    text: 'text-smooth-white',
   },
-  placeHolder: {
-    dark: 'placeholder:text-light-gray',
-    white: 'placeholder:text-midnight-gray',
-    default: '',
-  },
-  placeHolderText: {
-    dark: 'text-light-gray',
-    white: 'text-midnight-gray',
-    default: '',
-  },
-  text: {
-    dark: ' text-smooth-white',
-    white: ' text-smooth-black',
-    default: '',
+  white: {
+    border: 'border-white-gray',
+    bgColor: 'bg-[#bababa]',
+    placeHolder: 'placeholder:text-midnight-gray',
+    placeHolderText: 'text-midnight-gray',
+    text: 'text-smooth-black',
   },
 } as const
