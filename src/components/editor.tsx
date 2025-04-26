@@ -29,12 +29,14 @@ const TextEditorContainer = ({
   children: JSX.Element | JSX.Element[]
   themeMode: ThemeMode
 }) => {
+  const { bgColor, border, text } = themeColorStyles[themeMode]
   return (
     <div
       className={cls(
         'relative flex h-80 flex-col space-y-4 rounded-2xl border p-3',
-        themeColorStyles.border[themeMode],
-        themeColorStyles.text[themeMode],
+        bgColor,
+        border,
+        text,
       )}
     >
       {children}
@@ -47,7 +49,7 @@ const PlaceHolder = ({ children, themeMode }: { children: ReactNode; themeMode: 
     <div
       className={cls(
         'pointer-events-none absolute left-1 top-0 font-S-CoreDream-400',
-        themeColorStyles.placeHolderText[themeMode],
+        themeColorStyles[themeMode].placeHolderText,
       )}
     >
       {children}

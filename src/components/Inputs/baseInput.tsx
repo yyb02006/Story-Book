@@ -18,12 +18,12 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
   { name, placeholder, onChange, value, inputType, className = '', themeMode, ...rest }: InputProps,
   ref,
 ) => {
-  const { border, placeHolder, text } = themeColorStyles
+  const { border, placeHolder, text } = themeColorStyles[themeMode]
   const baseInputStyles = cls(
     'w-full border placeholder:pl-1 focus:ring-0 font-S-CoreDream-400',
-    border[themeMode],
-    placeHolder[themeMode],
-    text[themeMode],
+    border,
+    placeHolder,
+    text,
   )
 
   return (
