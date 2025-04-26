@@ -10,5 +10,7 @@ declare const styles: Readonly<{
   listitemChecked: string
   listitemUnchecked: string
   nestedListitem: string
+  code: string
+  [key: string]: string
 }>
 export = styles
