@@ -1,6 +1,6 @@
 import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
-import { BlockType, codeNode, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
+import { BlockType, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
 
@@ -30,13 +30,16 @@ export const formatParagraph = (editor: LexicalEditor) => {
  */
 export const createFormatHeading = (editor: LexicalEditor, selectedBlockType: BlockType) => {
   return (headingNodeType: HeadingNodeType) => {
-    if (selectedBlockType === headingNodeType) return
-    editor.update(() => {
-      const selection = $getSelection()
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode(headingNodeType))
-      }
-    })
+    if (selectedBlockType !== headingNodeType) {
+      editor.update(() => {
+        const selection = $getSelection()
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createHeadingNode(headingNodeType))
+        }
+      })
+    } else {
+      formatParagraph(editor)
+    }
   }
 }
 
@@ -59,6 +62,8 @@ export const createFormatQuote = (editor: LexicalEditor, selectedBlockType: Bloc
           $setBlocksType(selection, () => $createQuoteNode())
         }
       })
+    } else {
+      formatParagraph(editor)
     }
   }
 }
@@ -73,15 +78,20 @@ export const createFormatQuote = (editor: LexicalEditor, selectedBlockType: Bloc
  * const formatQuote = createFormatQuote(editor, 'paragraph')
  * formatCode('h1')
  */
-export const createFormatCode = (editor: LexicalEditor, selectedBlockType: BlockType) => {
-  return () => {
-    if (selectedBlockType !== codeNode) {
-      editor.update(() => {
-        const selection = $getSelection()
-        if ($isRangeSelection(selection)) {
-          $setBlocksType(selection, () => $createCodeNode())
-        }
-      })
-    }
+export const formatCode = (editor: LexicalEditor, blockType: string) => {
+  if (blockType !== 'code') {
+    editor.update(() => {
+      const selection = $getSelection()
+      if (!selection) return
+      if (!$isRangeSelection(selection) || selection.isCollapsed()) {
+        $setBlocksType(selection, () => $createCodeNode())
+      } else {
+        const textContent = selection.getTextContent()
+        selection.insertText(textContent)
+        $setBlocksType(selection, () => $createCodeNode())
+      }
+    })
+  } else {
+    formatParagraph(editor)
   }
 }
