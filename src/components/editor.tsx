@@ -48,7 +48,7 @@ const PlaceHolder = ({ children, themeMode }: { children: ReactNode; themeMode: 
   return (
     <div
       className={cls(
-        'pointer-events-none absolute left-1 top-0 font-S-CoreDream-400',
+        'font-S-CoreDream-400 pointer-events-none absolute left-1 top-0',
         themeColorStyles[themeMode].placeHolderText,
       )}
     >
@@ -70,7 +70,7 @@ export function Editor() {
       <TextInput
         name="title"
         value=""
-        className="h-14 rounded-2xl bg-dark-gray p-3 text-base"
+        className="bg-dark-gray h-14 rounded-2xl p-3 text-base"
         placeholder="제목을 입력해주세요"
         themeMode="dark"
       />

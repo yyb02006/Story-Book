@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={cls(inter.className, patrick_hand.variable)}>
         <Header themeMode="dark" />
         <GlobalNav />
-        <div className="h-screen bg-smooth-black pl-gnb-left pt-gsb-top universe-box-shadow">
+        <div className="bg-smooth-black pl-gnb-left pt-gsb-top universe-box-shadow h-screen">
           {children}
         </div>
       </body>
