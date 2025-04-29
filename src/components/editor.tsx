@@ -14,44 +14,23 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
-import { cls } from '#/libs/client/utils'
-import { themeColorStyles } from '#/libs/client/constants'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 
 function onError(error: unknown) {
   console.error(error)
 }
 
-const TextEditorContainer = ({
-  children,
-  themeMode,
-}: {
-  children: JSX.Element | JSX.Element[]
-  themeMode: ThemeMode
-}) => {
-  const { bgColor, border, text } = themeColorStyles[themeMode]
+const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
-    <div
-      className={cls(
-        'relative flex h-80 flex-col space-y-4 rounded-2xl border p-3',
-        bgColor,
-        border,
-        text,
-      )}
-    >
+    <div className="input-text-color-theme relative flex h-80 flex-col space-y-4 rounded-2xl p-3">
       {children}
     </div>
   )
 }
 
-const PlaceHolder = ({ children, themeMode }: { children: ReactNode; themeMode: ThemeMode }) => {
+const PlaceHolder = ({ children }: { children: ReactNode }) => {
   return (
-    <div
-      className={cls(
-        'font-S-CoreDream-400 pointer-events-none absolute top-0 left-1',
-        themeColorStyles[themeMode].placeHolderText,
-      )}
-    >
+    <div className="font-S-CoreDream-400 text-light-placeholder dark:text-dark-placeholder pointer-events-none absolute top-0 left-1">
       {children}
     </div>
   )
@@ -70,18 +49,17 @@ export function Editor() {
       <TextInput
         name="title"
         value=""
-        className="bg-dark-gray h-14 rounded-2xl p-3 text-base"
+        className="input-text-color-theme h-14 rounded-2xl p-3 text-base"
         placeholder="제목을 입력해주세요"
-        themeMode="dark"
       />
-      <TextEditorContainer themeMode="dark">
+      <TextEditorContainer>
         <div className="relative z-[1]">
           <ToolbarPlugin />
         </div>
         <div className="relative z-0 size-full">
           <RichTextPlugin
             contentEditable={<ContentEditable className="h-full" />}
-            placeholder={<PlaceHolder themeMode="dark">내용을 입력해주세요</PlaceHolder>}
+            placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
             ErrorBoundary={LexicalErrorBoundary}
           />
         </div>

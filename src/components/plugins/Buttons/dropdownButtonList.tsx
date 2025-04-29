@@ -1,7 +1,6 @@
 import { BlockType } from '#/components/plugins/blockTypes'
 import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
 import { ButtonSize } from '#/components/plugins/Buttons/buttonTypes'
-import { themeColorStyles } from '#/libs/client/constants'
 import { cls } from '#/libs/client/utils'
 import { useState } from 'react'
 
@@ -11,7 +10,6 @@ interface DropdownListProps<T> {
   buttonSize: ButtonSize
   onSelect: (arg: T) => void
   defaultButtonState: T
-  themeMode: ThemeMode
 }
 
 export default function DropdownButtonList<T extends BlockType>({
@@ -20,7 +18,6 @@ export default function DropdownButtonList<T extends BlockType>({
   buttonSize,
   onSelect,
   defaultButtonState,
-  themeMode,
 }: DropdownListProps<T>) {
   const [isDropdownListOpen, setIsDropdownListOpen] = useState<boolean>(false)
   const handleClick = () => {
@@ -30,8 +27,6 @@ export default function DropdownButtonList<T extends BlockType>({
   const resolvedListType = (List as string[]).includes(selectedBlockType)
     ? (selectedBlockType as (typeof List)[number])
     : defaultButtonState
-
-  const { border, bgColor } = themeColorStyles[themeMode]
 
   const [containerLeft, buttonPadding] = ['-left-2', 'p-2']
 
@@ -46,7 +41,7 @@ export default function DropdownButtonList<T extends BlockType>({
         }}
       />
       <button onClick={handleClick}>
-        <svg className="size-[12px] text-[#808080]">
+        <svg className="dark:text-dark-disabled-icon text-light-disabled-icon size-[12px]">
           <use href={`icons/toolbarButtons.svg#chevron-down`} />
         </svg>
       </button>
@@ -66,7 +61,10 @@ export default function DropdownButtonList<T extends BlockType>({
               }}
               selectedBlockType={selectedBlockType}
               buttonSize={buttonSize}
-              className={cls('relative rounded-full border', border, bgColor, buttonPadding)}
+              className={cls(
+                'dark:border-dark-border dark:bg-dark-bg border-light-border bg-light-bg relative rounded-full border',
+                buttonPadding,
+              )}
             />
           ))}
         </div>

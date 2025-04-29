@@ -14,7 +14,6 @@ export default function ListButton({
   selectedBlockType,
   editor,
   buttonSize,
-  themeMode,
 }: CommonToolButtonProps) {
   const createList = (listNodeType: ListNode) => {
     switch (true) {
@@ -52,7 +51,6 @@ export default function ListButton({
         defaultButtonState="bullet"
         onSelect={createList}
         selectedBlockType={selectedBlockType}
-        themeMode={themeMode}
       />
     </>
   )

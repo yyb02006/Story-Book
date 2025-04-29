@@ -1,4 +1,3 @@
-import { themeColorStyles } from '#/libs/client/constants'
 import { cls } from '#/libs/client/utils'
 import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 
@@ -7,7 +6,6 @@ type InputValueType = string | number
 interface InputProps {
   name: string
   inputType: 'text' | 'number'
-  themeMode: ThemeMode
   className?: string
   value?: InputValueType
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
@@ -15,16 +13,10 @@ interface InputProps {
 }
 
 const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
-  { name, placeholder, onChange, value, inputType, className = '', themeMode, ...rest }: InputProps,
+  { name, placeholder, onChange, value, inputType, className = '', ...rest }: InputProps,
   ref,
 ) => {
-  const { border, placeHolder, text } = themeColorStyles[themeMode]
-  const baseInputStyles = cls(
-    'w-full border placeholder:pl-1 focus:ring-0 font-S-CoreDream-400',
-    border,
-    placeHolder,
-    text,
-  )
+  const baseInputStyles = 'w-full placeholder:pl-1 focus:ring-0 font-S-CoreDream-400'
 
   return (
     <input
@@ -34,7 +26,7 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       placeholder={placeholder}
       type={inputType}
       spellCheck={false}
-      className={cls(className, baseInputStyles)}
+      className={cls(baseInputStyles, className)}
       value={value}
       // size={20} default
       {...rest}

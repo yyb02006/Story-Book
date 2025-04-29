@@ -36,7 +36,9 @@ export default function BaseToolButton({
       <ToolbarIcon<BlockType>
         svgId={buttonBlockType}
         size={buttonSize}
-        className={cls(isSelected ? 'text-bright-blue' : 'text-[#808080]')}
+        className={cls(
+          isSelected ? 'text-bright-blue' : 'dark:text-dark-disabled-icon text-light-disabled-icon',
+        )}
       />
     </button>
   )

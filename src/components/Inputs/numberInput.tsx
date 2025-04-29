@@ -5,7 +5,6 @@ import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 interface NumberInputProps {
   name: string
   value: number | undefined
-  themeMode: ThemeMode
   className?: string
   placeholder?: string
   onChange?: (value: number | undefined, event: ChangeEvent<HTMLInputElement>) => void
@@ -18,7 +17,6 @@ const NumberInputCallback: ForwardRefRenderFunction<HTMLInputElement, NumberInpu
     onChange,
     value,
     className = '',
-    themeMode,
     ...rest
   }: NumberInputProps,
   ref,
@@ -35,7 +33,6 @@ const NumberInputCallback: ForwardRefRenderFunction<HTMLInputElement, NumberInpu
       inputType="number"
       className={className}
       value={value}
-      themeMode={themeMode}
       {...rest}
     />
   )

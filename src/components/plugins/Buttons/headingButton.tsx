@@ -7,7 +7,6 @@ export default function HeadingButton({
   selectedBlockType,
   editor,
   buttonSize,
-  themeMode,
 }: CommonToolButtonProps) {
   const formatHeading = createFormatHeading(editor, selectedBlockType)
   return (
@@ -18,7 +17,6 @@ export default function HeadingButton({
         defaultButtonState="h1"
         onSelect={formatHeading}
         selectedBlockType={selectedBlockType}
-        themeMode={themeMode}
       />
     </>
   )

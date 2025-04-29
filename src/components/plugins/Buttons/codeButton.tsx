@@ -14,7 +14,7 @@ const codeLanguagesOptions = Object.entries(CODE_LANGUAGE_FRIENDLY_NAME_MAP).map
   ([value, label]) => ({ value, label }),
 )
 
-interface CodeDropDownProps extends Omit<CommonToolButtonProps, 'buttonSize' | 'themeMode'> {
+interface CodeDropDownProps extends Omit<CommonToolButtonProps, 'buttonSize'> {
   setIsDropdownListOpen: Dispatch<SetStateAction<boolean>>
   isDropdownListOpen: boolean
   codeLanguage: string
@@ -43,10 +43,14 @@ const CodeDropDown = ({
           setIsDropdownListOpen((p) => !p)
         }}
       >
-        <ToolbarIcon className="text-[#808080]" size={buttonSizes.xs} svgId="chevron-down" />
+        <ToolbarIcon
+          className="dark:text-dark-disabled-icon text-light-disabled-icon"
+          size={buttonSizes.xs}
+          svgId="chevron-down"
+        />
       </button>
       {isDropdownListOpen ? (
-        <ul className="bg-charcoal-gray absolute left-0 h-[200px] overflow-hidden rounded-lg">
+        <ul className="input-text-color-theme absolute left-0 h-[200px] overflow-hidden rounded-lg">
           <div className="scrollbar scrollbar-w-1 scrollbar-thumb-bright-blue h-full overflow-y-scroll">
             {codeLanguagesOptions.map(({ label, value }) => (
               <li
@@ -56,7 +60,7 @@ const CodeDropDown = ({
                 }}
                 className={cls(
                   isLanguageSelected(value) ? 'text-bright-blue' : '',
-                  'hover:bg-midnight-gray cursor-pointer px-2 py-1 whitespace-nowrap nth-[1]:pt-2 nth-last-[1]:pb-2',
+                  'dark:hover:bg-midnight-gray cursor-pointer px-2 py-1 whitespace-nowrap hover:bg-[#a0a0a0] nth-[1]:pt-2 nth-last-[1]:pb-2',
                 )}
               >
                 {label}

@@ -4,7 +4,6 @@ import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 interface InputProps {
   name: string
   value: string | undefined
-  themeMode: ThemeMode
   className?: string
   placeholder?: string
   onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void
@@ -17,7 +16,6 @@ const TextInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
     onChange,
     value,
     className = '',
-    themeMode,
     ...rest
   }: InputProps,
   ref,
@@ -35,7 +33,6 @@ const TextInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       inputType="text"
       className={className}
       value={value}
-      themeMode={themeMode}
       {...rest}
     />
   )
