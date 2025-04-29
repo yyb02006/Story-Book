@@ -25,7 +25,7 @@ export default function SearchForm({ onSearch, themeMode }: SearchFormProps) {
             <Search width={20} height={20} strokeColor="#eaeaea" strokeWidth={3} />
           </div>
           <div className="flex items-center">
-            <div className="mt-[2px] border-4 border-transparent border-t-smooth-white" />
+            <div className="border-t-smooth-white mt-[2px] border-4 border-transparent" />
           </div>
         </button>
         <TextInput
@@ -40,7 +40,7 @@ export default function SearchForm({ onSearch, themeMode }: SearchFormProps) {
         />
       </div>
       <button type="submit" className="flex aspect-square items-center justify-center p-1">
-        <div className="flex aspect-square h-full items-center justify-center rounded-full bg-bright-blue">
+        <div className="bg-bright-blue flex aspect-square h-full items-center justify-center rounded-full">
           <Search width={24} height={24} strokeColor="#eaeaea" strokeWidth={2} />
         </div>
       </button>

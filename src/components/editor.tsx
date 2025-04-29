@@ -48,7 +48,7 @@ const PlaceHolder = ({ children, themeMode }: { children: ReactNode; themeMode: 
   return (
     <div
       className={cls(
-        'font-S-CoreDream-400 pointer-events-none absolute left-1 top-0',
+        'font-S-CoreDream-400 pointer-events-none absolute top-0 left-1',
         themeColorStyles[themeMode].placeHolderText,
       )}
     >
