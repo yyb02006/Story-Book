@@ -1,5 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
-
 import { CSSProperties } from 'react'
 
 type StrokeColor = `#${string}`
