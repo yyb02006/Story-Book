@@ -8,6 +8,8 @@
   }
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-patrick-hand: 'Patrick Hand', cursive;
   --font-pretendard: 'Pretendard-Regular', sans-serif;
@@ -33,6 +35,17 @@
   --color-slate-blue: #474e79;
   --color-bright-blue: #516afc;
   --color-sky-blue: #76aadf;
+
+  --color-dark-disabled-icon: #808080;
+  --color-dark-bg: var(--color-dark-gray);
+  --color-dark-border: var(--color-midnight-gray);
+  --color-dark-text: var(--color-smooth-white);
+  --color-dark-placeholder: var(--color-light-gray);
+  --color-light-disabled-icon: #606060;
+  --color-light-bg: #e0e0e0;
+  --color-light-border: var(--color-white-gray);
+  --color-light-text: var(--color-smooth-black);
+  --color-light-placeholder: var(--color-midnight-gray);
 }
 
 @utility hide-scrollbar {
@@ -41,6 +54,28 @@
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@layer components {
+  .input-text-color-theme {
+    border-width: 1px;
+    &:where(.dark, .dark *) {
+      background-color: var(--color-dark-bg);
+      border-color: var(--color-dark-border);
+      color: var(--color-dark-text);
+      &::placeholder {
+        color: var(--color-dark-placeholder);
+      }
+    }
+    &:where(.light, .light *) {
+      background-color: var(--color-light-bg);
+      border-color: var(--color-light-border);
+      color: var(--color-light-text);
+      &::placeholder {
+        color: var(--color-light-placeholder);
+      }
+    }
+  }
 }
 
 :root {
@@ -64,8 +99,6 @@
 @plugin 'tailwind-scrollbar' {
   nocompatible: true;
 }
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
   font-family: 'S-CoreDream-100';
