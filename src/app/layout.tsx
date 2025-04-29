@@ -4,6 +4,7 @@ import './globals.css'
 import GlobalNav from '#/components/header/globalNav'
 import { cls } from '#/libs/client/utils'
 import Header from '#/components/header/header'
+import RootThemeProvider from '#/components/rootThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 const patrick_hand = Patrick_Hand({
@@ -25,11 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cls(inter.className, patrick_hand.variable)}>
-        <Header themeMode="dark" />
-        <GlobalNav />
-        <div className="bg-smooth-black pl-gnb-left pt-gsb-top universe-box-shadow h-screen">
-          {children}
-        </div>
+        <RootThemeProvider>
+          <Header themeMode="dark" />
+          <GlobalNav />
+          <div className="bg-smooth-black pl-gnb-left pt-gsb-top universe-box-shadow h-screen">
+            {children}
+          </div>
+        </RootThemeProvider>
       </body>
     </html>
   )
