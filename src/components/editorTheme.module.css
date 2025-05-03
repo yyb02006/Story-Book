@@ -168,3 +168,76 @@
 .codeHighlight__tokenFunction {
   color: #dd4a68;
 }
+
+.textBold {
+  font-weight: bold;
+}
+
+.textItalic {
+  font-style: italic;
+}
+
+.textUnderline {
+  text-decoration: underline;
+}
+
+.textStrikethrough {
+  text-decoration: line-through;
+}
+
+.textUnderlineStrikethrough {
+  text-decoration: underline line-through;
+}
+
+.tabNode.textUnderline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.15em;
+  border-bottom: 0.1em solid currentColor;
+}
+
+.tabNode.textStrikethrough::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.69em;
+  border-top: 0.1em solid currentColor;
+}
+
+.tabNode.textUnderlineStrikethrough::before,
+.tabNode.textUnderlineStrikethrough::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.tabNode.textUnderlineStrikethrough::before {
+  top: 0.69em;
+  border-top: 0.1em solid currentColor;
+}
+
+.tabNode.textUnderlineStrikethrough::after {
+  bottom: 0.05em;
+  border-bottom: 0.1em solid currentColor;
+}
+
+.textSubscript {
+  font-size: 0.8em;
+  vertical-align: sub !important;
+}
+
+.textSuperscript {
+  font-size: 0.8em;
+  vertical-align: super;
+}
+
+.textCode {
+  background-color: var(--color-midnight-gray);
+  padding: 1px 0.25rem;
+  font-family: Menlo, Consolas, Monaco, monospace;
+  font-size: 94%;
+}

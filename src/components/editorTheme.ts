@@ -22,6 +22,16 @@ export const theme: EditorThemeClasses = {
       listitem: editorTheme.nestedListitem,
     },
   },
+  text: {
+    bold: editorTheme.textBold,
+    code: editorTheme.textCode,
+    italic: editorTheme.textItalic,
+    underline: editorTheme.textUnderline,
+    strikethrough: editorTheme.textStrikethrough,
+    underlineStrikethrough: editorTheme.textUnderlineStrikethrough,
+    subscript: editorTheme.textSubscript,
+    superscript: editorTheme.textSuperscript,
+  },
   code,
   codeHighlight: {
     atrule: editorTheme.codeHighlight__tokenAttr,

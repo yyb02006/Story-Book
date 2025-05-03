@@ -11,6 +11,14 @@ declare const styles: Readonly<{
   listitemUnchecked: string
   nestedListitem: string
   code: string
+  textBold: string
+  textCode: string
+  textItalic: string
+  textUnderline: string
+  textStrikethrough: string
+  textUnderlineStrikethrough: string
+  textSubscript: string
+  textSuperscript: string
   [key: string]: string
 }>
 export = styles
