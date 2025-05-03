@@ -15,6 +15,7 @@ import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import InlineToolbarPlugin from '#/components/plugins/inlineToolbarPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -53,8 +54,9 @@ export function Editor() {
         placeholder="제목을 입력해주세요"
       />
       <TextEditorContainer>
-        <div className="relative z-[1]">
+        <div className="relative z-[1] flex gap-3">
           <ToolbarPlugin />
+          <InlineToolbarPlugin />
         </div>
         <div className="relative z-0 size-full">
           <RichTextPlugin
