@@ -55,3 +55,32 @@ export function parseInputValue<T>(value: string, previousValue: T) {
     return newValue
   }
 }
+
+const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'sms:', 'tel:'])
+
+/**
+ * URL의 안전성 검사 및 정제
+ * 지원되지 않는 프로토콜(예: javascript:)이 포함된 URL은 'about:blank'로 대체
+ * URL 파싱에 실패한 경우(잘못된 형식)에는 원래 URL을 그대로 반환
+ *
+ * @param {string} url - 정제할 URL 문자열.
+ * @returns {string} 안전한 URL 또는 'about:blank'(위험한 URL인 경우).
+ *
+ * @example
+ * const safeUrl = sanitizeUrl('https://example.com'); // 'https://example.com'
+ * const sanitized = sanitizeUrl('javascript:alert("XSS")'); // 'about:blank'
+ * const invalid = sanitizeUrl('invalid-url'); // 'invalid-url'
+ */
+export function sanitizeUrl(url: string): string {
+  try {
+    const parsedUrl = new URL(url)
+
+    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+      return 'about:blank'
+    }
+  } catch {
+    return url
+  }
+
+  return url
+}
