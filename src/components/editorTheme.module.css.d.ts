@@ -19,6 +19,7 @@ declare const styles: Readonly<{
   textUnderlineStrikethrough: string
   textSubscript: string
   textSuperscript: string
+  link: string
   [key: string]: string
 }>
 export = styles

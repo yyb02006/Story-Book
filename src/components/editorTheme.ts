@@ -1,7 +1,7 @@
 import { EditorThemeClasses } from 'lexical'
 import editorTheme from '#/components/editorTheme.module.css'
 
-const { h1, h2, h3, h4, listitem, listitemChecked, listitemUnchecked, ol, quote, ul, code } =
+const { h1, h2, h3, h4, listitem, listitemChecked, listitemUnchecked, ol, quote, ul, code, link } =
   editorTheme
 
 export const theme: EditorThemeClasses = {
@@ -33,6 +33,7 @@ export const theme: EditorThemeClasses = {
     superscript: editorTheme.textSuperscript,
   },
   code,
+  link,
   codeHighlight: {
     atrule: editorTheme.codeHighlight__tokenAttr,
     attr: editorTheme.codeHighlight__tokenAttr,
