@@ -6,7 +6,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
-import { ComponentProps, ReactNode } from 'react'
+import { ComponentProps, ReactNode, useState } from 'react'
 import { nodes } from '#/libs/client/nodes'
 import { ToolbarPlugin } from '#/components/plugins/toolbarPlugin'
 import { theme } from '#/components/editorTheme'
@@ -16,6 +16,8 @@ import CodeHighlightPlugin from '#/components/plugins/codeHighlightPlugin'
 import { TextInput } from '#/components/Inputs'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import InlineToolbarPlugin from '#/components/plugins/inlineToolbarPlugin'
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import FloatingLinkEditorPlugin from '#/components/plugins/FloatingLinkEditorPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -45,6 +47,15 @@ export function Editor() {
     nodes,
   }
 
+  const [isLinkEditMode, setIsLinkEditMode] = useState(false)
+  const [floatingAnchorElement, setFloatingAnchorElement] = useState<HTMLDivElement | null>(null)
+
+  const onFloatingAnchorRef = (_floatingAnchorElement: HTMLDivElement) => {
+    if (_floatingAnchorElement !== null) {
+      setFloatingAnchorElement(_floatingAnchorElement)
+    }
+  }
+
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <TextInput
@@ -56,11 +67,15 @@ export function Editor() {
       <TextEditorContainer>
         <div className="relative z-[1] flex gap-3">
           <ToolbarPlugin />
-          <InlineToolbarPlugin />
+          <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
         </div>
-        <div className="relative z-0 size-full">
+        <div className="relative z-0 size-full bg-indigo-400">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="h-full" />}
+            contentEditable={
+              <div ref={onFloatingAnchorRef} className="bg-red-500">
+                <ContentEditable className="h-full" />
+              </div>
+            }
             placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
             ErrorBoundary={LexicalErrorBoundary}
           />
@@ -72,6 +87,14 @@ export function Editor() {
       <CheckListPlugin />
       <CodeHighlightPlugin />
       <TabIndentationPlugin />
+      <LinkPlugin />
+      {floatingAnchorElement && (
+        <FloatingLinkEditorPlugin
+          floatingAnchorElement={floatingAnchorElement}
+          isLinkEditMode={isLinkEditMode}
+          setIsLinkEditMode={setIsLinkEditMode}
+        />
+      )}
     </LexicalComposer>
   )
 }
