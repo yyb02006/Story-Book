@@ -1,5 +1,13 @@
-import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor } from 'lexical'
-import { $setBlocksType } from '@lexical/selection'
+import {
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+  LexicalEditor,
+  ElementNode,
+  RangeSelection,
+  TextNode,
+} from 'lexical'
+import { $setBlocksType, $isAtNodeEnd } from '@lexical/selection'
 import { BlockType, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
@@ -93,5 +101,50 @@ export const formatCode = (editor: LexicalEditor, blockType: string) => {
     })
   } else {
     formatParagraph(editor)
+  }
+}
+
+/**
+ * 주어진 선택 범위에서 선택된 노드를 반환
+ * 선택이 역방향인지 여부에 따라 앵커 노드 또는 포커스 노드를 반환
+ *
+ * @param {RangeSelection} selection - 선택 범위 객체
+ * @returns {TextNode | ElementNode} - 선택된 노드 (텍스트 노드 또는 요소 노드)
+ */
+export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
+  const anchor = selection.anchor
+  const focus = selection.focus
+  const anchorNode = selection.anchor.getNode()
+  const focusNode = selection.focus.getNode()
+
+  /*
+  [노드 1의 끝] | [노드 2의 시작 부분...]
+                |_____________|
+               앵커          포커스
+
+  위와 같이 사용자는 노드 2를 드래그한 것이지만
+  이건 노드 1의 끝이기도 해서, 앵커는 노드 1이 선택됨.
+
+  사용자가 무엇을 선택했는 지 정확히 알려면 이 상황에서는 포커스가 선택되어야함.
+
+  역방향인 경우는 반대로 적용. 
+  */
+
+  // 앵커와 포커스가 같은 노드에 있는 경우, 해당 노드 반환
+  if (anchorNode === focusNode) {
+    return anchorNode
+  }
+
+  // 선택이 역방향인지 확인
+  const isBackward = selection.isBackward()
+
+  // 역방향 선택인 경우
+  if (isBackward) {
+    // 포커스가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
+    return $isAtNodeEnd(focus) ? anchorNode : focusNode
+  } else {
+    // 정방향 선택인 경우
+    // 앵커가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
+    return $isAtNodeEnd(anchor) ? anchorNode : focusNode
   }
 }
