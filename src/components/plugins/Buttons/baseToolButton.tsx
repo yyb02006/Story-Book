@@ -37,6 +37,7 @@ export default function BaseToolButton({
         svgId={buttonBlockType}
         size={buttonSize}
         className={cls(
+          'hover:text-bright-blue',
           isSelected ? 'text-bright-blue' : 'dark:text-dark-disabled-icon text-light-disabled-icon',
         )}
       />
