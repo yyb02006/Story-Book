@@ -25,7 +25,7 @@ function onError(error: unknown) {
 
 const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
-    <div className="input-text-color-theme relative flex h-80 flex-col space-y-4 rounded-2xl p-3">
+    <div className="input-text-color-theme relative flex h-fit min-h-80 flex-col space-y-4 rounded-2xl p-3">
       {children}
     </div>
   )
@@ -69,10 +69,10 @@ export function Editor() {
           <ToolbarPlugin />
           <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
         </div>
-        <div className="relative z-0 size-full bg-indigo-400">
+        <div className="relative z-0 grow">
           <RichTextPlugin
             contentEditable={
-              <div ref={onFloatingAnchorRef} className="bg-red-500">
+              <div ref={onFloatingAnchorRef}>
                 <ContentEditable className="h-full" />
               </div>
             }
