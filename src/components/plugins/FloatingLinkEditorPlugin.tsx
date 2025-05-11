@@ -9,48 +9,21 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  ElementNode,
   getDOMSelection,
   KEY_ESCAPE_COMMAND,
   LexicalEditor,
-  RangeSelection,
   SELECTION_CHANGE_COMMAND,
-  TextNode,
 } from 'lexical'
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
 import { $findMatchingParent } from '@lexical/utils'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
 import { createPortal } from 'react-dom'
-import { $isAtNodeEnd } from '@lexical/selection'
 import { sanitizeUrl } from '#/libs/client/utils'
+import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
+import { getSelectedNode } from '#/components/plugins/utils'
 
-function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
-  const anchor = selection.anchor
-  const focus = selection.focus
-  const anchorNode = selection.anchor.getNode()
-  const focusNode = selection.focus.getNode()
-
-  // 앵커와 포커스가 같은 노드에 있는 경우, 해당 노드 반환
-  if (anchorNode === focusNode) {
-    return anchorNode
-  }
-
-  // 선택이 역방향인지 확인
-  const isBackward = selection.isBackward()
-
-  // 역방향 선택인 경우
-  if (isBackward) {
-    // 포커스가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
-    return $isAtNodeEnd(focus) ? anchorNode : focusNode
-  } else {
-    // 정방향 선택인 경우
-    // 앵커가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
-    return $isAtNodeEnd(anchor) ? anchorNode : focusNode
-  }
-}
-
-function setFloatingElemPositionForLinkEditor(
+/* function setFloatingElemPositionForLinkEditor(
   targetRect: DOMRect | null,
   floatingElem: HTMLElement,
   anchorElem: HTMLElement,
@@ -89,6 +62,41 @@ function setFloatingElemPositionForLinkEditor(
 
   floatingElem.style.opacity = '1'
   floatingElem.style.transform = `translate(${left}px, ${top}px)`
+} */
+
+const setFloatingElemPositionForLinkEditor = (
+  targetLinkNodeRect: DOMRect | null,
+  floatingElem: HTMLElement,
+  anchorElem: HTMLElement,
+  verticalGap: number = 10,
+  horizontalOffset: number = 5,
+) => {
+  const scrollerElem = anchorElem.parentElement
+
+  if (targetLinkNodeRect === null || !scrollerElem) {
+    floatingElem.style.opacity = '0'
+    floatingElem.style.transform = 'translate(-10000px, -10000px)'
+    return
+  }
+
+  // 링크 에디터
+  const floatingElemRect = floatingElem.getBoundingClientRect()
+  // 에디터 실제 컨텐츠가 작성된 영역
+  const anchorElementRect = anchorElem.getBoundingClientRect()
+  // 에디터 컨텐츠 박스 뷰 영역
+  const editorScrollerRect = scrollerElem.getBoundingClientRect()
+
+  // targeRect = 링크노드
+  let left = targetLinkNodeRect.left - horizontalOffset
+
+  if (left + floatingElemRect.width > editorScrollerRect.right) {
+    left = editorScrollerRect.right - floatingElemRect.width - horizontalOffset
+  }
+
+  left -= anchorElementRect.left
+
+  floatingElem.style.opacity = '1'
+  floatingElem.style.transform = `translate(${left}px, ${verticalGap}px)`
 }
 
 function FloatingLinkEditor({
@@ -111,9 +119,6 @@ function FloatingLinkEditor({
   const [linkUrl, setLinkUrl] = useState('')
   const [editedLinkUrl, setEditedLinkUrl] = useState('https://')
   const [lastSelection, setLastSelection] = useState<BaseSelection | null>(null)
-  /*   const editorElem = editorRef.current
-  const nativeSelection = getDOMSelection(editor._window)
-  const activeElement = document.activeElement */
   const $updateLinkEditor = useCallback(() => {
     const selection = $getSelection()
     if ($isRangeSelection(selection)) {
@@ -128,6 +133,8 @@ function FloatingLinkEditor({
         setLinkUrl('')
       }
 
+      // 위의 setLinkUrl은 링크 노드로 이동할 때 한 번 실행되고, 이 때 링크노드의 url이 linkUrl에 할당된다.
+      // 이 후 isLinkEditMode가 true가 되면서 한 번 더 실행되고, 아래 조건문이 실행되며 url이 할당된 linkUrl로 부터 값을 받을 수 있게 된다.
       if (isLinkEditMode) {
         setEditedLinkUrl(linkUrl)
       }
@@ -160,7 +167,6 @@ function FloatingLinkEditor({
 
     if (selection !== null && rootElement !== null && editor.isEditable()) {
       let domRect: DOMRect | undefined
-
       if ($isNodeSelection(selection)) {
         const nodes = selection.getNodes()
 
@@ -171,20 +177,45 @@ function FloatingLinkEditor({
           }
         }
       } else if (nativeSelection !== null && rootElement.contains(nativeSelection.anchorNode)) {
+        // 위 조건문의 문제는, 링크 버튼 클릭으로 링크 생성시 selection(커서)가 사라지면서
+        // rootElement에 nativeSelection이 포함되지 않게 되어
+        // 값이 false가 되며 실행문이 작동하지 않아 브라우저 리사이징에 대응할 수 없게됨
+
+        /* rootElement.contains(nativeSelection.anchorNode)
+        위 조건을 제거 했더니 리사이징 시에 에디터 스타일이 예상대로 작동하지 않는다 why?
+        이 실행문은 링크 셀렉션의 DOMRect값을 가져오는 것이 목적이다
+        그러나 링크 에디터가 처음 생성될 때는 아래 구현된 focus동작 때문에 nativeSelection이 링크 에디터 요소를 가리킨다
+        조건문을 보면 rootElement(메인 에디터) 내에 생성된 nativeSelection이 있어야 하지만
+        링크 에디터는 rootElement 외부에 있는 요소이기 때문에 링크 에디터가 focus된 상태에서는 이 실행문이 작동하지 않고
+        링크 에디터가 focus된 상태에서는 리사이징과 같은 이벤트에서 스타일의 업데이트가 불가능해진다.
+        반면 저 조건을 지우면 어떤 nativeSelection도 가져올 수 있게 되어서 링크 에디터의 getBoundingClientRect를 가져와버리게 된다
+        원래 링크 셀렉션의 DOMRect를 가져와서 넣어야 하는데 링크 에디터의 DOMRect를 가져와서 넣으니 스타일이 이상해진다 */
+
         // 링크가 겹칠 때도 해결할 수 있을까? 겹친 상태로는 링크 삽입이 안되게 하거나, 플레이그라운드에서도 해결 안 되어 있음
+
+        // 아래와 같은 방법으로 셀렉션을 앞으로 긁었을 때도, 뒤로 긁었을 때도 작동하도록 만들어야 함
         domRect = selection.isBackward()
           ? nativeSelection.anchorNode?.parentElement?.getBoundingClientRect()
           : nativeSelection.focusNode?.parentElement?.getBoundingClientRect()
-        // 여기서 link 버튼을 클릭해도 여전히 전체 노드를 할당하기 때문에 링크 에디터가 맨 왼쪽에 가있게 됨
-        // 그 후 실제 링크노드를 클릭하면 그때서야 linknode를 선택했다고 판단되어 제대로 된 위치에 링크 에디터가 생성됨
+      } else if (isLinkEditMode && inputRef.current) {
+        // 링크 에디터 생성 시 포커스 이동때문에 리사이징에 대응할 수 없었던 문제를 해결하는 조건문
+        // inputRef.current가 존재하는 링크 에디터가 있다면, 최근 셀렉션에서 앵커노드를 가져와 domRect에 넣어준다
+        // 여기서 링크 에디터는 링크 노드와 상호작용을 해야 생성되기 때문에 위 조건에서 최근 셀렉션은 항상 링크 노드 아래에 있다
+        editor.getEditorState().read(() => {
+          if ($isRangeSelection(lastSelection) && lastSelection._cachedNodes) {
+            const node = lastSelection.anchor.getNode()
+            const domElement = editor.getElementByKey(node.getKey())
 
-        // 정확한 원인은 111111111111111111222에서 222만 링크노드로 만들 때, 뒤에서 앞으로 드래그를 긁으면
-        // focusNode가 1과 2사이에서 111111111111111111을 가리키기 때문에 앞 111111111111111111의 getBoundingClientRect를 가져와버린다
-        console.log(nativeSelection.focusNode)
+            if (domElement) {
+              domRect = domElement.getBoundingClientRect()
+            }
+          }
+        })
       }
 
       if (domRect) {
-        domRect.y += 40
+        domRect.y += 20
+
         setFloatingElemPositionForLinkEditor(domRect, editorElem, floatingAnchorElement)
       }
       setLastSelection(selection)
@@ -196,7 +227,7 @@ function FloatingLinkEditor({
       setIsLinkEditMode(false)
       setLinkUrl('')
     }
-  }, [editor, floatingAnchorElement, isLinkEditMode, linkUrl, setIsLinkEditMode])
+  }, [editor, floatingAnchorElement, isLinkEditMode, linkUrl, setIsLinkEditMode, lastSelection])
 
   useEffect(() => {
     const scrollerElem = floatingAnchorElement.parentElement
@@ -252,12 +283,14 @@ function FloatingLinkEditor({
     )
   }, [editor, $updateLinkEditor, setIsLink, isLink])
 
+  // 왜 이 코드가 필요하지?
   useEffect(() => {
     editor.getEditorState().read(() => {
       $updateLinkEditor()
     })
   }, [editor, $updateLinkEditor])
 
+  // 링크 에디터 생성 시 자동으로 포커스(마우스 커서)를 에디터 인풋으로 옮겨주는 코드
   useEffect(() => {
     if (isLinkEditMode && inputRef.current) {
       inputRef.current.focus()
@@ -278,7 +311,7 @@ function FloatingLinkEditor({
   ) => {
     event.preventDefault()
     if (lastSelection !== null) {
-      if (linkUrl !== '') {
+      if (linkUrl !== '' && editedLinkUrl !== '') {
         editor.update(() => {
           editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl))
         })
@@ -289,81 +322,107 @@ function FloatingLinkEditor({
   }
 
   return (
-    <div ref={linkEditorRef} className="absolute flex w-fit bg-amber-400 p-5">
-      {!isLink ? null : isLinkEditMode ? (
-        <>
-          <input
-            ref={inputRef}
-            className="link-input"
-            value={editedLinkUrl}
-            onChange={(event) => {
-              setEditedLinkUrl(event.target.value)
-            }}
-            onKeyDown={(event) => {
-              monitorInputInteraction(event)
-            }}
-          />
-          <div className="flex">
-            <div
-              className="size-10 bg-pink-400"
-              role="button"
-              tabIndex={0}
-              onMouseDown={(event) => {
-                event.preventDefault()
-              }}
-              onClick={() => {
-                setIsLinkEditMode(false)
-              }}
-            >
-              취소
+    <div ref={linkEditorRef} className="absolute w-[360px] rounded-2xl">
+      {!isLink ? null : (
+        <div className="border-gray bg-charcoal-gray shadow-smooth-gray dark:text-sky-blue text-bright-blue flex rounded-xl border px-3 py-2 shadow-lg/40">
+          {isLinkEditMode ? (
+            <>
+              <input
+                ref={inputRef}
+                className="link-input bg-midnight-gray mr-2 grow rounded-lg px-3"
+                value={editedLinkUrl}
+                onChange={(event) => {
+                  setEditedLinkUrl(event.target.value)
+                }}
+                onKeyDown={(event) => {
+                  monitorInputInteraction(event)
+                }}
+              />
+              <div className="flex">
+                <button
+                  className="flex size-10 items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                  }}
+                  onClick={() => {
+                    setIsLinkEditMode(false)
+                  }}
+                >
+                  <ToolbarIcon
+                    size="size-[24px]"
+                    svgId="cancel"
+                    className="dark:text-dark-disabled-icon text-light-disabled-icon hover:text-bright-blue"
+                  />
+                </button>
+                <button
+                  className="flex size-10 items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                  }}
+                  onClick={handleLinkSubmission}
+                >
+                  <ToolbarIcon
+                    size="size-[24px]"
+                    svgId="confirm"
+                    className="dark:text-dark-disabled-icon text-light-disabled-icon hover:text-bright-blue"
+                  />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex w-full justify-between py-1">
+              <a
+                href={sanitizeUrl(linkUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2"
+              >
+                {linkUrl}
+              </a>
+              <div className="flex">
+                <div
+                  className="link-edit flex w-10 items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                  }}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setEditedLinkUrl(linkUrl)
+                    setIsLinkEditMode(true)
+                  }}
+                >
+                  <ToolbarIcon
+                    size="size-[24px]"
+                    svgId="write"
+                    className="dark:text-dark-disabled-icon text-light-disabled-icon hover:text-bright-blue"
+                  />
+                </div>
+                <div
+                  className="link-trash flex w-10 items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                  }}
+                  onClick={() => {
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+                  }}
+                >
+                  <ToolbarIcon
+                    size="size-[24px]"
+                    svgId="delete"
+                    className="dark:text-dark-disabled-icon text-light-disabled-icon hover:text-rose-400"
+                  />
+                </div>
+              </div>
             </div>
-
-            <div
-              className="size-10 bg-sky-500"
-              role="button"
-              tabIndex={0}
-              onMouseDown={(event) => {
-                event.preventDefault()
-              }}
-              onClick={handleLinkSubmission}
-            >
-              등록
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="flex w-fit bg-amber-400">
-          <a href={sanitizeUrl(linkUrl)} target="_blank" rel="noopener noreferrer">
-            {linkUrl}
-          </a>
-          <div
-            className="link-edit"
-            role="button"
-            tabIndex={0}
-            onMouseDown={(event) => {
-              event.preventDefault()
-            }}
-            onClick={(event) => {
-              event.preventDefault()
-              setEditedLinkUrl(linkUrl)
-              setIsLinkEditMode(true)
-            }}
-          >
-            수정
-          </div>
-          <div
-            className="link-trash"
-            role="button"
-            tabIndex={0}
-            onMouseDown={(event) => {
-              event.preventDefault()
-            }}
-            onClick={() => {
-              editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-            }}
-          >
-            삭제
-          </div>
+          )}
         </div>
       )}
     </div>
