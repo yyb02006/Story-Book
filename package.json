@@ -10,10 +10,10 @@
     "analyze": "cross-env ANALYZE=true npm run build"
   },
   "dependencies": {
-    "@lexical/react": "^0.22.0",
+    "@lexical/react": "^0.31.1",
     "@next/bundle-analyzer": "^15.3.1",
     "framer-motion": "^11.11.10",
-    "lexical": "^0.22.0",
+    "lexical": "^0.31.1",
     "next": "14.2.7",
     "openai": "^4.58.1",
     "react": "^18",
