@@ -1,12 +1,13 @@
-import { buttonSizes } from '#/components/plugins/Buttons/buttonTypes'
-import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
+import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
+import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical'
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { $isCodeNode } from '@lexical/code'
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link'
 import { cls, sanitizeUrl } from '#/libs/client/utils'
-import { getSelectedNode } from '#/components/plugins/utils'
+import { getSelectedNode } from '#/lexical/plugins/utils'
+import { $createStickyNode } from '#/lexical/nodes/StickyNode'
 
 const SupportedInlineTypes = [
   'code',
@@ -95,6 +96,14 @@ export default function InlineToolbarPlugin({
     }
   }
 
+  const insertMemoHandler = () => {
+    editor.update(() => {
+      const root = $getRoot()
+      const stickyNode = $createStickyNode(0, 0)
+      root.append(stickyNode)
+    })
+  }
+
   return (
     <div className="flex space-x-3">
       {SupportedInlineTypes.map((inlineType) => {
@@ -123,13 +132,27 @@ export default function InlineToolbarPlugin({
       })}
       <button
         onClick={insertLinkHandler}
-        aria-label="Insert link"
-        title={`Insert link`}
+        aria-label="Insert Link"
+        title={`Insert Link`}
         type="button"
-        className={onLink ? 'text-amber-400' : ''}
       >
         <ToolbarIcon
           svgId={'link'}
+          size={buttonSizes['md']}
+          className={cls(
+            'hover:text-bright-blue',
+            onLink ? 'text-bright-blue' : 'dark:text-dark-disabled-icon text-light-disabled-icon',
+          )}
+        />
+      </button>
+      <button
+        onClick={insertMemoHandler}
+        aria-label="Stick Note"
+        title={`Stick Note`}
+        type="button"
+      >
+        <ToolbarIcon
+          svgId={'sticky-note'}
           size={buttonSizes['md']}
           className={cls(
             'hover:text-bright-blue',

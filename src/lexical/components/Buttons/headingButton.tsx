@@ -1,7 +1,7 @@
-import { headingNodes } from '#/components/plugins/blockTypes'
-import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
-import DropdownButtonList from '#/components/plugins/Buttons/dropdownButtonList'
-import { createFormatHeading } from '#/components/plugins/utils'
+import { headingNodes } from '#/lexical/plugins/blockTypes'
+import { CommonToolButtonProps } from '#/lexical/components/Buttons/buttonTypes'
+import DropdownButtonList from '#/lexical/components/Buttons/dropdownButtonList'
+import { createFormatHeading } from '#/lexical/plugins/utils'
 
 export default function HeadingButton({
   selectedBlockType,

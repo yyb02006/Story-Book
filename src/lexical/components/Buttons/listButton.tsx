@@ -1,12 +1,12 @@
-import { listNodes } from '#/components/plugins/blockTypes'
+import { listNodes } from '#/lexical/plugins/blockTypes'
 import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list'
-import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
-import DropdownButtonList from '#/components/plugins/Buttons/dropdownButtonList'
-import { formatParagraph } from '#/components/plugins/utils'
+import { CommonToolButtonProps } from '#/lexical/components/Buttons/buttonTypes'
+import DropdownButtonList from '#/lexical/components/Buttons/dropdownButtonList'
+import { formatParagraph } from '#/lexical/plugins/utils'
 
 type ListNode = (typeof listNodes)[number]
 

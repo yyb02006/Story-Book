@@ -1,7 +1,7 @@
-import { quoteNode } from '#/components/plugins/blockTypes'
-import { CommonToolButtonProps } from '#/components/plugins/Buttons/buttonTypes'
-import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
-import { createFormatQuote } from '#/components/plugins/utils'
+import { quoteNode } from '#/lexical/plugins/blockTypes'
+import { CommonToolButtonProps } from '#/lexical/components/Buttons/buttonTypes'
+import BaseToolButton from '#/lexical/components/Buttons/baseToolButton'
+import { createFormatQuote } from '#/lexical/plugins/utils'
 
 export default function QuoteButton({
   selectedBlockType,

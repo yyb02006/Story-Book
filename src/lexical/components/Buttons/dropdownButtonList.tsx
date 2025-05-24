@@ -1,6 +1,6 @@
-import { BlockType } from '#/components/plugins/blockTypes'
-import BaseToolButton from '#/components/plugins/Buttons/baseToolButton'
-import { ButtonSize } from '#/components/plugins/Buttons/buttonTypes'
+import { BlockType } from '#/lexical/plugins/blockTypes'
+import BaseToolButton from '#/lexical/components/Buttons/baseToolButton'
+import { ButtonSize } from '#/lexical/components/Buttons/buttonTypes'
 import { cls } from '#/libs/client/utils'
 import { useState } from 'react'
 

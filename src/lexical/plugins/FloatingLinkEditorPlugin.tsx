@@ -20,8 +20,8 @@ import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
 import { createPortal } from 'react-dom'
 import { sanitizeUrl } from '#/libs/client/utils'
-import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
-import { getSelectedNode } from '#/components/plugins/utils'
+import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
+import { getSelectedNode } from '#/lexical/plugins/utils'
 
 /* function setFloatingElemPositionForLinkEditor(
   targetRect: DOMRect | null,

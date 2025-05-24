@@ -1,4 +1,4 @@
-import { Editor } from '#/components/editor'
+import { Editor } from '#/lexical/editor'
 
 export default function Write() {
   return (

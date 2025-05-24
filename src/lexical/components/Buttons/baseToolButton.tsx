@@ -1,6 +1,6 @@
-import { BlockType, SupportedBlockType } from '#/components/plugins/blockTypes'
-import { ButtonSize } from '#/components/plugins/Buttons/buttonTypes'
-import ToolbarIcon from '#/components/plugins/Buttons/toolbarIcon'
+import { BlockType, SupportedBlockType } from '#/lexical/plugins/blockTypes'
+import { ButtonSize } from '#/lexical/components/Buttons/buttonTypes'
+import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { cls } from '#/libs/client/utils'
 import { SyntheticEvent } from 'react'
 

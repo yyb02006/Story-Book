@@ -8,7 +8,7 @@ import {
   TextNode,
 } from 'lexical'
 import { $setBlocksType, $isAtNodeEnd } from '@lexical/selection'
-import { BlockType, HeadingNodeType, quoteNode } from '#/components/plugins/blockTypes'
+import { BlockType, HeadingNodeType, quoteNode } from '#/lexical/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
 
