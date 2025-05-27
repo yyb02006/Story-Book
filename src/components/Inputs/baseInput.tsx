@@ -5,11 +5,12 @@ type InputValueType = string | number
 
 interface InputProps {
   name: string
-  inputType: 'text' | 'number'
+  inputType: 'text' | 'number' | 'file'
   className?: string
   value?: InputValueType
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
+  [key: string]: unknown
 }
 
 const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
