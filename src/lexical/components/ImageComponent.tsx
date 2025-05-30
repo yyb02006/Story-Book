@@ -416,7 +416,7 @@ export default function ImageComponent({
               <LazyImage
                 className={cls(
                   isFocused
-                    ? `focused ${$isNodeSelection(selection) ? 'draggable' : ''}`
+                    ? `ring-bright-blue ring-2 ${$isNodeSelection(selection) ? 'cursor-grab active:cursor-grabbing' : ''}`
                     : 'cursor-pointer',
                 )}
                 src={src}
