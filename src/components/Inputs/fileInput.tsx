@@ -5,7 +5,7 @@ interface InputProps {
   name: string
   className?: string
   accept?: string
-  label?: string
+  label?: { children: JSX.Element; id: string; className?: string }
   onChange?: (files: FileList | null) => void
 }
 
@@ -13,16 +13,23 @@ const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
   { name, className, accept, label, onChange },
   ref,
 ): JSX.Element => {
+  const labelClassName = label?.className || ''
   return (
-    <div className="Input__wrapper">
-      {label && <label className="Input__label">{label}</label>}
+    <div className="text-sm">
+      {label && (
+        <label htmlFor={label.id} className={labelClassName}>
+          {label.children}
+        </label>
+      )}
       <BaseInput
+        id={label?.id}
         ref={ref}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange?.(e.target.files)}
         name={name}
         inputType="file"
         className={className}
         accept={accept}
+        multiple={true}
       />
     </div>
   )
