@@ -251,3 +251,10 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.image {
+  cursor: default;
+  display: inline-block;
+  position: relative;
+  user-select: none;
+}

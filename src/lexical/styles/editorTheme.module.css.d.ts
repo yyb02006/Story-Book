@@ -20,6 +20,7 @@ declare const styles: Readonly<{
   textSubscript: string
   textSuperscript: string
   link: string
+  image: string
   [key: string]: string
 }>
 export = styles

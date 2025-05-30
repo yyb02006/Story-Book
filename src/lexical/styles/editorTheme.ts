@@ -1,8 +1,21 @@
 import { EditorThemeClasses } from 'lexical'
 import editorTheme from './editorTheme.module.css'
 
-const { h1, h2, h3, h4, listitem, listitemChecked, listitemUnchecked, ol, quote, ul, code, link } =
-  editorTheme
+const {
+  h1,
+  h2,
+  h3,
+  h4,
+  listitem,
+  listitemChecked,
+  listitemUnchecked,
+  ol,
+  quote,
+  ul,
+  code,
+  link,
+  image,
+} = editorTheme
 
 const theme: EditorThemeClasses = {
   heading: {
@@ -66,6 +79,7 @@ const theme: EditorThemeClasses = {
     url: editorTheme.codeHighlight__tokenOperator,
     variable: editorTheme.codeHighlight__tokenVariable,
   },
+  image,
 }
 
 export default theme
