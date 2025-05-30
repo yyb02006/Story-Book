@@ -78,6 +78,8 @@ export function InsertImageUploadedDialog({
     onClose()
   }
 
+  const contentAreaWidth = activeEditor.getRootElement()?.clientWidth
+
   return (
     <div className="flex min-w-60 flex-col gap-y-4">
       <FileInput
@@ -116,7 +118,12 @@ export function InsertImageUploadedDialog({
       <button
         disabled={isDisabled}
         onClick={() => {
-          onClick({ altText, src, maxWidth: activeEditor.getRootElement()?.clientWidth })
+          onClick({
+            altText,
+            src,
+            maxWidth: contentAreaWidth,
+            width: contentAreaWidth && contentAreaWidth >= 500 ? 500 : contentAreaWidth,
+          })
         }}
         className="bg-bright-blue cursor-pointer rounded-md px-4 py-2"
       >
