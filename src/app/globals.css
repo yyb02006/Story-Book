@@ -46,6 +46,8 @@
   --color-light-border: var(--color-white-gray);
   --color-light-text: var(--color-smooth-black);
   --color-light-placeholder: var(--color-midnight-gray);
+
+  --resizer-pointer-size: 8px;
 }
 
 @utility hide-scrollbar {
