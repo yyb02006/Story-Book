@@ -100,14 +100,14 @@ const setFloatingElemPositionForLinkEditor = (
 }
 
 function FloatingLinkEditor({
-  editor,
+  activeEditor,
   floatingAnchorElement,
   isLink,
   setIsLink,
   isLinkEditMode,
   setIsLinkEditMode,
 }: {
-  editor: LexicalEditor
+  activeEditor: LexicalEditor
   floatingAnchorElement: HTMLElement
   isLink: boolean
   setIsLink: Dispatch<SetStateAction<boolean>>
@@ -158,20 +158,20 @@ function FloatingLinkEditor({
     }
 
     const editorElem = linkEditorRef.current
-    const nativeSelection = getDOMSelection(editor._window)
+    const nativeSelection = getDOMSelection(activeEditor._window)
     const activeElement = document.activeElement
 
     if (editorElem === null) return
 
-    const rootElement = editor.getRootElement()
+    const rootElement = activeEditor.getRootElement()
 
-    if (selection !== null && rootElement !== null && editor.isEditable()) {
+    if (selection !== null && rootElement !== null && activeEditor.isEditable()) {
       let domRect: DOMRect | undefined
       if ($isNodeSelection(selection)) {
         const nodes = selection.getNodes()
 
         if (nodes.length > 0) {
-          const element = editor.getElementByKey(nodes[0].getKey())
+          const element = activeEditor.getElementByKey(nodes[0].getKey())
           if (element) {
             domRect = element.getBoundingClientRect()
           }
@@ -201,10 +201,10 @@ function FloatingLinkEditor({
         // 링크 에디터 생성 시 포커스 이동때문에 리사이징에 대응할 수 없었던 문제를 해결하는 조건문
         // inputRef.current가 존재하는 링크 에디터가 있다면, 최근 셀렉션에서 앵커노드를 가져와 domRect에 넣어준다
         // 여기서 링크 에디터는 링크 노드와 상호작용을 해야 생성되기 때문에 위 조건에서 최근 셀렉션은 항상 링크 노드 아래에 있다
-        editor.getEditorState().read(() => {
+        activeEditor.getEditorState().read(() => {
           if ($isRangeSelection(lastSelection) && lastSelection._cachedNodes) {
             const node = lastSelection.anchor.getNode()
-            const domElement = editor.getElementByKey(node.getKey())
+            const domElement = activeEditor.getElementByKey(node.getKey())
 
             if (domElement) {
               domRect = domElement.getBoundingClientRect()
@@ -227,13 +227,20 @@ function FloatingLinkEditor({
       setIsLinkEditMode(false)
       setLinkUrl('')
     }
-  }, [editor, floatingAnchorElement, isLinkEditMode, linkUrl, setIsLinkEditMode, lastSelection])
+  }, [
+    activeEditor,
+    floatingAnchorElement,
+    isLinkEditMode,
+    linkUrl,
+    setIsLinkEditMode,
+    lastSelection,
+  ])
 
   useEffect(() => {
     const scrollerElem = floatingAnchorElement.parentElement
 
     const update = () => {
-      editor.getEditorState().read(() => {
+      activeEditor.getEditorState().read(() => {
         $updateLinkEditor()
       })
     }
@@ -251,17 +258,17 @@ function FloatingLinkEditor({
         scrollerElem.removeEventListener('scroll', update)
       }
     }
-  }, [floatingAnchorElement.parentElement, editor, $updateLinkEditor])
+  }, [floatingAnchorElement.parentElement, activeEditor, $updateLinkEditor])
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
+      activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           $updateLinkEditor()
         })
       }),
 
-      editor.registerCommand(
+      activeEditor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
           $updateLinkEditor()
@@ -269,7 +276,7 @@ function FloatingLinkEditor({
         },
         COMMAND_PRIORITY_LOW,
       ),
-      editor.registerCommand(
+      activeEditor.registerCommand(
         KEY_ESCAPE_COMMAND,
         () => {
           if (isLink) {
@@ -281,14 +288,14 @@ function FloatingLinkEditor({
         COMMAND_PRIORITY_HIGH,
       ),
     )
-  }, [editor, $updateLinkEditor, setIsLink, isLink])
+  }, [activeEditor, $updateLinkEditor, setIsLink, isLink])
 
   // 왜 이 코드가 필요하지?
   useEffect(() => {
-    editor.getEditorState().read(() => {
+    activeEditor.getEditorState().read(() => {
       $updateLinkEditor()
     })
-  }, [editor, $updateLinkEditor])
+  }, [activeEditor, $updateLinkEditor])
 
   // 링크 에디터 생성 시 자동으로 포커스(마우스 커서)를 에디터 인풋으로 옮겨주는 코드
   useEffect(() => {
@@ -312,8 +319,8 @@ function FloatingLinkEditor({
     event.preventDefault()
     if (lastSelection !== null) {
       if (linkUrl !== '' && editedLinkUrl !== '') {
-        editor.update(() => {
-          editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl))
+        activeEditor.update(() => {
+          activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl))
         })
       }
       setEditedLinkUrl('https://')
@@ -411,7 +418,7 @@ function FloatingLinkEditor({
                     event.preventDefault()
                   }}
                   onClick={() => {
-                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+                    activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
                   }}
                 >
                   <ToolbarIcon
@@ -455,9 +462,9 @@ function useFloatingLinkEditorToolbar(
           .find((node) => {
             const linkNode = $findMatchingParent(node, $isLinkNode)
             return (
-              /* 선택된 노드들 중 부모가 focusLinkNode가 아닌 것이 있으면 true 반환 */
+              /* 1. 선택된 노드들 중 부모가 focusLinkNode가 아닌 것이 있으면 true 반환 */
+              /* 2. 선택된 노드들 중 부모 Link노드가 있으면서 그게 focusLinkNode가 아니라면 true 반환 */
               (focusLinkNode && !focusLinkNode.is(linkNode)) ||
-              /* 선택된 노드들 중 부모 Link노드가 있으면서 그게 focusLinkNode가 아니라면 true 반환 */
               // 그런데 위 조건과 아래 조건이 서로 다르게 나올 수 있나?
               // 여기까지 왔으면 이미 !focusLinkNode.is(linkNode)에서
               // 선택된 노드의 부모와 focusLinkNode가 서로 같다고 판단이 된 건데?
@@ -521,7 +528,7 @@ function useFloatingLinkEditorToolbar(
 
   return createPortal(
     <FloatingLinkEditor
-      editor={activeEditor}
+      activeEditor={activeEditor}
       isLink={isLink}
       floatingAnchorElement={floatingAnchorElement}
       setIsLink={setIsLink}
