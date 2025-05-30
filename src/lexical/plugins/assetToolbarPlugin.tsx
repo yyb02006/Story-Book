@@ -17,10 +17,9 @@ import { useEffect, useState } from 'react'
 
 type AssetState = 'memo' | 'image' | ''
 
-export default function AssetToolbar({}) {
+export default function AssetToolbarPlugin() {
   const [editor] = useLexicalComposerContext()
   const [modal, showModal] = useModal()
-  const [activeEditor, setActiveEditor] = useState(editor)
 
   const [assetState, setAssetState] = useState<AssetState>('')
 
@@ -78,7 +77,7 @@ export default function AssetToolbar({}) {
       <button
         onClick={() => {
           showModal('이미지 삽입', (onClose) => (
-            <InsertImageUploadedDialog activeEditor={activeEditor} onClose={onClose} />
+            <InsertImageUploadedDialog activeEditor={editor} onClose={onClose} />
           ))
         }}
       >

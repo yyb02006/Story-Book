@@ -19,7 +19,7 @@ import InlineToolbarPlugin from '#/lexical/plugins/inlineToolbarPlugin'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import FloatingLinkEditorPlugin from '#/lexical/plugins/FloatingLinkEditorPlugin'
 import ImagesPlugin from '#/lexical/plugins/ImagesPlugin'
-import AssetToolbar from '#/lexical/plugins/assetToolbarPlugin'
+import AssetToolbarPlugin from '#/lexical/plugins/assetToolbarPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -70,7 +70,7 @@ export function Editor() {
         <div className="relative z-[1] flex gap-3">
           <ToolbarPlugin />
           <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
-          <AssetToolbar />
+          <AssetToolbarPlugin />
         </div>
         <div className="relative z-0 grow">
           <RichTextPlugin
