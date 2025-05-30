@@ -18,7 +18,7 @@ import { $getNodeByKey } from 'lexical'
 import * as React from 'react'
 import { useEffect, useLayoutEffect, useRef } from 'react'
 
-import StickyEditorTheme from '../styles/stickyEditorTheme.css'
+import StickyEditorTheme from '../styles/stickyEditorTheme'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { $isStickyNode } from '../nodes/StickyNode'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
@@ -85,6 +85,7 @@ export default function StickyComponent({
         const entry = entries[i]
         const { target } = entry
         position.rootElementRect = target.getBoundingClientRect()
+
         const stickyContainer = stickyContainerRef.current
         if (stickyContainer !== null) {
           positionSticky(stickyContainer, position)
@@ -111,7 +112,6 @@ export default function StickyComponent({
 
     const handleWindowResize = () => {
       const rootElement = editor.getRootElement()
-      console.log(rootElement?.getBoundingClientRect())
 
       const stickyContainer = stickyContainerRef.current
       if (rootElement !== null && stickyContainer !== null) {
@@ -246,7 +246,7 @@ export default function StickyComponent({
         <LexicalNestedComposer initialEditor={caption} initialTheme={StickyEditorTheme}>
           <div className="relative">
             <PlainTextPlugin
-              contentEditable={<ContentEditable className="StickyNode__contentEditable" />}
+              contentEditable={<ContentEditable />}
               placeholder={
                 <div className="font-patrick-hand text-light-placeholder dark:text-dark-placeholder pointer-events-none absolute top-0 left-1">
                   Memo.
