@@ -76,7 +76,7 @@ export function Editor() {
           <RichTextPlugin
             contentEditable={
               <div ref={onFloatingAnchorRef}>
-                <ContentEditable className="h-full" />
+                <ContentEditable className="ContentEditable__root h-full" />
               </div>
             }
             placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
