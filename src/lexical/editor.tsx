@@ -18,6 +18,8 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import InlineToolbarPlugin from '#/lexical/plugins/inlineToolbarPlugin'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import FloatingLinkEditorPlugin from '#/lexical/plugins/FloatingLinkEditorPlugin'
+import ImagesPlugin from '#/lexical/plugins/ImagesPlugin'
+import AssetToolbar from '#/lexical/plugins/assetToolbarPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -68,6 +70,7 @@ export function Editor() {
         <div className="relative z-[1] flex gap-3">
           <ToolbarPlugin />
           <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+          <AssetToolbar />
         </div>
         <div className="relative z-0 grow">
           <RichTextPlugin
@@ -88,6 +91,7 @@ export function Editor() {
       <CodeHighlightPlugin />
       <TabIndentationPlugin />
       <LinkPlugin />
+      <ImagesPlugin />
       {floatingAnchorElement && (
         <FloatingLinkEditorPlugin
           floatingAnchorElement={floatingAnchorElement}
