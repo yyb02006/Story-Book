@@ -36,9 +36,10 @@ import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from '../node
 import FileInput from '#/components/Inputs/fileInput'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
-import { TextInput } from '#/components/Inputs'
 
 export type InsertImagePayload = Readonly<ImagePayload>
+
+type ImageData = { src: string; fileName: string; height: number; width: number }
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand('INSERT_IMAGE_COMMAND')
@@ -50,31 +51,58 @@ export function InsertImageUploadedDialog({
   activeEditor: LexicalEditor
   onClose: () => void
 }) {
-  const [src, setSrc] = useState('')
-  const [altText, setAltText] = useState('')
-  const [fileNames, setFileNames] = useState<string[]>([])
+  const [images, setImages] = useState<ImageData[]>([])
 
-  const isDisabled = src === ''
+  const isDisabled = images.length === 0
 
   const loadImage = (files: FileList | null) => {
-    const reader = new FileReader()
     if (files === null) return
-    reader.onload = function () {
-      if (typeof reader.result === 'string') {
-        setSrc(reader.result)
-      }
-      return ''
-    }
-    // onload 이벤트 트리거를 위한 read
-    reader.readAsDataURL(files[0])
-    setFileNames(Array.from(files).map((file) => file.name))
+
+    const fileArray = Array.from(files)
+    const srcPromises = fileArray.map(
+      (file) =>
+        new Promise<ImageData>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            if (typeof reader.result === 'string') {
+              const img = new Image()
+              const result = reader.result
+              img.onload = () => {
+                resolve({
+                  src: result,
+                  fileName: file.name,
+                  width: img.width,
+                  height: img.height,
+                })
+              }
+              img.onerror = () => {
+                reject(new Error('Failed to load image'))
+              }
+              img.src = result
+            } else {
+              reject(new Error('Failed to read file'))
+            }
+          }
+          reader.onerror = () => {
+            reject(new Error('Failed to read file'))
+          }
+          reader.readAsDataURL(file)
+        }),
+    )
+
+    Promise.all(srcPromises)
+      .then((results) => {
+        setImages(results)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
-  // 어차피 dispatch는 src, altText로부터 받아서 넣으니까 이미지 삭제 시에도
-  // input의 value를 바꾸는 게 아니라 받아놓은 데이터의 상태만 만지면 됨
-  // 여러장의 이미지를 처리할 때는 forEach같은 걸로 ㄱㄱ
-  const onClick = (payload: InsertImagePayload) => {
-    activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload)
+  const onClick = (payloads: InsertImagePayload[]) => {
+    payloads.forEach((payload) => {
+      activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload)
+    })
     onClose()
   }
 
@@ -94,13 +122,12 @@ export function InsertImageUploadedDialog({
         name="Image Upload"
         label={{
           children: (
-            <div className="flex items-center gap-x-2">
+            <div className="pointer-events-none flex items-center gap-x-2">
               <span>파일 선택</span>
               <ToolbarIcon size={buttonSizes.lg} svgId={'add-file'} className="" />
             </div>
           ),
-          className:
-            'cursor-pointer bg-charcoal-gray rounded-md py-12 text-sm flex justify-center items-center hover:text-bright-blue dark:text-dark-disabled-icon text-light-disabled-icon hover:ring-2',
+          className: '',
           id: 'File_Upload',
         }}
         onChange={loadImage}
@@ -108,31 +135,35 @@ export function InsertImageUploadedDialog({
         accept="image/*"
         className="hidden"
       />
-      {fileNames.length > 0 ? (
-        <ul className="font-S-CoreDream-400 text-sm">
-          {fileNames.map((fileName) => (
-            <li key={fileName}>{fileName}</li>
+      {images.length > 0 ? (
+        <ul className="font-S-CoreDream-400 space-y-2 text-sm">
+          {images.map(({ fileName }) => (
+            <li key={fileName} className="flex justify-between">
+              {fileName}
+              <button
+                onClick={() => {
+                  setImages((p) => p.filter((image) => image.fileName !== fileName))
+                }}
+              >
+                <ToolbarIcon size={buttonSizes.xs} className="" svgId="cancel" />
+              </button>
+            </li>
           ))}
         </ul>
       ) : null}
-      <TextInput
-        name="description"
-        value={altText}
-        onChange={(value) => {
-          setAltText(value)
-        }}
-        placeholder="출처란에 표시될 설명"
-        className="bg-charcoal-gray font-S-CoreDream-400 placeholder:font-S-CoreDream-400 rounded-md p-2 text-sm"
-      />
       <button
         disabled={isDisabled}
         onClick={() => {
-          onClick({
-            altText,
-            src,
-            maxWidth: contentAreaWidth,
-            width: contentAreaWidth && contentAreaWidth >= 500 ? 500 : contentAreaWidth,
-          })
+          onClick(
+            images.map(({ fileName, src, width, height }) => ({
+              altText: fileName,
+              src,
+              maxWidth: contentAreaWidth,
+              width: contentAreaWidth && width >= 500 ? 500 : width,
+              height:
+                contentAreaWidth && width >= 500 ? Math.round((height * 500) / width) : height,
+            })),
+          )
         }}
         className="bg-bright-blue cursor-pointer rounded-md px-4 py-2"
       >
