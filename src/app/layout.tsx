@@ -29,7 +29,7 @@ export default function RootLayout({
         <RootThemeProvider>
           <Header />
           <GlobalNav />
-          <div className="dark:bg-smooth-black bg-smooth-white pl-gnb-left pt-gsb-top universe-box-shadow h-screen">
+          <div className="dark:bg-smooth-black bg-smooth-white pl-gnb-left pt-gsb-top universe-box-shadow h-full min-h-screen">
             {children}
           </div>
         </RootThemeProvider>
