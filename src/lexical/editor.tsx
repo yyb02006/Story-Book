@@ -20,6 +20,7 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import FloatingLinkEditorPlugin from '#/lexical/plugins/FloatingLinkEditorPlugin'
 import ImagesPlugin from '#/lexical/plugins/ImagesPlugin'
 import AssetToolbarPlugin from '#/lexical/plugins/assetToolbarPlugin'
+import ElementAlignToolbarPlugin from '#/lexical/plugins/ElementAlignToolbarPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -71,12 +72,13 @@ export function Editor() {
           <ToolbarPlugin />
           <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
           <AssetToolbarPlugin />
+          <ElementAlignToolbarPlugin />
         </div>
         <div className="relative z-0 grow">
           <RichTextPlugin
             contentEditable={
               <div ref={onFloatingAnchorRef}>
-                <ContentEditable className="ContentEditable__root h-full" />
+                <ContentEditable className="ContentEditable__root font-S-CoreDream-200 h-full" />
               </div>
             }
             placeholder={<PlaceHolder>내용을 입력해주세요</PlaceHolder>}
