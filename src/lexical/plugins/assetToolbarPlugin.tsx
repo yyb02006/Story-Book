@@ -36,7 +36,6 @@ export default function AssetToolbarPlugin() {
           const anchorNode = getSelectedNode(selection)
           const parent = anchorNode.getParent()
           const isStickyNodeActive = $isStickyNode(anchorNode) || $isStickyNode(parent)
-          console.log(isStickyNodeActive)
 
           if (isStickyNodeActive) {
             setAssetState('memo')
