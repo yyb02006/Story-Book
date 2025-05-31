@@ -65,7 +65,7 @@ export default function AssetToolbarPlugin() {
       <button
         onClick={insertMemoHandler}
         aria-label="Sticky Note"
-        title={`Sticky Note`}
+        title="Sticky Note"
         type="button"
       >
         <ToolbarIcon
@@ -80,6 +80,9 @@ export default function AssetToolbarPlugin() {
             <InsertImageUploadedDialog activeEditor={editor} onClose={onClose} />
           ))
         }}
+        aria-label="Insert Image"
+        title="Insert Image"
+        type="button"
       >
         <ToolbarIcon
           svgId={'image'}
