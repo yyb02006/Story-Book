@@ -80,6 +80,14 @@ export function InsertImageUploadedDialog({
 
   const contentAreaWidth = activeEditor.getRootElement()?.clientWidth
 
+  const handleFileDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault()
+    const files = event.dataTransfer.files
+    if (files.length > 0) {
+      loadImage(files)
+    }
+  }
+
   return (
     <div className="flex min-w-60 flex-col gap-y-4">
       <FileInput
@@ -96,6 +104,7 @@ export function InsertImageUploadedDialog({
           id: 'File_Upload',
         }}
         onChange={loadImage}
+        onFileDrop={handleFileDrop}
         accept="image/*"
         className="hidden"
       />

@@ -1,5 +1,5 @@
 import BaseInput from '#/components/Inputs/baseInput'
-import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
+import { ChangeEvent, DragEvent, forwardRef, ForwardRefRenderFunction } from 'react'
 
 interface InputProps {
   name: string
@@ -7,17 +7,26 @@ interface InputProps {
   accept?: string
   label?: { children: JSX.Element; id: string; className?: string }
   onChange?: (files: FileList | null) => void
+  onFileDrop: (event: DragEvent<HTMLLabelElement>) => void
 }
 
 const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
-  { name, className, accept, label, onChange },
+  { name, className, accept, label, onChange, onFileDrop },
   ref,
 ): JSX.Element => {
   const labelClassName = label?.className || ''
+  const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault()
+  }
   return (
     <div className="text-sm">
       {label && (
-        <label htmlFor={label.id} className={labelClassName}>
+        <label
+          htmlFor={label.id}
+          className={labelClassName}
+          onDragOver={handleDragOver}
+          onDrop={onFileDrop}
+        >
           {label.children}
         </label>
       )}
