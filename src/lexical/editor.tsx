@@ -21,6 +21,7 @@ import FloatingLinkEditorPlugin from '#/lexical/plugins/FloatingLinkEditorPlugin
 import ImagesPlugin from '#/lexical/plugins/ImagesPlugin'
 import AssetToolbarPlugin from '#/lexical/plugins/assetToolbarPlugin'
 import ElementAlignToolbarPlugin from '#/lexical/plugins/ElementAlignToolbarPlugin'
+import ImageListPlugin from '#/lexical/plugins/ImageListPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -101,6 +102,7 @@ export function Editor() {
           setIsLinkEditMode={setIsLinkEditMode}
         />
       )}
+      <ImageListPlugin />
     </LexicalComposer>
   )
 }
