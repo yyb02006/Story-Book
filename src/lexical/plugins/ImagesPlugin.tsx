@@ -39,7 +39,12 @@ import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 
 export type InsertImagePayload = Readonly<ImagePayload>
 
-type ImageData = { src: string; fileName: string; height: number; width: number }
+export type EditorImageData = {
+  src: string
+  fileName: string
+  height: number
+  width: number
+}
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand('INSERT_IMAGE_COMMAND')
@@ -51,7 +56,7 @@ export function InsertImageUploadedDialog({
   activeEditor: LexicalEditor
   onClose: () => void
 }) {
-  const [images, setImages] = useState<ImageData[]>([])
+  const [images, setImages] = useState<EditorImageData[]>([])
 
   const isDisabled = images.length === 0
 
@@ -61,7 +66,7 @@ export function InsertImageUploadedDialog({
     const fileArray = Array.from(files)
     const srcPromises = fileArray.map(
       (file) =>
-        new Promise<ImageData>((resolve, reject) => {
+        new Promise<EditorImageData>((resolve, reject) => {
           const reader = new FileReader()
           reader.onload = () => {
             if (typeof reader.result === 'string') {
@@ -99,7 +104,7 @@ export function InsertImageUploadedDialog({
       })
   }
 
-  const onClick = (payloads: InsertImagePayload[]) => {
+  const submitImages = (payloads: InsertImagePayload[]) => {
     payloads.forEach((payload) => {
       activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload)
     })
@@ -115,6 +120,8 @@ export function InsertImageUploadedDialog({
       loadImage(files)
     }
   }
+
+  console.log(images)
 
   return (
     <div className="flex min-w-60 flex-col gap-y-4">
@@ -154,8 +161,8 @@ export function InsertImageUploadedDialog({
       <button
         disabled={isDisabled}
         onClick={() => {
-          onClick(
-            images.map(({ fileName, src, width, height }) => ({
+          submitImages(
+            images.map<InsertImagePayload>(({ fileName, src, width, height }) => ({
               altText: fileName,
               src,
               maxWidth: contentAreaWidth,
