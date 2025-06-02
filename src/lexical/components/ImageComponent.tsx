@@ -406,7 +406,16 @@ export default function ImageComponent({
   const isFocused = (isSelected || isResizing) && isEditable
 
   return (
-    <Suspense fallback={<div>loading...</div>}>
+    <Suspense
+      fallback={
+        <div
+          style={{ width, height }}
+          className="bg-charcoal-gray/50 flex items-center justify-center rounded-md"
+        >
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-4 border-gray-200 border-t-transparent" />
+        </div>
+      }
+    >
       <>
         <div draggable={draggable}>
           {isLoadError ? (
