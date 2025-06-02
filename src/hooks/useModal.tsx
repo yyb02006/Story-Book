@@ -6,7 +6,11 @@ import * as React from 'react'
 
 export default function useModal(): [
   JSX.Element | null,
-  (title: string, showModal: (onClose: () => void) => JSX.Element) => void,
+  (
+    title: string,
+    showModal: (onClose: () => void) => JSX.Element,
+    closeOnClickOutSide?: boolean,
+  ) => void,
 ] {
   const [modalContent, setModalContent] = useState<null | {
     closeOnClickOutside: boolean
