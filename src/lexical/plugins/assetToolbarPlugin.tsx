@@ -60,41 +60,45 @@ export default function AssetToolbarPlugin() {
   }
 
   return (
-    <div className="flex space-x-3">
-      <button
-        onClick={insertMemoHandler}
-        aria-label="Sticky Note"
-        title="Sticky Note"
-        type="button"
-      >
-        <ToolbarIcon
-          svgId={'sticky-note'}
-          size={buttonSizes['md']}
-          className="hover:text-bright-blue dark:text-dark-disabled-icon text-light-disabled-icon"
-        />
-      </button>
-      <button
-        onClick={() => {
-          showModal('이미지 삽입', (onClose) => (
-            <InsertImageUploadedDialog activeEditor={editor} onClose={onClose} />
-          ))
-        }}
-        aria-label="Insert Image"
-        title="Insert Image"
-        type="button"
-      >
-        <ToolbarIcon
-          svgId={'image'}
-          size={buttonSizes['md']}
-          className={cls(
-            'hover:text-bright-blue',
-            assetState === 'memo'
-              ? 'text-bright-blue'
-              : 'dark:text-dark-disabled-icon text-light-disabled-icon',
-          )}
-        />
-      </button>
+    <>
+      <div className="flex space-x-3">
+        <button
+          onClick={insertMemoHandler}
+          aria-label="Sticky Note"
+          title="Sticky Note"
+          type="button"
+        >
+          <ToolbarIcon
+            svgId={'sticky-note'}
+            size={buttonSizes['md']}
+            className="hover:text-bright-blue dark:text-dark-disabled-icon text-light-disabled-icon"
+          />
+        </button>
+        <button
+          onClick={() => {
+            showModal(
+              '이미지 삽입',
+              (onClose) => <InsertImageUploadedDialog activeEditor={editor} onClose={onClose} />,
+              true,
+            )
+          }}
+          aria-label="Insert Image"
+          title="Insert Image"
+          type="button"
+        >
+          <ToolbarIcon
+            svgId={'image'}
+            size={buttonSizes['md']}
+            className={cls(
+              'hover:text-bright-blue',
+              assetState === 'memo'
+                ? 'text-bright-blue'
+                : 'dark:text-dark-disabled-icon text-light-disabled-icon',
+            )}
+          />
+        </button>
+      </div>
       {modal}
-    </div>
+    </>
   )
 }
