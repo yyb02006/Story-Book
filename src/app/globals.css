@@ -59,7 +59,7 @@
 }
 
 @layer components {
-  .input-text-color-theme {
+  .input-color-theme {
     border-width: 1px;
     &:where(.dark, .dark *) {
       background-color: var(--color-dark-bg);

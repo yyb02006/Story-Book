@@ -50,7 +50,7 @@ const CodeDropDown = ({
         />
       </button>
       {isDropdownListOpen ? (
-        <ul className="input-text-color-theme absolute left-0 h-[200px] overflow-hidden rounded-lg">
+        <ul className="input-color-theme absolute left-0 h-[200px] overflow-hidden rounded-lg">
           <div className="scrollbar scrollbar-w-1 scrollbar-thumb-bright-blue h-full overflow-y-scroll">
             {codeLanguagesOptions.map(({ label, value }) => (
               <li

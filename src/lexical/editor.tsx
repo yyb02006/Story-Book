@@ -29,7 +29,7 @@ function onError(error: unknown) {
 
 const TextEditorContainer = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
-    <div className="input-text-color-theme relative flex h-fit min-h-80 flex-col space-y-4 rounded-2xl p-3">
+    <div className="input-color-theme relative flex h-fit min-h-80 flex-col space-y-4 rounded-2xl p-3">
       {children}
     </div>
   )
@@ -65,7 +65,7 @@ export function Editor() {
       <TextInput
         name="title"
         value=""
-        className="input-text-color-theme h-14 rounded-2xl p-3 text-base"
+        className="input-color-theme h-14 rounded-2xl p-3 text-base"
         placeholder="제목을 입력해주세요"
       />
       <TextEditorContainer>
@@ -86,6 +86,7 @@ export function Editor() {
             ErrorBoundary={LexicalErrorBoundary}
           />
         </div>
+        <ImageListPlugin />
       </TextEditorContainer>
       <HistoryPlugin />
       <AutoFocusPlugin />
@@ -102,7 +103,6 @@ export function Editor() {
           setIsLinkEditMode={setIsLinkEditMode}
         />
       )}
-      <ImageListPlugin />
     </LexicalComposer>
   )
 }
