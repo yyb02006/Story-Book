@@ -49,6 +49,10 @@ export type EditorImageData = {
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand('INSERT_IMAGE_COMMAND')
 
+export const INSERT_IMAGE_ARRAY_COMMAND: LexicalCommand<InsertImagePayload[]> = createCommand(
+  'INSERT_IMAGE_ARRAY_COMMAND',
+)
+
 export function InsertImageUploadedDialog({
   activeEditor,
   onClose,
@@ -105,9 +109,7 @@ export function InsertImageUploadedDialog({
   }
 
   const submitImages = (payloads: InsertImagePayload[]) => {
-    payloads.forEach((payload) => {
-      activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload)
-    })
+    activeEditor.dispatchCommand(INSERT_IMAGE_ARRAY_COMMAND, payloads)
     onClose()
   }
 
@@ -121,20 +123,17 @@ export function InsertImageUploadedDialog({
     }
   }
 
-  console.log(images)
-
   return (
-    <div className="flex min-w-60 flex-col gap-y-4">
+    <div className="flex min-w-80 flex-col gap-y-4">
       <FileInput
         name="Image Upload"
         label={{
           children: (
-            <div className="pointer-events-none flex items-center gap-x-2">
+            <div className="pointer-events-none flex items-center gap-x-2 py-20">
               <span>파일 선택</span>
               <ToolbarIcon size={buttonSizes.lg} svgId={'add-file'} className="" />
             </div>
           ),
-          className: '',
           id: 'File_Upload',
         }}
         onChange={loadImage}
@@ -152,7 +151,7 @@ export function InsertImageUploadedDialog({
                   setImages((p) => p.filter((image) => image.fileName !== fileName))
                 }}
               >
-                <ToolbarIcon size={buttonSizes.xs} className="" svgId="cancel" />
+                <ToolbarIcon size={buttonSizes.xs} svgId="cancel" />
               </button>
             </li>
           ))}
@@ -197,11 +196,27 @@ export default function ImagesPlugin({
         INSERT_IMAGE_COMMAND,
         (payload) => {
           const imageNode = $createImageNode(payload)
+
           $insertNodes([imageNode])
 
           if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
             $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
           }
+
+          return true
+        },
+        COMMAND_PRIORITY_EDITOR,
+      ),
+      editor.registerCommand<InsertImagePayload[]>(
+        INSERT_IMAGE_ARRAY_COMMAND,
+        (payloads) => {
+          const imageNodes = payloads.map((payload) => {
+            const imageNode = $createImageNode(payload)
+            const paragraphNode = $createParagraphNode()
+            return paragraphNode.append(imageNode)
+          })
+
+          $insertNodes(imageNodes)
 
           return true
         },
