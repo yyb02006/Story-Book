@@ -38,7 +38,7 @@ const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
         <label
           htmlFor={label.id}
           className={cls(
-            'bg-charcoal-gray hover:text-bright-blue flex cursor-pointer items-center justify-center rounded-md py-12 text-sm hover:ring-2',
+            'bg-charcoal-gray hover:text-bright-blue flex cursor-pointer items-center justify-center rounded-md text-sm hover:ring-2',
             isMouseOverWithFile
               ? 'text-bright-blue ring-bright-blue ring-2'
               : 'dark:text-dark-disabled-icon text-light-disabled-icon',
