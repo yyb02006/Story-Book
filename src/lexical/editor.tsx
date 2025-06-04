@@ -22,6 +22,7 @@ import ImagesPlugin from '#/lexical/plugins/ImagesPlugin'
 import AssetToolbarPlugin from '#/lexical/plugins/assetToolbarPlugin'
 import ElementAlignToolbarPlugin from '#/lexical/plugins/ElementAlignToolbarPlugin'
 import ImageListPlugin from '#/lexical/plugins/ImageListPlugin'
+import SubmitPlugin from '#/lexical/plugins/SubmitPlugin'
 
 function onError(error: unknown) {
   console.error(error)
@@ -69,10 +70,13 @@ export function Editor() {
         placeholder="제목을 입력해주세요"
       />
       <TextEditorContainer>
-        <div className="relative z-[1] flex gap-3">
+        <div className="relative z-[1] flex h-8 items-center gap-x-3">
           <ToolbarPlugin />
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
           <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
           <AssetToolbarPlugin />
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
           <ElementAlignToolbarPlugin />
         </div>
         <div className="relative z-0 grow">
@@ -103,6 +107,7 @@ export function Editor() {
           setIsLinkEditMode={setIsLinkEditMode}
         />
       )}
+      <SubmitPlugin />
     </LexicalComposer>
   )
 }
