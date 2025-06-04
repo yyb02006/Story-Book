@@ -144,6 +144,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  font-family: var(--font-S-CoreDream-200);
 }
 
 input {
