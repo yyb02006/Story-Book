@@ -5,19 +5,19 @@ type InputValueType = string | number
 
 interface InputProps {
   name: string
-  inputType: 'text' | 'number'
+  inputType: 'text' | 'number' | 'file'
   className?: string
   value?: InputValueType
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
+  [key: string]: unknown
 }
 
 const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
   { name, placeholder, onChange, value, inputType, className = '', ...rest }: InputProps,
   ref,
 ) => {
-  const baseInputClasses =
-    'w-full border border-[#606060] bg-[#101010] placeholder:pl-1 placeholder:text-[#bababa] focus:ring-0 font-bold text-smooth-white placeholder:pl-1'
+  const baseInputStyles = 'w-full placeholder:pl-1 focus:ring-0 font-S-CoreDream-400'
 
   return (
     <input
@@ -27,7 +27,7 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       placeholder={placeholder}
       type={inputType}
       spellCheck={false}
-      className={cls(className, baseInputClasses)}
+      className={cls(baseInputStyles, className)}
       value={value}
       // size={20} default
       {...rest}

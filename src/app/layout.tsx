@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter, Patrick_Hand } from 'next/font/google'
 import './globals.css'
-import GlobalNav from '#/components/nav/globalNav'
+import GlobalNav from '#/components/header/globalNav'
 import { cls } from '#/libs/client/utils'
-import GlobalSearchBar from '#/components/globalSearchBar'
+import Header from '#/components/header/header'
+import RootThemeProvider from '#/components/rootThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 const patrick_hand = Patrick_Hand({
@@ -25,11 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cls(inter.className, patrick_hand.variable)}>
-        <GlobalSearchBar />
-        <GlobalNav />
-        <div className="h-screen bg-smooth-black pl-gnb-left pt-gsb-top universe-box-shadow">
-          {children}
-        </div>
+        <RootThemeProvider>
+          <Header />
+          <GlobalNav />
+          <div className="dark:bg-smooth-black bg-smooth-white pl-gnb-left pt-gsb-top universe-box-shadow h-full min-h-screen">
+            {children}
+          </div>
+        </RootThemeProvider>
       </body>
     </html>
   )

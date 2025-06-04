@@ -1,4 +1,4 @@
-import { BlockType } from '#/components/plugins/blockTypes'
+import { BlockType } from '#/lexical/plugins/blockTypes'
 import { LexicalEditor } from 'lexical'
 
 export const buttonSizes = {
