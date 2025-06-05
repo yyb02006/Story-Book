@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter, Patrick_Hand } from 'next/font/google'
+import { Patrick_Hand } from 'next/font/google'
 import './globals.css'
 import GlobalNav from '#/components/header/globalNav'
-import { cls } from '#/libs/client/utils'
 import Header from '#/components/header/header'
 import RootThemeProvider from '#/components/rootThemeProvider'
 
-const inter = Inter({ subsets: ['latin'] })
 const patrick_hand = Patrick_Hand({
   subsets: ['latin'],
   weight: ['400'],
@@ -24,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={cls(inter.className, patrick_hand.variable)}>
+    <html lang="en" className={patrick_hand.variable}>
+      <body>
         <RootThemeProvider>
           <Header />
           <GlobalNav />

@@ -3,7 +3,6 @@
 import { WaveWithInitAnim } from '#/components/waveCanvas'
 import { motion } from 'framer-motion'
 import { BookMark, Calendar, Chat, CreateMemo, Search } from '../../../public/icons/ui'
-import { cloneElement } from 'react'
 import Link from 'next/link'
 import { globalNavWaves } from '#/libs/client/constants'
 
@@ -20,7 +19,7 @@ const MenuLink = ({
     <Link href={href}>
       <li className="group flex aspect-square w-full flex-col items-center justify-center space-y-1 stroke-2">
         <div className="dark:group-hover:bg-slate-blue dark:stroke-smooth-white group-hover:bg-bright-blue group-hover:stroke-smooth-white rounded-md stroke-[#707070] p-2">
-          {cloneElement(children)}
+          {children}
         </div>
         <div className="dark:text-smooth-white dark:font-S-CoreDream-400 font-S-CoreDream-500 text-xs text-[#606060]">
           {title}
@@ -48,7 +47,7 @@ export default function GlobalNav() {
       {/*       {wave.colors.map((color) => (
         <div key={color} className={cls('absolute size-full')} style={{ backgroundColor: color }} />
       ))} */}
-      <h1 className="font-patrick-hand dark:text-smooth-white text-midnight-gray relative text-center text-[1.25rem]">
+      <h1 className="font-patrick dark:text-smooth-white text-midnight-gray relative text-center text-[1.25rem]">
         <Link href="/">MEMOISM</Link>
       </h1>
       <div className="relative mt-2 w-full p-4">

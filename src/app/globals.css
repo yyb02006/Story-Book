@@ -10,8 +10,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+  --font-patrick: var(--font-patrick-hand), 'cursive';
+}
+
 @theme {
-  --font-patrick-hand: 'Patrick Hand', cursive;
   --font-pretendard: 'Pretendard-Regular', sans-serif;
   --font-S-CoreDream-100: 'S-CoreDream-100', sans-serif;
   --font-S-CoreDream-200: 'S-CoreDream-200', sans-serif;
