@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import { Patrick_Hand } from 'next/font/google'
 import './globals.css'
-import GlobalNav from '#/components/header/globalNav'
-import Header from '#/components/header/header'
 import RootThemeProvider from '#/components/rootThemeProvider'
 
 const patrick_hand = Patrick_Hand({
@@ -24,13 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={patrick_hand.variable}>
       <body>
-        <RootThemeProvider>
-          <Header />
-          <GlobalNav />
-          <div className="dark:bg-smooth-black bg-smooth-white pl-gnb-left pt-gsb-top universe-box-shadow h-full min-h-screen">
-            {children}
-          </div>
-        </RootThemeProvider>
+        <RootThemeProvider>{children}</RootThemeProvider>
       </body>
     </html>
   )
