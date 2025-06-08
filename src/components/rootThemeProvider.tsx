@@ -5,5 +5,7 @@ import { ReactNode, useState } from 'react'
 
 export default function RootThemeProvider({ children }: { children: ReactNode }) {
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
-  return <div className={cls(themeMode, 'h-full')}>{children}</div>
+  return (
+    <div className={cls(themeMode, 'dark:bg-smooth-black bg-smooth-white h-full')}>{children}</div>
+  )
 }

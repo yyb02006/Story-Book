@@ -10,7 +10,7 @@ export default function MainLayout({
     <>
       <Header />
       <GlobalNav />
-      <div className="dark:bg-smooth-black bg-smooth-white pl-gnb-left pt-gsb-top universe-box-shadow h-full min-h-screen">
+      <div className="pl-gnb-left pt-gsb-top universe-box-shadow h-full min-h-screen">
         {children}
       </div>
     </>
