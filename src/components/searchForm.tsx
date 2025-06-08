@@ -9,11 +9,11 @@ interface SearchFormProps {
 export default function SearchForm({ onSearch }: SearchFormProps) {
   const [searchWord, setSearchWord] = useState('')
   return (
-    <form onSubmit={onSearch} className="flex h-14 w-full space-x-2">
+    <form onSubmit={onSearch} className="flex h-12 w-full space-x-2">
       <div className="dark:border-dark-border border-light-border dark:bg-smooth-black bg-light-bg flex w-full rounded-full border">
-        <button className="flex items-center p-2">
+        <button className="flex items-center p-[6px]">
           <div className="dark:border-dark-border dark:bg-dark-bg bg-white-gray border-light-border mr-1 flex aspect-square h-full items-center justify-center rounded-full border">
-            <Search width={20} height={20} strokeColor="#eaeaea" strokeWidth={3} />
+            <Search width={16} height={16} strokeColor="#eaeaea" strokeWidth={3} />
           </div>
           <div className="flex items-center">
             <div className="border-t-dark-disabled-icon mt-[2px] border-4 border-transparent" />
@@ -29,9 +29,9 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
           value={searchWord}
         />
       </div>
-      <button type="submit" className="flex aspect-square items-center justify-center p-1">
-        <div className="bg-bright-blue flex aspect-square h-full items-center justify-center rounded-full">
-          <Search width={24} height={24} strokeColor="#eaeaea" strokeWidth={2} />
+      <button type="submit" className="flex aspect-square items-center justify-center p-[2px]">
+        <div className="dark:border-dark-border border-light-border dark:bg-smooth-black bg-light-bg hover:bg-bright-blue flex aspect-square h-full items-center justify-center rounded-full border hover:border-0">
+          <Search width={20} height={20} strokeColor="#eaeaea" strokeWidth={2} />
         </div>
       </button>
     </form>
