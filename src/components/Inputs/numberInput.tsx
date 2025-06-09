@@ -1,6 +1,8 @@
+'use client'
+
 import BaseInput from '#/components/Inputs/baseInput'
 import { parseInputValue } from '#/libs/client/utils'
-import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
+import { ChangeEvent } from 'react'
 
 interface NumberInputProps {
   name: string
@@ -10,23 +12,19 @@ interface NumberInputProps {
   onChange?: (value: number | undefined, event: ChangeEvent<HTMLInputElement>) => void
 }
 
-const NumberInputCallback: ForwardRefRenderFunction<HTMLInputElement, NumberInputProps> = (
-  {
-    name,
-    placeholder = '숫자를 입력해주세요',
-    onChange,
-    value,
-    className = '',
-    ...rest
-  }: NumberInputProps,
-  ref,
-) => {
+const NumberInput = ({
+  name,
+  placeholder = '숫자를 입력해주세요',
+  onChange,
+  value,
+  className = '',
+  ...rest
+}: NumberInputProps) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange?.(parseInputValue<number | undefined>(event.target.value, value), event)
   }
   return (
     <BaseInput
-      ref={ref}
       onChange={handleChange}
       name={name}
       placeholder={placeholder}
@@ -37,7 +35,5 @@ const NumberInputCallback: ForwardRefRenderFunction<HTMLInputElement, NumberInpu
     />
   )
 }
-
-const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(NumberInputCallback)
 
 export default NumberInput

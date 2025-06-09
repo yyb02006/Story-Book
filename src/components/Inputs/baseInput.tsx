@@ -1,5 +1,7 @@
+'use client'
+
 import { cls } from '#/libs/client/utils'
-import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from 'react'
+import { ChangeEvent } from 'react'
 
 type InputValueType = string | number
 
@@ -13,15 +15,19 @@ interface InputProps {
   [key: string]: unknown
 }
 
-const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
-  { name, placeholder, onChange, value, inputType, className = '', ...rest }: InputProps,
-  ref,
-) => {
+const BaseInput = ({
+  name,
+  placeholder,
+  onChange,
+  value,
+  inputType,
+  className = '',
+  ...rest
+}: InputProps) => {
   const baseInputStyles = 'w-full placeholder:pl-1 focus:ring-0 font-S-CoreDream-400'
 
   return (
     <input
-      ref={ref}
       onChange={onChange}
       name={name}
       placeholder={placeholder}
@@ -34,7 +40,5 @@ const BaseInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
     />
   )
 }
-
-const BaseInput = forwardRef<HTMLInputElement, InputProps>(BaseInputCallback)
 
 export default BaseInput

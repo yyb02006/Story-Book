@@ -1,6 +1,8 @@
+'use client'
+
 import BaseInput from '#/components/Inputs/baseInput'
 import { cls } from '#/libs/client/utils'
-import { ChangeEvent, DragEvent, forwardRef, ForwardRefRenderFunction, useState } from 'react'
+import { ChangeEvent, DragEvent, useState } from 'react'
 
 interface InputProps {
   name: string
@@ -11,10 +13,7 @@ interface InputProps {
   onFileDrop: (event: DragEvent<HTMLLabelElement>) => void
 }
 
-const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
-  { name, className, accept, label, onChange, onFileDrop },
-  ref,
-): JSX.Element => {
+const FileInput = ({ name, className, accept, label, onChange, onFileDrop }: InputProps) => {
   const [isMouseOverWithFile, setIsMouseOverWithFile] = useState(false)
   const labelClassName = label?.className || ''
   const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
@@ -53,7 +52,6 @@ const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
       )}
       <BaseInput
         id={label?.id}
-        ref={ref}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange?.(e.target.files)}
         name={name}
         inputType="file"
@@ -64,7 +62,5 @@ const FileInputCallback: ForwardRefRenderFunction<HTMLInputElement, InputProps> 
     </div>
   )
 }
-
-const FileInput = forwardRef<HTMLInputElement, InputProps>(FileInputCallback)
 
 export default FileInput

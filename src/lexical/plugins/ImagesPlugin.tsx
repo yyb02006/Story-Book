@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from 'react'
 import * as React from 'react'
 import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from '../nodes/ImageNode'
-import FileInput from '#/components/Inputs/fileInput'
+import { FileInput } from '#/components/Inputs/index'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 
