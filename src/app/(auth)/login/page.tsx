@@ -2,7 +2,7 @@
 
 import { handleForm } from '#/app/(auth)/actions'
 import FormButton from '#/components/form/formButton'
-import FormTextInput from '#/components/form/formTextInput'
+import FormInput from '#/components/form/formInput'
 import SNSAuth from '#/components/SNSAuth'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
@@ -20,14 +20,15 @@ export default function Login() {
           <div className="bg-charcoal-gray my-6 h-[1px] w-full rounded-full"></div>
         </div>
         <form action={action} className="flex w-full flex-col space-y-4">
-          <FormTextInput
+          <FormInput
+            type="text"
             id="id"
             name="id"
             placeholder="아이디"
             className="bg-dark-gray h-12 rounded-lg px-3"
           />
-          {state?.id?.toString()}
-          <FormTextInput
+          <FormInput
+            type="text"
             id="password"
             name="password"
             placeholder="패스워드"
