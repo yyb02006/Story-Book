@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 type AllowedInputType = 'text' | 'email'
 
-interface FormTextInputProps {
+interface FormInputProps {
   id: string
   name: string
   type: AllowedInputType
@@ -13,7 +13,7 @@ interface FormTextInputProps {
   className?: string
 }
 
-export default function FormInput({ id, name, placeholder, className, type }: FormTextInputProps) {
+export default function FormInput({ id, name, placeholder, className, type }: FormInputProps) {
   const [value, setValue] = useState('')
   return (
     <BaseInput
