@@ -1,25 +1,29 @@
 'use client'
 
-import { TextInput } from '#/components/Inputs'
+import BaseInput from '#/components/Inputs/baseInput'
 import { useState } from 'react'
+
+type AllowedInputType = 'text' | 'email'
 
 interface FormTextInputProps {
   id: string
   name: string
+  type: AllowedInputType
   placeholder?: string
   className?: string
 }
 
-export default function FormTextInput({ id, name, placeholder, className }: FormTextInputProps) {
+export default function FormInput({ id, name, placeholder, className, type }: FormTextInputProps) {
   const [value, setValue] = useState('')
   return (
-    <TextInput
+    <BaseInput
+      inputType={type}
       id={id}
       name={name}
       placeholder={placeholder}
       value={value}
-      onChange={(value) => {
-        setValue(value)
+      onChange={(event) => {
+        setValue(event.target.value)
       }}
       className={className}
     />
