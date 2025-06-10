@@ -1,6 +1,6 @@
 'use client'
 
-import { handleForm } from '#/app/(auth)/actions'
+import { handleLoginForm } from '#/app/(auth)/login/actions'
 import FormButton from '#/components/form/formButton'
 import FormInput from '#/components/form/formInput'
 import SNSAuth from '#/components/SNSAuth'
@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useFormState } from 'react-dom'
 
 export default function Login() {
-  const [state, action] = useFormState(handleForm, null)
+  const [state, action] = useFormState(handleLoginForm, null)
   return (
     <div className="flex h-screen w-screen flex-col items-center">
       <section className="flex h-full w-[400px] flex-col justify-center">

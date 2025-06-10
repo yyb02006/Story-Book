@@ -1,13 +1,14 @@
 'use client'
 
-import { handleForm } from '#/app/(auth)/actions'
+import { handleSignupForm } from '#/app/(auth)/signup/actions'
 import FormButton from '#/components/form/formButton'
 import FormInput from '#/components/form/formInput'
 import SNSAuth from '#/components/SNSAuth'
+import Link from 'next/link'
 import { useFormState } from 'react-dom'
 
 export default function SignUp() {
-  const [state, action] = useFormState(handleForm, null)
+  const [state, action] = useFormState(handleSignupForm, null)
   return (
     <div className="flex h-screen w-screen flex-col items-center">
       <section className="flex h-full w-[400px] flex-col justify-center">
@@ -28,6 +29,12 @@ export default function SignUp() {
           />
           <FormButton title="이메일 확인" className="h-10 w-full rounded-lg px-3" />
         </form>
+        <div className="font-S-CoreDream-200 text-white-gray mt-2 flex w-full items-center justify-center space-x-2 px-4 text-xs">
+          <span>이미 가입하셨나요?</span>
+          <button className="text-bright-blue">
+            <Link href={'/login'}>로그인</Link>
+          </button>
+        </div>
       </section>
     </div>
   )

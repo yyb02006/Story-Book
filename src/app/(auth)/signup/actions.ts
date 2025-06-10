@@ -1,6 +1,6 @@
 'use server'
 
-export const handleForm = async (
+export const handleSignupForm = async (
   prevState: {
     id: FormDataEntryValue | null
     password: FormDataEntryValue | null
