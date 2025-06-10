@@ -5,7 +5,7 @@ import { ChangeEvent } from 'react'
 
 interface InputProps {
   name: string
-  value: string | undefined
+  value?: string
   className?: string
   placeholder?: string
   onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void
