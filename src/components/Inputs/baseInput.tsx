@@ -3,19 +3,21 @@
 import { cls } from '#/libs/client/utils'
 import { ChangeEvent } from 'react'
 
-type InputValueType = string | number
+type InputType = 'text' | 'number' | 'file' | 'email'
 
-interface InputProps {
+type InputValueType<T> = T extends 'number' ? number : string
+
+interface InputProps<T extends InputType> {
   name: string
-  inputType: 'text' | 'number' | 'file'
+  inputType: T
   className?: string
-  value?: InputValueType
+  value?: InputValueType<T>
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
   [key: string]: unknown
 }
 
-const BaseInput = ({
+const BaseInput = <T extends InputType>({
   name,
   placeholder,
   onChange,
@@ -23,7 +25,7 @@ const BaseInput = ({
   inputType,
   className = '',
   ...rest
-}: InputProps) => {
+}: InputProps<T>) => {
   const baseInputStyles = 'w-full placeholder:pl-1 focus:ring-0 font-S-CoreDream-400'
 
   return (
