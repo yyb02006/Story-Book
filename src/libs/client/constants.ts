@@ -21,3 +21,16 @@ export const themeColorStyles = {
     text: 'text-smooth-black',
   },
 } as const
+
+export const ACCOUNT_LENGTH = {
+  id: {
+    minLength: 6,
+    maxLength: 20,
+  },
+  password: {
+    minLength: 8,
+    maxLength: 30,
+  },
+}
+
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/
