@@ -29,7 +29,7 @@ const TextInput = ({
       onChange={handleChange}
       name={name}
       placeholder={placeholder}
-      inputType="text"
+      type="text"
       className={className}
       value={value}
       {...rest}

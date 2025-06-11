@@ -2,18 +2,20 @@
 
 import BaseInput from '#/components/Inputs/baseInput'
 import { cls } from '#/libs/client/utils'
-import { ChangeEvent, DragEvent, useState } from 'react'
+import { DragEvent, InputHTMLAttributes, useState } from 'react'
 
-interface InputProps {
+interface FileInputProps {
   name: string
-  className?: string
-  accept?: string
   label?: { children: JSX.Element; id: string; className?: string }
-  onChange?: (files: FileList | null) => void
   onFileDrop: (event: DragEvent<HTMLLabelElement>) => void
 }
 
-const FileInput = ({ name, className, accept, label, onChange, onFileDrop }: InputProps) => {
+const FileInput = ({
+  name,
+  label,
+  onFileDrop,
+  ...rest
+}: FileInputProps & InputHTMLAttributes<HTMLInputElement>) => {
   const [isMouseOverWithFile, setIsMouseOverWithFile] = useState(false)
   const labelClassName = label?.className || ''
   const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
@@ -50,15 +52,7 @@ const FileInput = ({ name, className, accept, label, onChange, onFileDrop }: Inp
           {label.children}
         </label>
       )}
-      <BaseInput
-        id={label?.id}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange?.(e.target.files)}
-        name={name}
-        inputType="file"
-        className={className}
-        accept={accept}
-        multiple={true}
-      />
+      <BaseInput id={label?.id} name={name} type="file" multiple={true} {...rest} />
     </div>
   )
 }

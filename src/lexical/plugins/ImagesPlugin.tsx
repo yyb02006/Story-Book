@@ -123,6 +123,10 @@ export function InsertImageUploadedDialog({
     }
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    loadImage(e.target.files)
+  }
+
   return (
     <div className="flex min-w-80 flex-col gap-y-4">
       <FileInput
@@ -136,7 +140,7 @@ export function InsertImageUploadedDialog({
           ),
           id: 'File_Upload',
         }}
-        onChange={loadImage}
+        onChange={handleFileChange}
         onFileDrop={handleFileDrop}
         accept="image/*"
         className="hidden"
