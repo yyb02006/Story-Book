@@ -1,31 +1,38 @@
 'use client'
 
 import BaseInput from '#/components/Inputs/baseInput'
-import { useState } from 'react'
-
-type AllowedInputType = 'text' | 'email'
+import { InputHTMLAttributes, useState } from 'react'
 
 interface FormInputProps {
-  id: string
   name: string
-  type: AllowedInputType
-  placeholder?: string
-  className?: string
+  errorMessages?: string[]
 }
 
-export default function FormInput({ id, name, placeholder, className, type }: FormInputProps) {
+export default function FormInput({
+  name,
+  errorMessages,
+  ...rest
+}: FormInputProps & InputHTMLAttributes<HTMLInputElement>) {
   const [value, setValue] = useState('')
   return (
-    <BaseInput
-      inputType={type}
-      id={id}
-      name={name}
-      placeholder={placeholder}
-      value={value}
-      onChange={(event) => {
-        setValue(event.target.value)
-      }}
-      className={className}
-    />
+    <div>
+      <BaseInput
+        name={name}
+        value={value}
+        onChange={(event) => {
+          setValue(event.target.value)
+        }}
+        {...rest}
+      />
+      {errorMessages && (
+        <div className="mt-1 space-y-1 text-xs">
+          {errorMessages.map((message, idx) => (
+            <div className="text-amber-400" key={idx}>
+              {message}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
