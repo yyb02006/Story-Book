@@ -3,11 +3,11 @@
 import { cls } from '#/libs/client/utils'
 import { ChangeEvent } from 'react'
 
-type InputType = 'text' | 'number' | 'file' | 'email'
+export type BaseInputType = 'text' | 'number' | 'file' | 'email' | 'password'
 
 type InputValueType<T> = T extends 'number' ? number : string
 
-interface InputProps<T extends InputType> {
+interface InputProps<T extends BaseInputType> {
   name: string
   inputType: T
   className?: string
@@ -17,7 +17,7 @@ interface InputProps<T extends InputType> {
   [key: string]: unknown
 }
 
-const BaseInput = <T extends InputType>({
+const BaseInput = <T extends BaseInputType>({
   name,
   placeholder,
   onChange,
