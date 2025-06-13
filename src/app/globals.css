@@ -161,8 +161,12 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-text-fill-color: #bababa;
-  -webkit-box-shadow: 0 0 0px 40rem #202020 inset;
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-transition: background-color 5000s ease-in-out 0s;
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-dark-gray) inset !important;
+  box-shadow: 0 0 0px 1000px var(--color-dark-gray) inset !important;
+  -webkit-text-fill-color: var(--color-smooth-white) !important;
+  font-family: 'S-CoreDream-400', sans-serif !important;
 }
 
 /* search input 데코레이션 삭제 */
