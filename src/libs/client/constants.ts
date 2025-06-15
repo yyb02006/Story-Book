@@ -34,3 +34,4 @@ export const ACCOUNT_LENGTH = {
 }
 
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/
+export const ID_REGEX = /^[a-zA-Z0-9]+$/
