@@ -19,7 +19,7 @@ const BaseInput = ({
     <input
       name={name}
       spellCheck={false}
-      className={cls(className, baseInputStyles)}
+      className={cls(baseInputStyles, className)}
       // size={20} default
       {...rest}
     />
