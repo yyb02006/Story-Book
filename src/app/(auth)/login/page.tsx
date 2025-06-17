@@ -4,6 +4,7 @@ import { handleLoginForm } from '#/app/(auth)/login/actions'
 import FormButton from '#/components/form/formButton'
 import FormInput from '#/components/form/formInput'
 import SNSAuth from '#/components/SNSAuth'
+import { ACCOUNT_LENGTH } from '#/libs/client/constants'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
 
@@ -25,15 +26,22 @@ export default function Login() {
             id="id"
             name="id"
             placeholder="아이디"
-            className="bg-dark-gray h-12 rounded-lg px-3"
+            errorMessages={state?.properties?.user_id?.errors}
+            {...ACCOUNT_LENGTH.id}
           />
           <FormInput
-            type="text"
+            type="password"
             id="password"
             name="password"
             placeholder="패스워드"
-            className="bg-dark-gray h-12 rounded-lg px-3"
+            errorMessages={state?.properties?.password?.errors}
+            {...ACCOUNT_LENGTH.password}
           />
+          {state?.errors.map((error, id) => (
+            <div key={id} className="space-y-1 text-xs text-amber-400">
+              {error}
+            </div>
+          ))}
           <FormButton title="로그인" className="h-10 w-full rounded-lg px-3" />
         </form>
         <div className="font-S-CoreDream-200 text-white-gray mt-2 flex w-full items-center justify-evenly px-4 text-xs">
