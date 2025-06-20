@@ -16,14 +16,18 @@ export default function SNSAuth({ buttonText }: SNSAuthProps) {
     client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID!,
     scope: 'read:user,user:email',
   })
+  const googleAuthUTL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${'http://localhost:3000/api/google/token'}&response_type=code&scope=${encodeURIComponent('profile email')}&access_type=offline`
   return (
     <div className="flex flex-col space-y-4">
-      <button className="bg-smooth-white text-smooth-black font-S-CoreDream-400 flex h-10 items-center justify-center space-x-1 rounded-lg text-sm">
+      <Link
+        href={googleAuthUTL}
+        className="bg-smooth-white hover:ring-bright-blue text-smooth-black font-S-CoreDream-400 flex h-10 items-center justify-center space-x-1 overflow-hidden rounded-lg text-sm hover:ring-2"
+      >
         <svg className="size-6">
           <use href={`/icons/brandIcons.svg#google`} />
         </svg>
         <span>구글 {buttonText}</span>
-      </button>
+      </Link>
 
       <Link
         href={githubAuthURL}
