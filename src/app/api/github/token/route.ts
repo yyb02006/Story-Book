@@ -1,5 +1,6 @@
 import prisma from '#/libs/server/prisma'
 import getSession from '#/libs/server/session'
+import { User } from '@prisma/client'
 import { randomBytes } from 'crypto'
 import { notFound, redirect } from 'next/navigation'
 import { NextRequest } from 'next/server'
@@ -11,6 +12,29 @@ interface AccessTokenData {
 
 type githubResponseData = { id: number; avatar_url: string; login: string }
 
+type UserIdByAuthProvider =
+  | {
+      github_id: string
+      google_id?: undefined
+      kakao_id?: undefined
+    }
+  | {
+      google_id: string
+      github_id?: undefined
+      kakao_id?: undefined
+    }
+  | {
+      kakao_id: string
+      github_id?: undefined
+      google_id?: undefined
+    }
+
+interface CreateUniqueUserProps {
+  initialUsername: string
+  additionalData: Partial<Pick<User, 'user_id' | 'email' | 'password' | 'avatar'>> &
+    UserIdByAuthProvider
+}
+
 const createUniqueUsername = async (baseUsername: string) => {
   const randomString = randomBytes(4).toString('hex')
   const uniqueUsername = `${baseUsername}_${randomString}`
@@ -18,21 +42,14 @@ const createUniqueUsername = async (baseUsername: string) => {
   return uniqueUsername
 }
 
-const getCookieAndRedirect = async (idForSession: number) => {
-  const session = await getSession()
-  session.id = idForSession
-  await session.save()
-  return redirect('/')
-}
-
-const getAccessToken = async (code: string) => {
+const getGithubAccessToken = async (code: string) => {
   const accessTokenParams = new URLSearchParams({
     client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID!,
     client_secret: process.env.GITHUB_CLIENT_SECRET!,
     code,
   }).toString()
   const accessTokenURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`
-  const data: AccessTokenData = await (
+  const tokenData: AccessTokenData = await (
     await fetch(accessTokenURL, {
       method: 'POST',
       headers: {
@@ -40,7 +57,7 @@ const getAccessToken = async (code: string) => {
       },
     })
   ).json()
-  return data
+  return tokenData
 }
 
 const getGithubUserData = async (path: string, access_token: string) => {
@@ -54,26 +71,18 @@ const getGithubUserData = async (path: string, access_token: string) => {
   return { github_id, avatar_url, login }
 }
 
-export async function GET(request: NextRequest) {
-  const code = request.nextUrl.searchParams.get('code')
-  if (!code) return notFound()
+export const getCookieAndRedirect = async (idForSession: number) => {
+  const session = await getSession()
+  session.id = idForSession
+  await session.save()
+  return redirect('/')
+}
 
-  const { error, access_token } = await getAccessToken(code)
-
-  if (error) return new Response(null, { status: 400 })
-
-  const { avatar_url, github_id, login } = await getGithubUserData(
-    'https://api.github.com/user',
-    access_token,
-  )
-  const user = await prisma.user.findUnique({
-    where: { github_id },
-    select: { id: true },
-  })
-
-  if (user) return await getCookieAndRedirect(user.id)
-
-  let uniqueUsername = login
+export const createUniqueUser = async ({
+  initialUsername,
+  additionalData,
+}: CreateUniqueUserProps) => {
+  let uniqueUsername = initialUsername
   while (true) {
     const existNamedUser = await prisma.user.findUnique({
       where: { username: uniqueUsername },
@@ -81,13 +90,39 @@ export async function GET(request: NextRequest) {
     })
     if (!existNamedUser) {
       const newUser = await prisma.user.create({
-        data: { username: uniqueUsername, avatar: avatar_url, github_id },
+        data: { username: uniqueUsername, ...additionalData },
       })
       const session = await getSession()
       session.id = newUser.id
       await session.save()
       return redirect('/')
     }
-    uniqueUsername = await createUniqueUsername(login)
+    uniqueUsername = await createUniqueUsername(initialUsername)
   }
+}
+
+export async function GET(request: NextRequest) {
+  const code = request.nextUrl.searchParams.get('code')
+  if (!code) return notFound()
+
+  const { error, access_token } = await getGithubAccessToken(code)
+
+  if (error) return new Response('Failed to exchange code for tokens', { status: 400 })
+
+  const { avatar_url, github_id, login } = await getGithubUserData(
+    'https://api.github.com/user',
+    access_token,
+  )
+
+  const existUser = await prisma.user.findUnique({
+    where: { github_id },
+    select: { id: true },
+  })
+
+  if (existUser) return await getCookieAndRedirect(existUser.id)
+
+  await createUniqueUser({
+    initialUsername: login,
+    additionalData: { avatar: avatar_url, github_id },
+  })
 }
