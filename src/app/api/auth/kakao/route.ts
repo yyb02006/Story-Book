@@ -1,4 +1,4 @@
-import { createUniqueUser, getCookieAndRedirect } from '#/app/api/auth/github/route'
+import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/app/api/auth/github/route'
 import prisma from '#/libs/server/prisma'
 import { notFound } from 'next/navigation'
 import { NextRequest } from 'next/server'
@@ -67,8 +67,6 @@ const getKaKaoAccessToken = async (code: string) => {
     })
   ).json()
 
-  console.log(tokenData)
-
   return tokenData
 }
 
@@ -121,7 +119,7 @@ export async function GET(request: NextRequest) {
   if (existUser) {
     return await getCookieAndRedirect(existUser.id)
   } else {
-    return await createUniqueUser({
+    return await createUniqueUserAndRedirect({
       initialUsername: username,
       additionalData: { kakao_id, avatar },
     })

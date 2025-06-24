@@ -78,7 +78,7 @@ export const getCookieAndRedirect = async (idForSession: number) => {
   return redirect('/')
 }
 
-export const createUniqueUser = async ({
+export const createUniqueUserAndRedirect = async ({
   initialUsername,
   additionalData,
 }: CreateUniqueUserProps) => {
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
 
   const { error, access_token } = await getGithubAccessToken(code)
 
-  if (error) return new Response('Failed to exchange code for tokens', { status: 400 })
+  if (error) return new Response(error, { status: 400 })
 
   const { avatar_url, github_id, login } = await getGithubUserData(
     'https://api.github.com/user',
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
 
   if (existUser) return await getCookieAndRedirect(existUser.id)
 
-  await createUniqueUser({
+  await createUniqueUserAndRedirect({
     initialUsername: login,
     additionalData: { avatar: avatar_url, github_id },
   })

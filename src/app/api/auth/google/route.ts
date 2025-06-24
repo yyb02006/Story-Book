@@ -1,4 +1,4 @@
-import { createUniqueUser, getCookieAndRedirect } from '#/app/api/auth/github/route'
+import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/app/api/auth/github/route'
 import prisma from '#/libs/server/prisma'
 import { notFound } from 'next/navigation'
 import { NextRequest } from 'next/server'
@@ -40,7 +40,7 @@ const getGoogleAccessToken = async (code: string) => {
         code,
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: 'http://localhost:3000/api/google/token',
+        redirect_uri: 'http://localhost:3000/api/auth/google',
         grant_type: 'authorization_code',
       }),
     })
@@ -65,8 +65,7 @@ export async function GET(request: NextRequest) {
 
   const tokenData = await getGoogleAccessToken(code)
 
-  if ('error' in tokenData)
-    return new Response('Failed to exchange code for tokens', { status: 400 })
+  if ('error' in tokenData) return new Response(tokenData.error, { status: 400 })
 
   const { access_token } = tokenData
 
@@ -79,7 +78,7 @@ export async function GET(request: NextRequest) {
 
   if (existUser) return await getCookieAndRedirect(existUser.id)
 
-  await createUniqueUser({
+  await createUniqueUserAndRedirect({
     initialUsername: name,
     additionalData: { avatar: picture, google_id: sub },
   })
