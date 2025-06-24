@@ -1,15 +1,13 @@
-import { SyntheticEvent, useState } from 'react'
+'use client'
+
+import { useState } from 'react'
 import { Search } from '../../public/icons/ui'
 import { TextInput } from '#/components/Inputs'
 
-interface SearchFormProps {
-  onSearch: (e: SyntheticEvent<HTMLFormElement>) => void
-}
-
-export default function SearchForm({ onSearch }: SearchFormProps) {
+export default function SearchForm() {
   const [searchWord, setSearchWord] = useState('')
   return (
-    <form onSubmit={onSearch} className="flex h-12 w-full space-x-2">
+    <form action={''} className="flex h-12 w-full space-x-2">
       <div className="dark:border-dark-border border-light-border dark:bg-smooth-black bg-light-bg flex w-full rounded-full border">
         <button className="flex items-center p-[6px]">
           <div className="dark:border-dark-border dark:bg-dark-bg bg-white-gray border-light-border mr-1 flex aspect-square h-full items-center justify-center rounded-full border">
