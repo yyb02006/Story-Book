@@ -52,12 +52,19 @@ export default function UserButton({ avatar, username }: PickedUser) {
         )}
       </button>
       {onDropdown && (
-        <div className="bg-dark-gray font-S-CoreDream-400 dark:border-dark-border border-light-border absolute -right-4 mt-[6px] w-[200px] rounded-md border px-2 py-2 text-[0.8125rem] leading-[0.8125rem] whitespace-nowrap">
+        <div className="bg-dark-gray font-S-CoreDream-400 dark:border-dark-border border-light-border absolute -right-4 mt-[6px] w-[200px] rounded-md border py-2 text-[0.8125rem] leading-[0.8125rem] whitespace-nowrap">
+          <div className="relative w-full px-2">
+            <button onClick={() => {}} className="peer relative z-1 flex w-full px-2 py-2">
+              회원정보 수정
+            </button>
+            <div className="peer-hover:bg-bright-blue absolute top-[14px] left-2 z-0 h-[10px] w-[calc(100%-16px)] rounded-xs" />
+          </div>
+          <div className="dark:bg-dark-border bg-light-border my-2 h-[1px] w-full" />
           <div className="relative w-full">
-            <button onClick={handleClick} className="peer relative z-1 flex w-full px-2 py-2">
+            <button onClick={handleClick} className="peer relative z-1 flex w-full px-4 py-2">
               로그아웃
             </button>
-            <div className="peer-hover:bg-bright-blue absolute top-[14px] z-0 h-[10px] w-full rounded-xs"></div>
+            <div className="peer-hover:bg-bright-blue absolute top-[14px] left-2 z-0 h-[10px] w-[calc(100%-16px)] rounded-xs" />
           </div>
         </div>
       )}
