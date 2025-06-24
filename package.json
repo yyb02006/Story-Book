@@ -12,12 +12,17 @@
   "dependencies": {
     "@lexical/react": "^0.31.1",
     "@next/bundle-analyzer": "^15.3.1",
+    "@prisma/client": "^6.9.0",
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^6.0.0",
     "framer-motion": "^11.11.10",
+    "iron-session": "^8.0.4",
     "lexical": "^0.31.1",
     "next": "14.2.7",
     "openai": "^4.58.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zod": "^3.25.57"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",
@@ -44,6 +49,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
+    "prisma": "^6.9.0",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.4",
     "typed-css-modules": "^0.9.1",

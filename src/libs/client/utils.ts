@@ -84,3 +84,19 @@ export function sanitizeUrl(url: string): string {
 
   return url
 }
+
+/**
+ * 문자열에서 모든 종류의 공백 문자를 찾아 제거.
+ * 공백 문자는 공백(' '), 탭('\t'), 줄 바꿈('\n') 등을 포함.
+ *
+ * @param {string} str - 공백을 제거할 문자열.
+ * @returns {string} 공백이 제거된 문자열.
+ *
+ * @example
+ * const originalString = "Hello World! This is a test.";
+ * const stringWithoutSpaces = removeSpaces(originalString);
+ * console.log(stringWithoutSpaces); // "HelloWorld!Thisisatest."
+ */
+export function removeSpaces(str: string) {
+  return str.replace(/\s+/g, '')
+}

@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from 'react'
 import * as React from 'react'
 import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from '../nodes/ImageNode'
-import FileInput from '#/components/Inputs/fileInput'
+import { FileInput } from '#/components/Inputs/index'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 
@@ -123,6 +123,10 @@ export function InsertImageUploadedDialog({
     }
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    loadImage(e.target.files)
+  }
+
   return (
     <div className="flex min-w-80 flex-col gap-y-4">
       <FileInput
@@ -136,7 +140,7 @@ export function InsertImageUploadedDialog({
           ),
           id: 'File_Upload',
         }}
-        onChange={loadImage}
+        onChange={handleFileChange}
         onFileDrop={handleFileDrop}
         accept="image/*"
         className="hidden"
