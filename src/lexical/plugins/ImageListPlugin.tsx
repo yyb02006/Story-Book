@@ -8,7 +8,12 @@ import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import useModal from '#/hooks/useModal'
 import Image from 'next/image'
 
-type OmitedImageData = Omit<EditorImageData, 'src' | 'width' | 'height'> & { key: string }
+type OmitedImageData = Omit<
+  EditorImageData,
+  'uploadStatus' | 'permanentSrc' | 'previewSrc' | 'width' | 'height' | 'id' | 'file'
+> & {
+  key: string
+}
 
 export default function ImageListPlugin() {
   const [editor] = useLexicalComposerContext()
