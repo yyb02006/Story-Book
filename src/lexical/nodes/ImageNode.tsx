@@ -46,6 +46,7 @@ export interface ImagePayload {
   src: string
   width?: number
   captionsEnabled?: boolean
+  id: string
 }
 
 function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
@@ -62,8 +63,8 @@ function $convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (img.src.startsWith('file:///') || isGoogleDocCheckboxImg(img)) {
     return null
   }
-  const { alt: altText, src, width, height } = img
-  const node = $createImageNode({ altText, height, src, width })
+  const { alt: altText, src, width, height, id } = img
+  const node = $createImageNode({ altText, height, src, width, id })
   return { node }
 }
 
@@ -76,6 +77,7 @@ export type SerializedImageNode = Spread<
     showCaption: boolean
     src: string
     width?: number
+    id: string
   },
   SerializedLexicalNode
 >
@@ -90,6 +92,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __caption: LexicalEditor
   // Captions cannot yet be used within editor cells
   __captionsEnabled: boolean
+  __id: string
 
   static getType(): string {
     return 'image'
@@ -100,6 +103,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__src,
       node.__altText,
       node.__maxWidth,
+      node.__id,
       node.__width,
       node.__height,
       node.__showCaption,
@@ -110,7 +114,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, height, width, maxWidth, src, showCaption } = serializedNode
+    const { altText, height, width, maxWidth, src, showCaption, id } = serializedNode
     return $createImageNode({
       altText,
       height,
@@ -118,6 +122,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       showCaption,
       src,
       width,
+      id,
     }).updateFromJSON(serializedNode)
   }
 
@@ -139,6 +144,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     element.setAttribute('alt', this.__altText)
     element.setAttribute('width', this.__width.toString())
     element.setAttribute('height', this.__height.toString())
+    element.setAttribute('data-image-id', this.__id)
     return { element }
   }
 
@@ -155,6 +161,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     src: string,
     altText: string,
     maxWidth: number,
+    id: string,
     width?: 'inherit' | number,
     height?: 'inherit' | number,
     showCaption?: boolean,
@@ -176,6 +183,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         nodes: [RootNode, TextNode, LineBreakNode, ParagraphNode, LinkNode, HashtagNode],
       })
     this.__captionsEnabled = captionsEnabled || captionsEnabled === undefined
+    this.__id = id || ''
   }
 
   exportJSON(): SerializedImageNode {
@@ -188,7 +196,17 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       showCaption: this.__showCaption,
       src: this.getSrc(),
       width: this.__width === 'inherit' ? 0 : this.__width,
+      id: this.getId(),
     }
+  }
+
+  getId(): string {
+    return this.__id
+  }
+
+  setSrc(src: string): void {
+    const writable = this.getWritable()
+    writable.__src = src
   }
 
   setWidthAndHeight(width: 'inherit' | number, height: 'inherit' | number): void {
@@ -254,12 +272,14 @@ export function $createImageNode({
   showCaption,
   caption,
   key,
+  id,
 }: ImagePayload): ImageNode {
   return $applyNodeReplacement(
     new ImageNode(
       src,
       altText,
       maxWidth,
+      id,
       width,
       height,
       showCaption,
