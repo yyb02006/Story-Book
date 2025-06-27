@@ -36,14 +36,22 @@ import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from '../node
 import { FileInput } from '#/components/Inputs/index'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
+import { supabase } from '#/libs/client/supabase'
+import { cls } from '#/libs/client/utils'
 
 export type InsertImagePayload = Readonly<ImagePayload>
 
+type UploadStatus = 'pending' | 'uploading' | 'uploaded' | 'failed'
+
 export type EditorImageData = {
-  src: string
+  id: string
+  file: File
+  previewSrc: string // Dialog에서 미리보기용 Base64 URL
+  permanentSrc: string | null // 스토리지 업로드 후 받을 영구 URL
   fileName: string
-  height: number
   width: number
+  height: number
+  uploadStatus: UploadStatus // 업로드 상태
 }
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
@@ -53,6 +61,18 @@ export const INSERT_IMAGE_ARRAY_COMMAND: LexicalCommand<InsertImagePayload[]> = 
   'INSERT_IMAGE_ARRAY_COMMAND',
 )
 
+async function uploadImageToSupabase(file: File, id: string) {
+  const fileExtension = file.name.split('.').pop()
+  const filePath = `public/${id}-${file.lastModified}.${fileExtension}`
+  const { error } = await supabase.storage.from('temp-images').upload(filePath, file)
+  const projectId = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID
+  if (error) {
+    throw new Error(error.message)
+  } else {
+    return `https://${projectId}.supabase.co/storage/v1/object/public/temp-images/${filePath}`
+  }
+}
+
 export function InsertImageUploadedDialog({
   activeEditor,
   onClose,
@@ -61,55 +81,107 @@ export function InsertImageUploadedDialog({
   onClose: () => void
 }) {
   const [images, setImages] = useState<EditorImageData[]>([])
+  const [uploadButtonStatus, setUploadButtonStatus] = useState<
+    '업로드중' | '업로드 불가' | '업로드' | null
+  >(null)
 
-  const isDisabled = images.length === 0
+  useEffect(() => {
+    switch (true) {
+      case images.length === 0:
+        setUploadButtonStatus(null)
+        break
+      case images.some((image) => image.uploadStatus === 'uploading'):
+        setUploadButtonStatus('업로드중')
+        break
+      case images.some((image) => image.uploadStatus === 'failed'):
+        setUploadButtonStatus('업로드 불가')
+        break
+      default:
+        setUploadButtonStatus('업로드')
+        break
+    }
+    console.log(images)
+  }, [images])
 
   const loadImage = (files: FileList | null) => {
     if (files === null) return
 
     const fileArray = Array.from(files)
-    const srcPromises = fileArray.map(
-      (file) =>
-        new Promise<EditorImageData>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              const img = new Image()
-              const result = reader.result
-              img.onload = () => {
-                resolve({
-                  src: result,
-                  fileName: file.name,
-                  width: img.width,
-                  height: img.height,
-                })
-              }
-              img.onerror = () => {
-                reject(new Error('Failed to load image'))
-              }
-              img.src = result
-            } else {
-              reject(new Error('Failed to read file'))
-            }
-          }
-          reader.onerror = () => {
-            reject(new Error('Failed to read file'))
-          }
-          reader.readAsDataURL(file)
-        }),
-    )
+    fileArray.forEach((file) => {
+      const id = crypto.randomUUID()
 
-    Promise.all(srcPromises)
-      .then((results) => {
-        setImages(results)
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+      setImages((prev) => [
+        ...prev,
+        {
+          id,
+          file,
+          previewSrc: '',
+          permanentSrc: null,
+          fileName: file.name,
+          height: 0,
+          width: 0,
+          uploadStatus: 'uploading',
+        },
+      ])
+
+      const reader = new FileReader()
+
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          const previewDataUrl = reader.result
+          const img = new Image()
+          img.onload = () => {
+            setImages((prev) =>
+              prev.map((item) =>
+                item.id === id
+                  ? { ...item, previewSrc: previewDataUrl, width: img.width, height: img.height }
+                  : item,
+              ),
+            )
+          }
+          img.onerror = () => {
+            console.error('Failed to load image for preview:', file.name)
+            setImages((prev) =>
+              prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+            )
+          }
+          img.src = previewDataUrl
+        } else {
+          console.error('Failed to read file as string:', file.name)
+          setImages((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+          )
+        }
+      }
+      reader.onerror = () => {
+        console.error('FileReader error:', file.name)
+        setImages((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+        )
+      }
+      reader.readAsDataURL(file)
+      uploadImageToSupabase(file, id)
+        .then((permanentUrl) => {
+          setImages((prev) =>
+            prev.map((item) =>
+              item.id === id
+                ? { ...item, permanentSrc: permanentUrl, uploadStatus: 'uploaded' }
+                : item,
+            ),
+          )
+        })
+        .catch((err) => {
+          console.log('Image upload to Supabase failed:', file.name, err)
+          setImages((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+          )
+        })
+    })
   }
 
   const submitImages = (payloads: InsertImagePayload[]) => {
     activeEditor.dispatchCommand(INSERT_IMAGE_ARRAY_COMMAND, payloads)
+
     onClose()
   }
 
@@ -120,11 +192,13 @@ export function InsertImageUploadedDialog({
     const files = event.dataTransfer.files
     if (files.length > 0) {
       loadImage(files)
+      event.dataTransfer.clearData()
     }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     loadImage(e.target.files)
+    e.target.value = ''
   }
 
   return (
@@ -147,8 +221,8 @@ export function InsertImageUploadedDialog({
       />
       {images.length > 0 ? (
         <ul className="font-S-CoreDream-400 space-y-2 text-sm">
-          {images.map(({ fileName }) => (
-            <li key={fileName} className="flex justify-between">
+          {images.map(({ fileName, id }) => (
+            <li key={id} className="flex justify-between">
               {fileName}
               <button
                 onClick={() => {
@@ -162,12 +236,14 @@ export function InsertImageUploadedDialog({
         </ul>
       ) : null}
       <button
-        disabled={isDisabled}
+        disabled={images.length === 0 || images.some((img) => img.uploadStatus !== 'uploaded')}
         onClick={() => {
+          if (images.some((img) => img.uploadStatus !== 'uploaded')) return
           submitImages(
-            images.map<InsertImagePayload>(({ fileName, src, width, height }) => ({
+            images.map<InsertImagePayload>(({ fileName, permanentSrc, width, height, id }) => ({
+              id,
               altText: fileName,
-              src,
+              src: permanentSrc!,
               maxWidth: contentAreaWidth,
               width: contentAreaWidth && width >= 500 ? 500 : width,
               height:
@@ -175,9 +251,12 @@ export function InsertImageUploadedDialog({
             })),
           )
         }}
-        className="bg-bright-blue cursor-pointer rounded-md px-4 py-2"
+        className={cls(
+          uploadButtonStatus === '업로드' ? 'bg-bright-blue' : 'bg-charcoal-gray',
+          'cursor-pointer rounded-md px-4 py-2',
+        )}
       >
-        업로드
+        {uploadButtonStatus === null ? '업로드' : uploadButtonStatus}
       </button>
     </div>
   )
