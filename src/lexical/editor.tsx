@@ -54,6 +54,7 @@ export function Editor() {
 
   const [isLinkEditMode, setIsLinkEditMode] = useState(false)
   const [floatingAnchorElement, setFloatingAnchorElement] = useState<HTMLDivElement | null>(null)
+  const [title, setTitle] = useState('')
 
   const onFloatingAnchorRef = (_floatingAnchorElement: HTMLDivElement) => {
     if (_floatingAnchorElement !== null) {
@@ -65,9 +66,12 @@ export function Editor() {
     <LexicalComposer initialConfig={initialConfig}>
       <TextInput
         name="title"
-        value=""
+        value={title}
         className="input-color-theme h-14 rounded-2xl p-3 text-base"
         placeholder="제목을 입력해주세요"
+        onChange={(value) => {
+          setTitle(value)
+        }}
       />
       <TextEditorContainer>
         <div className="relative z-[1] flex h-8 items-center gap-x-3">
@@ -107,7 +111,7 @@ export function Editor() {
           setIsLinkEditMode={setIsLinkEditMode}
         />
       )}
-      <SubmitPlugin />
+      <SubmitPlugin title={title} />
     </LexicalComposer>
   )
 }
