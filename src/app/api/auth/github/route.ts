@@ -1,5 +1,6 @@
 import prisma from '#/libs/server/prisma'
 import getSession from '#/libs/server/session'
+import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/libs/server/utils'
 import { User } from '@prisma/client'
 import { randomBytes } from 'crypto'
 import { notFound, redirect } from 'next/navigation'
@@ -11,36 +12,6 @@ interface AccessTokenData {
 }
 
 type githubResponseData = { id: number; avatar_url: string; login: string }
-
-type UserIdByAuthProvider =
-  | {
-      github_id: string
-      google_id?: undefined
-      kakao_id?: undefined
-    }
-  | {
-      google_id: string
-      github_id?: undefined
-      kakao_id?: undefined
-    }
-  | {
-      kakao_id: string
-      github_id?: undefined
-      google_id?: undefined
-    }
-
-interface CreateUniqueUserProps {
-  initialUsername: string
-  additionalData: Partial<Pick<User, 'user_id' | 'email' | 'password' | 'avatar'>> &
-    UserIdByAuthProvider
-}
-
-const createUniqueUsername = async (baseUsername: string) => {
-  const randomString = randomBytes(4).toString('hex')
-  const uniqueUsername = `${baseUsername}_${randomString}`
-
-  return uniqueUsername
-}
 
 const getGithubAccessToken = async (code: string) => {
   const accessTokenParams = new URLSearchParams({
@@ -69,36 +40,6 @@ const getGithubUserData = async (path: string, access_token: string) => {
   ).json()
   const github_id = id.toString()
   return { github_id, avatar_url, login }
-}
-
-export const getCookieAndRedirect = async (idForSession: number) => {
-  const session = await getSession()
-  session.id = idForSession
-  await session.save()
-  return redirect('/')
-}
-
-export const createUniqueUserAndRedirect = async ({
-  initialUsername,
-  additionalData,
-}: CreateUniqueUserProps) => {
-  let uniqueUsername = initialUsername
-  while (true) {
-    const existNamedUser = await prisma.user.findUnique({
-      where: { username: uniqueUsername },
-      select: { id: true },
-    })
-    if (!existNamedUser) {
-      const newUser = await prisma.user.create({
-        data: { username: uniqueUsername, ...additionalData },
-      })
-      const session = await getSession()
-      session.id = newUser.id
-      await session.save()
-      return redirect('/')
-    }
-    uniqueUsername = await createUniqueUsername(initialUsername)
-  }
 }
 
 export async function GET(request: NextRequest) {
