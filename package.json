@@ -12,7 +12,7 @@
   "dependencies": {
     "@lexical/react": "^0.31.1",
     "@next/bundle-analyzer": "^15.3.1",
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
     "@supabase/supabase-js": "^2.50.1",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^6.0.0",
@@ -50,7 +50,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.1",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.4",
     "typed-css-modules": "^0.9.1",
