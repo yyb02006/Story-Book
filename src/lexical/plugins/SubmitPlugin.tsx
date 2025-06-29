@@ -2,36 +2,36 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $generateHtmlFromNodes } from '@lexical/html'
 import { ImageNode } from '#/lexical/nodes/ImageNode'
 import { useEffect, useState } from 'react'
-import { supabase } from '#/libs/client/supabase'
+import { Prisma } from '@prisma/client'
+import CreatePost from '#/lexical/plugins/actions'
 
-export default function SubmitPlugin() {
+export default function SubmitPlugin({ title }: { title: string }) {
   const [editor] = useLexicalComposerContext()
-  const [TempImageNames, setTempImageNames] = useState<string[]>([])
+  const [tempImageNames, setTempImageNames] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const handleSubmit = async () => {
-    if (loading) return
-    editor.read(async () => {
-      const htmlString = $generateHtmlFromNodes(editor, null)
-      const title = (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || ''
+    let htmlContent: string | undefined
+    let editorState: Prisma.InputJsonValue | undefined
 
-      const postData = {
-        title,
-        content: htmlString,
-      }
-
-      try {
-        setLoading(true)
-        await moveFileToPermanent()
-
-        localStorage.setItem('post', JSON.stringify(postData))
-        console.log(htmlString)
-        alert('게시글이 성공적으로 저장되었습니다.')
-        setLoading(false)
-      } catch (error) {
-        console.error('게시글 등록 중 오류 발생:', error)
-        alert('게시글 등록 중 오류가 발생했습니다.')
-      }
+    setLoading(true)
+    editor.read(() => {
+      htmlContent = $generateHtmlFromNodes(editor, null)
+      editorState = editor.getEditorState().toJSON() as unknown as Prisma.InputJsonValue
     })
+
+    if (htmlContent && editorState) {
+      try {
+        await CreatePost({
+          data: { htmlContent, editorState, title },
+          tempImageNames,
+        })
+      } catch (error) {
+        throw new Error('Fail to Submit')
+      }
+    } else {
+      throw new Error('Fail to Submit')
+    }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -49,22 +49,6 @@ export default function SubmitPlugin() {
       )
     })
   }, [editor])
-
-  const moveFileToPermanent = async () => {
-    const promises = TempImageNames.map((name) =>
-      supabase.storage
-        .from('temp-images')
-        .move(`public/${name}`, `public/${name}`, { destinationBucket: 'permanent-images' }),
-    )
-
-    const results = await Promise.all(promises)
-
-    if (results.filter((result) => result.error).length > 0) {
-      setLoading(false)
-      console.log(results.filter((result) => result.error))
-      throw new Error('파일 업로드 시 문제가 발생했습니다.')
-    }
-  }
 
   return (
     <button
