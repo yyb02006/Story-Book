@@ -100,7 +100,6 @@ export function InsertImageUploadedDialog({
         setUploadButtonStatus('업로드')
         break
     }
-    console.log(images)
   }, [images])
 
   const loadImage = (files: FileList | null) => {
@@ -128,7 +127,8 @@ export function InsertImageUploadedDialog({
 
       reader.onload = () => {
         if (typeof reader.result === 'string') {
-          const previewDataUrl = reader.result
+          const previewDataUrl = URL.createObjectURL(file)
+          console.log(previewDataUrl)
           const img = new Image()
           img.onload = () => {
             setImages((prev) =>
