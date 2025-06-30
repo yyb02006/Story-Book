@@ -24,13 +24,10 @@ export async function middleware(request: NextRequest) {
     url,
   } = request
   if (!session.id) {
-    console.log('no session')
-
     if (signedOnlyUrls[pathname]) {
-      return NextResponse.redirect(new URL('/', url))
+      return NextResponse.redirect(new URL('/login', url))
     }
   } else {
-    console.log('no session')
     if (publicOnlyUrls[pathname]) {
       return NextResponse.redirect(new URL('/', url))
     }
