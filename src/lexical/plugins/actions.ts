@@ -21,19 +21,30 @@ const moveFileToPermanent = async (tempImageNames: string[]) => {
 }
 
 export default async function CreatePost({
-  data: { editorState, htmlContent, title },
+  data,
   tempImageNames,
 }: {
-  data: { editorState: Prisma.InputJsonValue; title: string; htmlContent: string }
+  data: {
+    editorState: Prisma.InputJsonValue
+    title: string
+    htmlContent: string
+    previewImageUrl?: string
+    previewText?: string
+  }
   tempImageNames: string[]
 }) {
+  console.log(data.previewImageUrl, data.previewText)
+
   const session = await getSession()
   if (!session) throw new Error('no user session')
   try {
     await moveFileToPermanent(tempImageNames)
-    // 실제 게시글 아이디로 수정 필요, 근데 첫 글에 id가 어딨지? 이거 upsert로 처리하는 게 맞나?
+    // 이미지 url은 별도의 field에 저장할 필요가 있음
     await prisma.post.create({
-      data: { editorState, title, htmlContent: htmlContent, userId: session.id },
+      data: {
+        ...data,
+        userId: session.id,
+      },
     })
     return { success: true }
   } catch (error) {
