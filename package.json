@@ -17,6 +17,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/sanitize-html": "^2.16.0",
     "bcrypt": "^6.0.0",
+    "browser-image-compression": "^2.0.2",
     "framer-motion": "^11.11.10",
     "iron-session": "^8.0.4",
     "lexical": "^0.31.1",
