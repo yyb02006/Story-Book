@@ -42,6 +42,7 @@ import { $isImageNode } from '#/lexical/nodes/ImageNode'
 import NextImage from 'next/image'
 import ImageResizer from '#/lexical/components/ImageResizer'
 import { cls } from '#/libs/client/utils'
+import { SET_THUMBNAIL_COMMAND } from '#/lexical/plugins/ImagesPlugin'
 
 const imageCache = new Map<string, Promise<boolean> | boolean>()
 
@@ -234,6 +235,7 @@ export default function ImageComponent({
   const activeEditorRef = useRef<LexicalEditor | null>(null)
   const [isLoadError, setIsLoadError] = useState<boolean>(false)
   const isEditable = useLexicalEditable()
+  const [isHovered, setIsHovered] = useState(false)
 
   const $onEnter = useCallback(
     (event: KeyboardEvent) => {
@@ -402,6 +404,10 @@ export default function ImageComponent({
     setIsResizing(true)
   }
 
+  const setThumbnail = () => {
+    editor.dispatchCommand(SET_THUMBNAIL_COMMAND, { nodeKey })
+  }
+
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing
   const isFocused = (isSelected || isResizing) && isEditable
 
@@ -421,7 +427,15 @@ export default function ImageComponent({
           {isLoadError ? (
             <BrokenImage />
           ) : (
-            <div className="relative z-1">
+            <div
+              className="relative z-1"
+              onMouseEnter={() => {
+                setIsHovered(true)
+              }}
+              onMouseLeave={() => {
+                setIsHovered(false)
+              }}
+            >
               <LazyImage
                 className={cls(
                   isFocused
@@ -448,6 +462,16 @@ export default function ImageComponent({
                   onResizeEnd={onResizeEnd}
                   captionsEnabled={!isLoadError && captionsEnabled}
                 />
+              )}
+              {isHovered && (
+                <button
+                  onClick={() => {
+                    setThumbnail()
+                  }}
+                  className="font-S-CoreDream-200 hover:border-bright-blue bg-charcoal-gray/60 border-white-gray absolute top-3 left-1/2 -translate-x-1/2 rounded-md border px-3 py-2 text-xs"
+                >
+                  썸네일로 설정
+                </button>
               )}
             </div>
           )}
