@@ -6,15 +6,21 @@ import getSession from '#/libs/server/session'
 import { Prisma } from '@prisma/client'
 
 const moveFileToPermanent = async (tempImageNames: string[]) => {
-  const promises = tempImageNames.map((name) =>
-    supabase.storage
-      .from('temp-images')
-      .move(`public/${name}`, `public/${name}`, { destinationBucket: 'permanent-images' }),
-  )
+  const promises = tempImageNames
+    .map((name) => {
+      const moveContentPromise = supabase.storage
+        .from('temp-images')
+        .move(`content/${name}`, `content/${name}`, { destinationBucket: 'permanent-images' })
+      const moveThumbnailPromise = supabase.storage
+        .from('temp-images')
+        .move(`thumbnail/${name}`, `thumbnail/${name}`, { destinationBucket: 'permanent-images' })
+      return [moveContentPromise, moveThumbnailPromise]
+    })
+    .flat()
 
   const results = await Promise.all(promises)
 
-  if (results.filter((result) => result.error).length > 0) {
+  if (results.some((result) => result.error)) {
     console.log(results.filter((result) => result.error))
     throw new Error('파일 업로드 시 문제가 발생했습니다.')
   }
