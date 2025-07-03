@@ -13,6 +13,8 @@ import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import {
   $createParagraphNode,
   $createRangeSelection,
+  $getNodeByKey,
+  $getRoot,
   $getSelection,
   $insertNodes,
   $isNodeSelection,
@@ -29,6 +31,7 @@ import {
   isHTMLElement,
   LexicalCommand,
   LexicalEditor,
+  NodeKey,
 } from 'lexical'
 import { useEffect, useState } from 'react'
 import * as React from 'react'
@@ -38,10 +41,15 @@ import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 import { supabase } from '#/libs/client/supabase'
 import { cls } from '#/libs/client/utils'
+import imageCompression from 'browser-image-compression'
 
 export type InsertImagePayload = Readonly<ImagePayload>
 
 type UploadStatus = 'pending' | 'uploading' | 'uploaded' | 'failed'
+
+interface ThumbnailPayload {
+  nodeKey: NodeKey
+}
 
 export type EditorImageData = {
   id: string
@@ -61,15 +69,43 @@ export const INSERT_IMAGE_ARRAY_COMMAND: LexicalCommand<InsertImagePayload[]> = 
   'INSERT_IMAGE_ARRAY_COMMAND',
 )
 
+export const SET_THUMBNAIL_COMMAND: LexicalCommand<ThumbnailPayload> =
+  createCommand('SET_THUMBNAIL_COMMAND')
+
 async function uploadImageToSupabase(file: File, id: string) {
   const fileExtension = file.name.split('.').pop()
-  const filePath = `public/${id}-${file.lastModified}.${fileExtension}`
-  const { error } = await supabase.storage.from('temp-images').upload(filePath, file)
+  const imagePath = `${id}-${file.lastModified}.${fileExtension}`
+  const thumbnailImage = await imageCompression(file, {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 100,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+  })
+  // const { error } = await supabase.storage.from('temp-images').upload(contentImagePath, file)
+  const [contentResult, thumbnailResult] = await Promise.all([
+    supabase.storage.from('temp-images').upload(`content/${imagePath}`, file),
+    supabase.storage.from('temp-images').upload(`thumbnail/${imagePath}`, thumbnailImage),
+  ])
   const projectId = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID
-  if (error) {
-    throw new Error(error.message)
+  if (contentResult.error || thumbnailResult.error) {
+    throw new Error(
+      `contentImageError: ${contentResult.error?.message || ''} thumbnailImageError:  ${thumbnailResult.error?.message || ''}`,
+    )
   } else {
-    return `https://${projectId}.supabase.co/storage/v1/object/public/temp-images/${filePath}`
+    return `https://${projectId}.supabase.co/storage/v1/object/public/temp-images/content/${imagePath}`
+  }
+}
+
+const uploadStatusTag = (uploadStatus: UploadStatus) => {
+  switch (uploadStatus) {
+    case 'failed':
+      return <div className="rounded-md border border-red-400 px-2 text-red-400">실패</div>
+    case 'uploaded':
+      return <div className="rounded-md border border-green-600 px-2 text-green-600">성공</div>
+    default:
+      return (
+        <div className="border-white-gray text-white-gray rounded-md border px-2">업로드 중</div>
+      )
   }
 }
 
@@ -138,12 +174,14 @@ export function InsertImageUploadedDialog({
                   : item,
               ),
             )
+            URL.revokeObjectURL(previewDataUrl)
           }
           img.onerror = () => {
             console.error('Failed to load image for preview:', file.name)
             setImages((prev) =>
               prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
             )
+            URL.revokeObjectURL(previewDataUrl)
           }
           img.src = previewDataUrl
         } else {
@@ -181,7 +219,6 @@ export function InsertImageUploadedDialog({
 
   const submitImages = (payloads: InsertImagePayload[]) => {
     activeEditor.dispatchCommand(INSERT_IMAGE_ARRAY_COMMAND, payloads)
-
     onClose()
   }
 
@@ -221,16 +258,19 @@ export function InsertImageUploadedDialog({
       />
       {images.length > 0 ? (
         <ul className="font-S-CoreDream-400 space-y-2 text-sm">
-          {images.map(({ fileName, id }) => (
-            <li key={id} className="flex justify-between">
-              {fileName}
-              <button
-                onClick={() => {
-                  setImages((p) => p.filter((image) => image.fileName !== fileName))
-                }}
-              >
-                <ToolbarIcon size={buttonSizes.xs} svgId="cancel" />
-              </button>
+          {images.map(({ fileName, id, uploadStatus }) => (
+            <li key={id} className="font-S-CoreDream-200 flex justify-between">
+              <span>{fileName}</span>
+              <div className="flex space-x-2">
+                <span>{uploadStatusTag(uploadStatus)}</span>
+                <button
+                  onClick={() => {
+                    setImages((p) => p.filter((image) => image.fileName !== fileName))
+                  }}
+                >
+                  <ToolbarIcon size={buttonSizes.xs} svgId="cancel" />
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -248,6 +288,7 @@ export function InsertImageUploadedDialog({
               width: contentAreaWidth && width >= 500 ? 500 : width,
               height:
                 contentAreaWidth && width >= 500 ? Math.round((height * 500) / width) : height,
+              isThumbnail: false,
             })),
           )
         }}
@@ -301,6 +342,27 @@ export default function ImagesPlugin({
 
           $insertNodes(imageNodes)
 
+          return true
+        },
+        COMMAND_PRIORITY_EDITOR,
+      ),
+      editor.registerCommand<{ nodeKey: NodeKey }>(
+        SET_THUMBNAIL_COMMAND,
+        ({ nodeKey }) => {
+          // 이걸 submit 플러그인에서 처리
+          editor.update(() => {
+            const nodes = $getRoot().getChildren()
+            nodes.forEach((node) => {
+              if ($isImageNode(node)) {
+                node.setIsThumbnail(false) // 모든 노드의 isThumbnail을 false로 설정
+              }
+            })
+
+            const targetNode = $getNodeByKey(nodeKey)
+            if ($isImageNode(targetNode)) {
+              targetNode.setIsThumbnail(true) // 지정된 노드의 isThumbnail을 true로 설정
+            }
+          })
           return true
         },
         COMMAND_PRIORITY_EDITOR,
