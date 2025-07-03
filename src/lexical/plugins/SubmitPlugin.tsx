@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Prisma } from '@prisma/client'
 import CreatePost from '#/lexical/plugins/actions'
 import { $getRoot } from 'lexical'
+import { useRouter } from 'next/navigation'
 
 const getPreviewText = (str: string, maxLength: number = 50) => {
   const modifiedText = str
@@ -22,6 +23,7 @@ export default function SubmitPlugin({ title }: { title: string }) {
   const [editor] = useLexicalComposerContext()
   const [tempImageNames, setTempImageNames] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
   const handleSubmit = async () => {
     let htmlContent: string | undefined
     let editorState: Prisma.InputJsonValue | undefined
@@ -37,17 +39,20 @@ export default function SubmitPlugin({ title }: { title: string }) {
         (node) => node.getType() === 'image',
       ) as ImageNode[]
 
-      imageNodes.forEach((node, idx) => {
-        const src = node.getSrc()
-        if (src.includes('temp-images')) {
-          const newSrc = src.replace('temp-images', 'permanent-images')
-          node.setSrc(newSrc)
-        }
-        const currentSrc = node.getSrc()
-        if (idx === 0) {
-          previewImageUrl = currentSrc
+      imageNodes.forEach((node) => {
+        const newSrc = node.getSrc().replace('temp-images', 'permanent-images')
+
+        if (node.getIsThumbnail()) {
+          previewImageUrl = newSrc.replace('content', 'thumbnail')
         }
       })
+
+      if (!previewImageUrl && imageNodes.length > 0) {
+        previewImageUrl = imageNodes[0]
+          .getSrc()
+          .replace('temp-images', 'permanent-images')
+          .replace('content', 'thumbnail')
+      }
 
       const root = $getRoot()
 
@@ -63,7 +68,9 @@ export default function SubmitPlugin({ title }: { title: string }) {
           data: { htmlContent, editorState, title, previewImageUrl, previewText },
           tempImageNames,
         })
+        router.push('/')
       } catch (error) {
+        console.log(error)
         throw new Error('Fail to Submit')
       }
     } else {
@@ -75,15 +82,15 @@ export default function SubmitPlugin({ title }: { title: string }) {
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
       const nodes = editorState.read(() => {
-        return editor.getEditorState()._nodeMap
+        return editorState._nodeMap
       })
       const imageNodes = Array.from(nodes.values()).filter(
         (node) => node.getType() === 'image',
       ) as ImageNode[]
       setTempImageNames(
         imageNodes
-          .filter((name) => name.getSrc().includes('/temp-images/public/'))
-          .map((name) => name.getSrc().split('/temp-images/public/')[1]),
+          .filter((name) => name.getSrc().includes('/temp-images/content/'))
+          .map((name) => name.getSrc().split('/temp-images/content/')[1]),
       )
     })
   }, [editor])
