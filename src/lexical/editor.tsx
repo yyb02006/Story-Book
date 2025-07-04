@@ -23,6 +23,7 @@ import AssetToolbarPlugin from '#/lexical/plugins/assetToolbarPlugin'
 import ElementAlignToolbarPlugin from '#/lexical/plugins/ElementAlignToolbarPlugin'
 import ImageListPlugin from '#/lexical/plugins/ImageListPlugin'
 import SubmitPlugin from '#/lexical/plugins/SubmitPlugin'
+import { cls } from '#/libs/client/utils'
 
 function onError(error: unknown) {
   console.error(error)
@@ -64,15 +65,26 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <TextInput
-        name="title"
-        value={title}
-        className="input-color-theme h-14 rounded-2xl p-3 text-base"
-        placeholder="제목을 입력해주세요"
-        onChange={(value) => {
-          setTitle(value)
-        }}
-      />
+      <div className="relative h-14 rounded-2xl">
+        <TextInput
+          name="title"
+          value={title}
+          className="input-color-theme peer h-full rounded-2xl p-3 text-base"
+          placeholder=""
+          onChange={(value) => {
+            setTitle(value)
+          }}
+        />
+        <div
+          className={cls(
+            title.length > 0 ? 'invisible' : 'visible',
+            `input-color-theme text-smooth-white pointer-events-none absolute top-0 flex h-full w-full items-center rounded-2xl p-4 leading-0 peer-focus:invisible`,
+          )}
+        >
+          제목을 입력해주세요
+          <span className="-translate-y-1 text-red-500">*</span>
+        </div>
+      </div>
       <TextEditorContainer>
         <div className="relative z-[1] flex h-8 items-center gap-x-3">
           <ToolbarPlugin />
