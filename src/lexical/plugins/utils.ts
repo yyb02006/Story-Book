@@ -6,11 +6,15 @@ import {
   ElementNode,
   RangeSelection,
   TextNode,
+  $getRoot,
+  LexicalNode,
+  $isElementNode,
 } from 'lexical'
 import { $setBlocksType, $isAtNodeEnd } from '@lexical/selection'
 import { BlockType, HeadingNodeType, quoteNode } from '#/lexical/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
+import { $isImageNode, ImageNode } from '#/lexical/nodes/ImageNode'
 
 /**
  * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 paragraph로 변환
@@ -147,4 +151,43 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     // 앵커가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
     return $isAtNodeEnd(anchor) ? anchorNode : focusNode
   }
+}
+
+/**
+ * 현재 Lexical 에디터 문서 내의 모든 ImageNode 인스턴스를 찾아 반환
+ *
+ * 이 함수는 에디터 상태를 읽기 전용으로 탐색하며, 트리 구조를 재귀적으로 순회하여
+ * 사용자가 정의한 `ImageNode` 클래스의 모든 인스턴스를 수집
+ *
+ * @param editor - 이미지 노드를 가져올 대상인 LexicalEditor 인스턴스
+ * @returns 에디터 문서 내에서 발견된 모든 ImageNode 객체들의 배열
+ *
+ * @example
+ * const imageNodes = getAllImageNodes(editor);
+ * imageNodes.forEach((node) => {
+ *   console.log(node.getSrc());
+ * });
+ */
+export function forEachImageNodes(
+  editor: LexicalEditor,
+  callback: (node: ImageNode, index: number) => void,
+): void {
+  editor.update(() => {
+    const root = $getRoot()
+    let index = 0
+
+    const traverse = (node: LexicalNode) => {
+      if ($isImageNode(node)) {
+        callback(node, index++)
+      }
+
+      if ($isElementNode(node)) {
+        for (const child of node.getChildren()) {
+          traverse(child)
+        }
+      }
+    }
+
+    traverse(root)
+  })
 }
