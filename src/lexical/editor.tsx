@@ -25,6 +25,11 @@ import ImageListPlugin from '#/lexical/plugins/ImageListPlugin'
 import SubmitPlugin from '#/lexical/plugins/SubmitPlugin'
 import { cls } from '#/libs/client/utils'
 
+export type SubmitStatus = {
+  error: { title: string[]; editor: string }
+  status: 'success' | 'pending' | 'failed' | 'initial'
+}
+
 function onError(error: unknown) {
   console.error(error)
 }
@@ -56,6 +61,10 @@ export function Editor() {
   const [isLinkEditMode, setIsLinkEditMode] = useState(false)
   const [floatingAnchorElement, setFloatingAnchorElement] = useState<HTMLDivElement | null>(null)
   const [title, setTitle] = useState('')
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({
+    error: { title: [''], editor: '' },
+    status: 'initial',
+  })
 
   const onFloatingAnchorRef = (_floatingAnchorElement: HTMLDivElement) => {
     if (_floatingAnchorElement !== null) {
@@ -71,19 +80,29 @@ export function Editor() {
           value={title}
           className="input-color-theme peer h-full rounded-2xl p-3 text-base"
           placeholder=""
+          maxLength={200}
           onChange={(value) => {
+            if (submitStatus.status === 'pending') return
+            if (value.length > 0) {
+              setSubmitStatus((p) => ({ ...p, error: { title: [], editor: '' } }))
+            }
             setTitle(value)
           }}
         />
         <div
           className={cls(
             title.length > 0 ? 'invisible' : 'visible',
-            `input-color-theme text-smooth-white pointer-events-none absolute top-0 flex h-full w-full items-center rounded-2xl p-4 leading-0 peer-focus:invisible`,
+            `input-color-theme text-light-placeholder dark:text-dark-placeholder pointer-events-none absolute top-0 flex h-full w-full items-center rounded-2xl p-4 leading-0 peer-focus:invisible`,
           )}
         >
           제목을 입력해주세요
           <span className="-translate-y-1 text-red-500">*</span>
         </div>
+        {submitStatus.error.title.length > 0 ? (
+          <div className="font-S-CoreDream-200 absolute mt-1 text-[13px] text-red-400">
+            {submitStatus.error.title.map((err) => err)}
+          </div>
+        ) : null}
       </div>
       <TextEditorContainer>
         <div className="relative z-[1] flex h-8 items-center gap-x-3">
@@ -123,7 +142,7 @@ export function Editor() {
           setIsLinkEditMode={setIsLinkEditMode}
         />
       )}
-      <SubmitPlugin title={title} />
+      <SubmitPlugin title={title} submitStatus={submitStatus} setSubmitStatus={setSubmitStatus} />
     </LexicalComposer>
   )
 }
