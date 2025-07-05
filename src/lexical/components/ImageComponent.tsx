@@ -98,6 +98,7 @@ function LazyImage({
     height: number
   } | null>(null)
   const isSVGImage = isSVG(src)
+  const [loading, setLoading] = useState(true)
 
   // Set initial dimensions for SVG images
   useEffect(() => {
@@ -164,26 +165,37 @@ function LazyImage({
   const imageStyle = calculateDimensions()
 
   return (
-    <NextImage
-      className={className || undefined}
-      src={src}
-      alt={altText}
-      ref={imageRef}
-      width={typeof imageStyle.width === 'number' ? imageStyle.width : 200}
-      height={typeof imageStyle.height === 'number' ? imageStyle.height : 200}
-      style={imageStyle}
-      onError={onError}
-      draggable="false"
-      onLoad={(e) => {
-        if (isSVGImage) {
-          const img = e.currentTarget
-          setDimensions({
-            height: img.naturalHeight,
-            width: img.naturalWidth,
-          })
-        }
-      }}
-    />
+    <>
+      {loading && (
+        <div
+          style={{ width, height }}
+          className="bg-charcoal-gray/50 absolute flex items-center justify-center rounded-md"
+        >
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-4 border-gray-200 border-t-transparent" />
+        </div>
+      )}
+      <NextImage
+        className={className || undefined}
+        src={src}
+        alt={altText}
+        ref={imageRef}
+        width={typeof imageStyle.width === 'number' ? imageStyle.width : 200}
+        height={typeof imageStyle.height === 'number' ? imageStyle.height : 200}
+        style={imageStyle}
+        onError={onError}
+        draggable="false"
+        onLoad={(e) => {
+          if (isSVGImage) {
+            const img = e.currentTarget
+            setDimensions({
+              height: img.naturalHeight,
+              width: img.naturalWidth,
+            })
+          }
+          setLoading(false)
+        }}
+      />
+    </>
   )
 }
 
@@ -214,6 +226,7 @@ export default function ImageComponent({
   showCaption,
   caption,
   captionsEnabled,
+  isThumbnail,
 }: {
   altText: string
   caption: LexicalEditor
@@ -225,6 +238,7 @@ export default function ImageComponent({
   src: string
   width: 'inherit' | number
   captionsEnabled: boolean
+  isThumbnail: boolean
 }): JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
@@ -404,8 +418,8 @@ export default function ImageComponent({
     setIsResizing(true)
   }
 
-  const setThumbnail = () => {
-    editor.dispatchCommand(SET_THUMBNAIL_COMMAND, { nodeKey })
+  const setThumbnail = (isThumbnail: boolean) => {
+    editor.dispatchCommand(SET_THUMBNAIL_COMMAND, { nodeKey, isThumbnail, editor })
   }
 
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing
@@ -463,14 +477,19 @@ export default function ImageComponent({
                   captionsEnabled={!isLoadError && captionsEnabled}
                 />
               )}
-              {isHovered && (
+              {(isHovered || isThumbnail) && (
                 <button
                   onClick={() => {
-                    setThumbnail()
+                    setThumbnail(!isThumbnail)
                   }}
-                  className="font-S-CoreDream-200 hover:border-bright-blue bg-charcoal-gray/60 border-white-gray absolute top-3 left-1/2 -translate-x-1/2 rounded-md border px-3 py-2 text-xs"
+                  className={cls(
+                    isThumbnail
+                      ? 'bg-bright-blue/60'
+                      : 'bg-charcoal-gray/60 border-white-gray hover:border-bright-blue border',
+                    'font-S-CoreDream-200 absolute top-3 left-1/2 -translate-x-1/2 rounded-md px-3 py-2 text-xs',
+                  )}
                 >
-                  썸네일로 설정
+                  {isThumbnail ? '썸네일' : '썸네일로 설정'}
                 </button>
               )}
             </div>
