@@ -48,6 +48,7 @@ export interface ImagePayload {
   captionsEnabled?: boolean
   id: string
   isThumbnail: boolean
+  storageUrl?: string
 }
 
 function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
@@ -80,6 +81,7 @@ export type SerializedImageNode = Spread<
     width?: number
     id: string
     isThumbnail: boolean
+    storageUrl?: string
   },
   SerializedLexicalNode
 >
@@ -96,6 +98,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __captionsEnabled: boolean
   __id: string
   __isThumbnail: boolean
+  __storageUrl: string
 
   static getType(): string {
     return 'image'
@@ -114,11 +117,13 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__caption,
       node.__captionsEnabled,
       node.__key,
+      node.__storageUrl,
     )
   }
 
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, height, width, maxWidth, src, showCaption, id, isThumbnail } = serializedNode
+    const { altText, height, width, maxWidth, src, showCaption, id, isThumbnail, storageUrl } =
+      serializedNode
     return $createImageNode({
       altText,
       height,
@@ -128,6 +133,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       width,
       id,
       isThumbnail,
+      storageUrl,
     }).updateFromJSON(serializedNode)
   }
 
@@ -174,6 +180,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     caption?: LexicalEditor,
     captionsEnabled?: boolean,
     key?: NodeKey,
+    storageUrl?: string,
   ) {
     super(key)
     this.__src = src
@@ -191,6 +198,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__captionsEnabled = captionsEnabled || captionsEnabled === undefined
     this.__id = id || ''
     this.__isThumbnail = isThumbnail
+    this.__storageUrl = storageUrl || ''
   }
 
   exportJSON(): SerializedImageNode {
@@ -205,6 +213,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       width: this.__width === 'inherit' ? 0 : this.__width,
       id: this.getId(),
       isThumbnail: this.__isThumbnail,
+      storageUrl: this.__storageUrl,
     }
   }
 
@@ -224,6 +233,15 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   setIsThumbnail(isThumbnail: boolean): void {
     const writable = this.getWritable()
     writable.__isThumbnail = isThumbnail
+  }
+
+  getStorageUrl(): string {
+    return this.__storageUrl
+  }
+
+  setSrcByStorageUrl(): void {
+    const writable = this.getWritable()
+    writable.__src = this.__storageUrl
   }
 
   setWidthAndHeight(width: 'inherit' | number, height: 'inherit' | number): void {
@@ -274,6 +292,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         caption={this.__caption}
         captionsEnabled={this.__captionsEnabled}
         resizable={true}
+        isThumbnail={this.__isThumbnail}
       />
     )
   }
@@ -291,6 +310,7 @@ export function $createImageNode({
   key,
   id,
   isThumbnail,
+  storageUrl,
 }: ImagePayload): ImageNode {
   return $applyNodeReplacement(
     new ImageNode(
@@ -305,6 +325,7 @@ export function $createImageNode({
       caption,
       captionsEnabled,
       key,
+      storageUrl,
     ),
   )
 }
