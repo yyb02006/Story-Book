@@ -42,6 +42,7 @@ import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 import { supabase } from '#/libs/client/supabase'
 import { cls } from '#/libs/client/utils'
 import imageCompression from 'browser-image-compression'
+import { forEachImageNodes } from '#/lexical/plugins/utils'
 
 export type InsertImagePayload = Readonly<ImagePayload>
 
@@ -49,13 +50,15 @@ type UploadStatus = 'pending' | 'uploading' | 'uploaded' | 'failed'
 
 interface ThumbnailPayload {
   nodeKey: NodeKey
+  isThumbnail: boolean
+  editor: LexicalEditor
 }
 
 export type EditorImageData = {
   id: string
   file: File
   previewSrc: string // Dialog에서 미리보기용 Base64 URL
-  permanentSrc: string | null // 스토리지 업로드 후 받을 영구 URL
+  storageUrl: string | null // 스토리지 업로드 후 받을 영구 URL
   fileName: string
   width: number
   height: number
@@ -151,7 +154,7 @@ export function InsertImageUploadedDialog({
           id,
           file,
           previewSrc: '',
-          permanentSrc: null,
+          storageUrl: null,
           fileName: file.name,
           height: 0,
           width: 0,
@@ -164,7 +167,6 @@ export function InsertImageUploadedDialog({
       reader.onload = () => {
         if (typeof reader.result === 'string') {
           const previewDataUrl = URL.createObjectURL(file)
-          console.log(previewDataUrl)
           const img = new Image()
           img.onload = () => {
             setImages((prev) =>
@@ -199,12 +201,10 @@ export function InsertImageUploadedDialog({
       }
       reader.readAsDataURL(file)
       uploadImageToSupabase(file, id)
-        .then((permanentUrl) => {
+        .then((storageUrl) => {
           setImages((prev) =>
             prev.map((item) =>
-              item.id === id
-                ? { ...item, permanentSrc: permanentUrl, uploadStatus: 'uploaded' }
-                : item,
+              item.id === id ? { ...item, storageUrl, uploadStatus: 'uploaded' } : item,
             ),
           )
         })
@@ -280,15 +280,16 @@ export function InsertImageUploadedDialog({
         onClick={() => {
           if (images.some((img) => img.uploadStatus !== 'uploaded')) return
           submitImages(
-            images.map<InsertImagePayload>(({ fileName, permanentSrc, width, height, id }) => ({
+            images.map<InsertImagePayload>(({ fileName, storageUrl, width, height, id, file }) => ({
               id,
               altText: fileName,
-              src: permanentSrc!,
+              src: URL.createObjectURL(file),
               maxWidth: contentAreaWidth,
               width: contentAreaWidth && width >= 500 ? 500 : width,
               height:
                 contentAreaWidth && width >= 500 ? Math.round((height * 500) / width) : height,
               isThumbnail: false,
+              storageUrl: storageUrl || '',
             })),
           )
         }}
@@ -346,21 +347,16 @@ export default function ImagesPlugin({
         },
         COMMAND_PRIORITY_EDITOR,
       ),
-      editor.registerCommand<{ nodeKey: NodeKey }>(
+      editor.registerCommand<ThumbnailPayload>(
         SET_THUMBNAIL_COMMAND,
-        ({ nodeKey }) => {
-          // 이걸 submit 플러그인에서 처리
-          editor.update(() => {
-            const nodes = $getRoot().getChildren()
-            nodes.forEach((node) => {
-              if ($isImageNode(node)) {
-                node.setIsThumbnail(false) // 모든 노드의 isThumbnail을 false로 설정
-              }
-            })
-
-            const targetNode = $getNodeByKey(nodeKey)
-            if ($isImageNode(targetNode)) {
-              targetNode.setIsThumbnail(true) // 지정된 노드의 isThumbnail을 true로 설정
+        ({ nodeKey, isThumbnail, editor }) => {
+          forEachImageNodes(editor, (node) => {
+            const isCurrentImage = node.getKey() === nodeKey
+            if (isThumbnail && !isCurrentImage) {
+              node.setIsThumbnail(false)
+            }
+            if (node.getKey() === nodeKey) {
+              node.setIsThumbnail(isThumbnail)
             }
           })
           return true
