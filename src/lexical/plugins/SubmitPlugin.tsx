@@ -1,11 +1,14 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $generateHtmlFromNodes } from '@lexical/html'
-import { ImageNode } from '#/lexical/nodes/ImageNode'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback } from 'react'
 import { Prisma } from '@prisma/client'
 import CreatePost from '#/lexical/plugins/actions'
 import { $getRoot } from 'lexical'
 import { useRouter } from 'next/navigation'
+import { z } from 'zod/v4'
+import { SubmitStatus } from '#/lexical/editor'
+import { cls } from '#/libs/client/utils'
+import { forEachImageNodes } from '#/lexical/plugins/utils'
 
 const getPreviewText = (str: string, maxLength: number = 50) => {
   const modifiedText = str
@@ -19,41 +22,74 @@ const getPreviewText = (str: string, maxLength: number = 50) => {
   return modifiedText
 }
 
-export default function SubmitPlugin({ title }: { title: string }) {
+export default function SubmitPlugin({
+  title,
+  setSubmitStatus,
+  submitStatus,
+}: {
+  title: string
+  setSubmitStatus: Dispatch<SetStateAction<SubmitStatus>>
+  submitStatus: SubmitStatus
+}) {
   const [editor] = useLexicalComposerContext()
-  const [tempImageNames, setTempImageNames] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  const disable = submitStatus.status === 'pending' || submitStatus.status === 'success'
+
+  const fail = useCallback(
+    (msg: string) => {
+      setSubmitStatus({
+        error: { title: [], editor: msg },
+        status: 'failed',
+      })
+    },
+    [setSubmitStatus],
+  )
+
   const handleSubmit = async () => {
+    // 한 번 누르면 아무 반응도 없는 현상
     let htmlContent: string | undefined
     let editorState: Prisma.InputJsonValue | undefined
     let previewText: string | undefined
     let previewImageUrl: string | undefined
+    let firstImageUrl = ''
+    const imageNames: string[] = []
 
-    setLoading(true)
+    setSubmitStatus((p) => ({ ...p, status: 'pending' }))
 
-    editor.update(() => {
-      // 이미지 노드의 src를 permanent로 변경
-      const nodes = editor.getEditorState()._nodeMap
-      const imageNodes = Array.from(nodes.values()).filter(
-        (node) => node.getType() === 'image',
-      ) as ImageNode[]
+    const { success, error, data } = z
+      .string()
+      .trim()
+      .refine((value) => value.length !== 0, { error: '제목을 입력해주세요' })
+      .refine((value) => value.length <= 200, { error: '제목은 200자 이하여야 합니다' })
+      .safeParse(title)
 
-      imageNodes.forEach((node) => {
-        const newSrc = node.getSrc().replace('temp-images', 'permanent-images')
+    if (!success) {
+      const newError = z.flattenError(error).formErrors
+      return setSubmitStatus((p) => ({ error: { ...p.error, title: newError }, status: 'failed' }))
+    }
 
+    const validTitle = data
+
+    forEachImageNodes(editor, (node) => {
+      node.setSrcByStorageUrl()
+    })
+
+    editor.read(() => {
+      forEachImageNodes(editor, (node, index) => {
+        const src = node.getSrc()
+        const matches = src.match(/\/temp-images\/content\/(.+)$/)
+        if (matches?.[1]) imageNames.push(matches[1])
+
+        const newSrc = src.replace('temp-images', 'permanent-images')
+
+        if (index === 0) {
+          firstImageUrl = newSrc.replace('content', 'thumbnail')
+        }
         if (node.getIsThumbnail()) {
           previewImageUrl = newSrc.replace('content', 'thumbnail')
         }
       })
-
-      if (!previewImageUrl && imageNodes.length > 0) {
-        previewImageUrl = imageNodes[0]
-          .getSrc()
-          .replace('temp-images', 'permanent-images')
-          .replace('content', 'thumbnail')
-      }
-
       const root = $getRoot()
 
       previewText = getPreviewText(root.getTextContent())
@@ -61,47 +97,42 @@ export default function SubmitPlugin({ title }: { title: string }) {
       editorState = editor.getEditorState().toJSON() as unknown as Prisma.InputJsonValue
     })
 
+    if (!previewImageUrl && firstImageUrl) {
+      previewImageUrl = firstImageUrl
+    }
+
     if (htmlContent && editorState) {
       try {
         // 여기에서 사진을 따로 꺼내서 저장할 수 있도록 해야함 게시글 목록 같은 곳에서 확인할 수 있도록
-        await CreatePost({
-          data: { htmlContent, editorState, title, previewImageUrl, previewText },
-          tempImageNames,
+        const result = await CreatePost({
+          data: { htmlContent, editorState, title: validTitle, previewImageUrl, previewText },
+          imageNames,
         })
+        if (!result.success) {
+          return fail('게시글 등록 실패: 서버 처리 중 문제가 발생했습니다.')
+        }
         router.push('/')
       } catch (error) {
-        console.log(error)
-        throw new Error('Fail to Submit')
+        console.error(error)
+        fail('게시글 등록 실패: 네트워크 또는 서버 오류')
       }
     } else {
-      throw new Error('Fail to Submit')
+      fail('게시글 등록 실패 : 유효하지 않은 컨텐츠입니다.')
+      alert('게시글 등록에 실패했습니다.\n게시글의 내용을 확인하거나 새로고침 후 다시 작성해주세요')
     }
-    setLoading(false)
+    setSubmitStatus({ error: { title: [], editor: '' }, status: 'success' })
   }
-
-  useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      const nodes = editorState.read(() => {
-        return editorState._nodeMap
-      })
-      const imageNodes = Array.from(nodes.values()).filter(
-        (node) => node.getType() === 'image',
-      ) as ImageNode[]
-      setTempImageNames(
-        imageNodes
-          .filter((name) => name.getSrc().includes('/temp-images/content/'))
-          .map((name) => name.getSrc().split('/temp-images/content/')[1]),
-      )
-    })
-  }, [editor])
 
   return (
     <button
-      className="bg-bright-blue font-S-CoreDream-400 float-right h-10 w-20 rounded-md"
+      className={cls(
+        disable ? 'bg-charcoal-gray' : 'bg-bright-blue',
+        'font-S-CoreDream-400 float-right h-10 min-w-20 rounded-md px-3',
+      )}
       onClick={handleSubmit}
-      disabled={loading}
+      disabled={disable}
     >
-      {loading ? '등록 중...' : '등록'}
+      {disable ? '등록 중...' : '등록'}
     </button>
   )
 }
