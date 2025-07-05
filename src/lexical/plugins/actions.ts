@@ -5,8 +5,16 @@ import prisma from '#/libs/server/prisma'
 import getSession from '#/libs/server/session'
 import { Prisma } from '@prisma/client'
 
-const moveFileToPermanent = async (tempImageNames: string[]) => {
-  const promises = tempImageNames
+class SupabaseMoveError extends Error {
+  constructor(public failures: unknown[]) {
+    super('파일 이동 실패')
+    this.name = 'SupabaseMoveError'
+  }
+}
+
+const moveFileToPermanent = async (imageNames: string[]) => {
+  if (imageNames.length === 0) return
+  const promises = imageNames
     .map((name) => {
       const moveContentPromise = supabase.storage
         .from('temp-images')
@@ -21,14 +29,15 @@ const moveFileToPermanent = async (tempImageNames: string[]) => {
   const results = await Promise.all(promises)
 
   if (results.some((result) => result.error)) {
-    console.log(results.filter((result) => result.error))
-    throw new Error('파일 업로드 시 문제가 발생했습니다.')
+    throw new SupabaseMoveError(
+      results.filter((result) => result.error).map((result) => result.error),
+    )
   }
 }
 
 export default async function CreatePost({
   data,
-  tempImageNames,
+  imageNames,
 }: {
   data: {
     editorState: Prisma.InputJsonValue
@@ -37,15 +46,14 @@ export default async function CreatePost({
     previewImageUrl?: string
     previewText?: string
   }
-  tempImageNames: string[]
-}) {
+  imageNames: string[]
+}): Promise<{ success: true } | { success: false; error: unknown }> {
   console.log(data.previewImageUrl, data.previewText)
 
   const session = await getSession()
-  if (!session) throw new Error('no user session')
+  if (!session) return { success: false, error: '로그인 필요' }
   try {
-    await moveFileToPermanent(tempImageNames)
-    // 이미지 url은 별도의 field에 저장할 필요가 있음
+    await moveFileToPermanent(imageNames)
     await prisma.post.create({
       data: {
         ...data,
@@ -54,7 +62,7 @@ export default async function CreatePost({
     })
     return { success: true }
   } catch (error) {
-    console.log(error)
-    return { success: false }
+    console.error(error)
+    return { success: false, error }
   }
 }
