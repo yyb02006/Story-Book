@@ -10,10 +10,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
-  --font-patrick: var(--font-patrick-hand), 'cursive';
-}
-
 @theme {
   --font-pretendard: 'Pretendard-Regular', sans-serif;
   --font-S-CoreDream-100: 'S-CoreDream-100', sans-serif;
@@ -40,6 +36,14 @@
   --color-sky-blue: #76aadf;
 
   --color-dark-disabled-icon: #808080;
+
+  --resizer-pointer-size: 8px;
+}
+
+@theme inline {
+  --font-patrick: var(--font-patrick-hand), 'cursive';
+  --font-spoqa: var(--font-spoqa), 'sans-serif';
+
   --color-dark-bg: var(--color-dark-gray);
   --color-dark-border: var(--color-midnight-gray);
   --color-dark-text: var(--color-smooth-white);
@@ -49,8 +53,6 @@
   --color-light-border: var(--color-white-gray);
   --color-light-text: var(--color-smooth-black);
   --color-light-placeholder: var(--color-midnight-gray);
-
-  --resizer-pointer-size: 8px;
 }
 
 @utility hide-scrollbar {
@@ -104,14 +106,6 @@
 
 @plugin 'tailwind-scrollbar' {
   nocompatible: true;
-}
-
-@font-face {
-  font-family: 'S-CoreDream-100';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-1Thin.woff')
-    format('woff');
-  font-weight: 100;
-  font-style: normal;
 }
 
 @font-face {
