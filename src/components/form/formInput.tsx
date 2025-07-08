@@ -117,7 +117,7 @@ export default function FormInput({
           onChange={handleChange}
           className={cls(
             rest.readOnly ? '' : 'focus:ring-bright-blue! focus:ring-2!',
-            'bg-dark-gray autofill:bg-dark-gray! h-12 rounded-lg px-3 placeholder:text-sm',
+            'bg-dark-gray autofill:bg-dark-gray! h-12 w-full rounded-lg px-3 placeholder:text-sm',
             className,
           )}
           {...rest}
