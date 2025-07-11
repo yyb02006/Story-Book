@@ -15,6 +15,7 @@ import { BlockType, HeadingNodeType, quoteNode } from '#/lexical/plugins/blockTy
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
 import { $isImageNode, ImageNode } from '#/lexical/nodes/ImageNode'
+import { ColorInput, TinyColor } from '@ctrl/tinycolor'
 
 /**
  * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 paragraph로 변환
@@ -190,4 +191,36 @@ export function forEachImageNodes(
 
     traverse(root)
   })
+}
+
+/**
+ * 주어진 colorHex가 6자리 hex 코드가 맞는지 여부를 반환
+ *
+ * @param {string} colorHex - 색상 값
+ * @returns {boolean}
+ */
+export function isHexColor(colorHex: string): boolean {
+  const hexColorRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+  return hexColorRegex.test(colorHex)
+}
+
+/**
+ * 주어진 색상 값을 TinyColor 객체로 변환
+ *
+ * @param {ColorInput} color - 변환할 색상 값
+ * @returns {TinyColor} 변환된 TinyColor 객체
+ */
+export function tinycolor(color: ColorInput) {
+  return new TinyColor(color)
+}
+
+/**
+ * 주어진 색상 값을 HSV 포맷으로 변환하고, a 값을 제외한 h, s, v 프로퍼티만 반환
+ *
+ * @param {string} color - 변환할 색상 값
+ * @returns {{ h: number, s: number, v: number }} - h, s, v 프로퍼티를 포함한 객체.
+ */
+export function getHsvWithoutAlpha(color: ColorInput) {
+  const { h, s, v } = tinycolor(color).toHsv()
+  return { h, s, v }
 }
