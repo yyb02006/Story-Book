@@ -78,7 +78,7 @@ export function Editor() {
         <TextInput
           name="title"
           value={title}
-          className="input-color-theme peer h-full rounded-2xl p-3 text-base"
+          className="input-color-theme peer h-full w-full rounded-2xl p-3 text-base"
           placeholder=""
           maxLength={200}
           onChange={(value) => {
