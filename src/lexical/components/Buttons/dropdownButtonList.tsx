@@ -58,6 +58,7 @@ export default function DropdownButtonList<T extends BlockType>({
               buttonBlockType={node}
               onClick={() => {
                 onSelect(node)
+                setIsDropdownListOpen(false)
               }}
               selectedBlockType={selectedBlockType}
               buttonSize={buttonSize}
