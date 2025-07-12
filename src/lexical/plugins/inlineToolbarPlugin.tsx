@@ -20,6 +20,9 @@ import {
   $createTextNode,
   $getNodeByKey,
   SerializedTextNode,
+  TextNode,
+  RangeSelection,
+  LexicalEditor,
 } from 'lexical'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { $isCodeNode } from '@lexical/code'
@@ -203,125 +206,14 @@ export default function InlineToolbarPlugin({
       editor.registerCommand(
         DRAGSTART_COMMAND,
         (event) => {
-          const selection = $getSelection()
-          if (!$isRangeSelection(selection)) return false
-          const dataTransfer = event.dataTransfer
-          if (!dataTransfer) return false
-
-          const nodes = selection.getNodes().filter($isTextNode)
-
-          const slicedNodes: SlicedNode[] = nodes.map((node) => {
-            const text = node.getTextContent()
-            let sliced = text
-            let isPartial: boolean
-            let startOffset: number = 0
-            let endOffset: number = text.length
-
-            // 부분 문자열만 추출
-            // 항상 뒤부터 잘라야함
-            if (selection.isBackward()) {
-              if (node.getKey() === selection.anchor.key) {
-                sliced = sliced.slice(0, selection.anchor.offset)
-                endOffset = selection.anchor.offset
-              }
-              if (node.getKey() === selection.focus.key) {
-                sliced = sliced.slice(selection.focus.offset)
-                startOffset = selection.focus.offset
-              }
-            } else {
-              if (node.getKey() === selection.focus.key) {
-                sliced = sliced.slice(0, selection.focus.offset)
-                endOffset = selection.focus.offset
-              }
-              if (node.getKey() === selection.anchor.key) {
-                sliced = sliced.slice(selection.anchor.offset)
-                startOffset = selection.anchor.offset
-              }
-            }
-
-            if (sliced.length !== text.length) {
-              isPartial = true
-            } else {
-              isPartial = false
-            }
-
-            const newNode = $createTextNode(sliced)
-            newNode.setStyle(node.getStyle())
-            newNode.setFormat(node.getFormat())
-
-            return {
-              serialized: newNode.exportJSON(),
-              originalKey: node.getKey(),
-              isPartial,
-              startOffset,
-              endOffset,
-            }
-          })
-
-          dataTransfer.setData('application/x-lexical-drag-text', JSON.stringify(slicedNodes))
-
-          return true
+          return $onDragStart(event)
         },
         COMMAND_PRIORITY_HIGH,
       ),
       editor.registerCommand(
         DROP_COMMAND,
-        (event) => {
-          const selection = $getSelection()
-          if (!$isRangeSelection(selection)) return false
-          if (!$isTextNode(getSelectedNode(selection))) return false
-
-          const json = event.dataTransfer?.getData('application/x-lexical-drag-text')
-          if (!json) return false
-
-          const serializedNodes: SlicedNode[] = JSON.parse(json)
-
-          event.preventDefault()
-          let range: Range | null = null
-          const domSelection = getDOMSelectionFromTarget(event.target)
-
-          // 크로스 브라우징
-          if (document.caretPositionFromPoint) {
-            const pos = document.caretPositionFromPoint(event.clientX, event.clientY)
-            if (pos) {
-              range = document.createRange()
-              range.setStart(pos.offsetNode, pos.offset)
-              range.collapse(true)
-            }
-          } else if (document.caretRangeFromPoint) {
-            range = document.caretRangeFromPoint(event.clientX, event.clientY)
-          } else if (event.rangeParent && domSelection !== null) {
-            domSelection.collapse(event.rangeParent, event.rangeOffset || 0)
-            range = domSelection.getRangeAt(0)
-          } else {
-            throw Error(`Cannot get the selection when dragging`)
-          }
-
-          editor.update(() => {
-            const selection = $createRangeSelection()
-            if (range) selection.applyDOMRange(range)
-            $setSelection(selection)
-
-            const nodes = serializedNodes.map((node) => {
-              const originalNode = $getNodeByKey(node.originalKey)
-              if (originalNode && $isTextNode(originalNode)) {
-                if (node.isPartial) {
-                  const text = originalNode.getTextContent()
-                  originalNode.setTextContent(
-                    text.slice(0, node.startOffset) + text.slice(node.endOffset),
-                  )
-                } else {
-                  originalNode.remove()
-                }
-              }
-
-              return $parseSerializedNode(node.serialized)
-            })
-
-            $insertNodes(nodes)
-          })
-
-          return true
+        (event, editor) => {
+          return $onDrop(event, editor)
         },
         COMMAND_PRIORITY_HIGH,
       ),
@@ -405,4 +297,152 @@ export default function InlineToolbarPlugin({
       <ColorPickerDropdown onChange={colorChange} hsv={hsv} setHsv={setHsv} />
     </div>
   )
+}
+
+const $onDragStart = (event: DragEvent) => {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection)) return false
+  const dataTransfer = event.dataTransfer
+  if (!dataTransfer) return false
+
+  const nodes = selection.getNodes().filter($isTextNode)
+
+  const slicedNodes: SlicedNode[] = nodes.map((node) => {
+    const { slicedText, endOffset, startOffset, isPartial } = $sliceTextNodeBySelection(
+      node,
+      selection,
+    )
+
+    const newNode = $createSlicedTextNode(node, slicedText)
+
+    return {
+      serialized: newNode.exportJSON(),
+      originalKey: node.getKey(),
+      isPartial,
+      startOffset,
+      endOffset,
+    }
+  })
+
+  dataTransfer.setData('application/x-lexical-drag-text', JSON.stringify(slicedNodes))
+
+  return true
+}
+
+const $onDrop = (event: DragEvent, editor: LexicalEditor) => {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection)) return false
+  if (!$isTextNode(getSelectedNode(selection))) return false
+
+  const json = event.dataTransfer?.getData('application/x-lexical-drag-text')
+  if (!json) return false
+
+  const serializedNodes: SlicedNode[] = JSON.parse(json)
+
+  event.preventDefault()
+
+  const range = getCaretRangeFromDropPoint(event)
+
+  editor.update(() => {
+    $applyDropNode(range, serializedNodes)
+  })
+
+  return true
+}
+
+const $sliceTextNodeBySelection = (node: TextNode, selection: RangeSelection) => {
+  const text = node.getTextContent()
+  const nodeKey = node.getKey()
+
+  let slicedText = text
+  let startOffset: number = 0
+  let endOffset: number = text.length
+
+  // 항상 뒤부터 잘라야함
+  if (selection.isBackward()) {
+    if (nodeKey === selection.anchor.key) {
+      slicedText = slicedText.slice(0, selection.anchor.offset)
+      endOffset = selection.anchor.offset
+    }
+    if (nodeKey === selection.focus.key) {
+      slicedText = slicedText.slice(selection.focus.offset)
+      startOffset = selection.focus.offset
+    }
+  } else {
+    if (nodeKey === selection.focus.key) {
+      slicedText = slicedText.slice(0, selection.focus.offset)
+      endOffset = selection.focus.offset
+    }
+    if (nodeKey === selection.anchor.key) {
+      slicedText = slicedText.slice(selection.anchor.offset)
+      startOffset = selection.anchor.offset
+    }
+  }
+
+  const isPartial = startOffset !== 0 || endOffset !== text.length
+
+  return { slicedText, startOffset, endOffset, isPartial }
+}
+
+const $createSlicedTextNode = (node: TextNode, slicedText: string) => {
+  const newNode = $createTextNode(slicedText)
+  newNode.setStyle(node.getStyle())
+  newNode.setFormat(node.getFormat())
+
+  return newNode
+}
+
+const getCaretRangeFromDropPoint = (event: DragEvent) => {
+  const domSelection = getDOMSelectionFromTarget(event.target)
+  let range: Range | null = null
+
+  // 크로스 브라우징
+  if (document.caretPositionFromPoint) {
+    const pos = document.caretPositionFromPoint(event.clientX, event.clientY)
+    if (pos) {
+      range = document.createRange()
+      range.setStart(pos.offsetNode, pos.offset)
+      range.collapse(true)
+    }
+  } else if (document.caretRangeFromPoint) {
+    range = document.caretRangeFromPoint(event.clientX, event.clientY)
+  } else if (event.rangeParent && domSelection !== null) {
+    domSelection.collapse(event.rangeParent, event.rangeOffset || 0)
+    range = domSelection.getRangeAt(0)
+  }
+
+  if (!range) {
+    throw Error(`Cannot get the selection when dragging`)
+  }
+
+  return range
+}
+
+const $applyDropNode = (range: Range, serializedNodes: SlicedNode[]) => {
+  $setDOMRangetoEditorSelection(range)
+
+  serializedNodes.forEach($updateOriginalNode)
+  const nodes = serializedNodes.map((node) => {
+    return $parseSerializedNode(node.serialized)
+  })
+
+  $insertNodes(nodes)
+}
+
+const $setDOMRangetoEditorSelection = (range: Range) => {
+  const selection = $createRangeSelection()
+  if (range) selection.applyDOMRange(range)
+  $setSelection(selection)
+}
+
+const $updateOriginalNode = (node: SlicedNode) => {
+  const originalNode = $getNodeByKey(node.originalKey)
+  if (originalNode && $isTextNode(originalNode)) {
+    if (node.isPartial) {
+      const text = originalNode.getTextContent()
+      originalNode.setTextContent(text.slice(0, node.startOffset) + text.slice(node.endOffset))
+    } else {
+      originalNode.remove()
+    }
+  }
 }
