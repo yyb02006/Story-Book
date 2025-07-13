@@ -408,6 +408,7 @@ function $onDragStart(event: DragEvent): boolean {
   if (!dataTransfer) {
     return false
   }
+
   dataTransfer.setData('text/plain', '_')
   dataTransfer.setDragImage(img, 0, 0)
   dataTransfer.setData(
@@ -422,6 +423,9 @@ function $onDragStart(event: DragEvent): boolean {
         showCaption: node.__showCaption,
         src: node.__src,
         width: node.__width,
+        id: node.__id,
+        isThumbnail: node.__isThumbnail,
+        storageUrl: node.__storageUrl,
       },
       type: 'image',
     }),
@@ -450,6 +454,7 @@ function $onDrop(event: DragEvent, editor: LexicalEditor): boolean {
   if (!data) {
     return false
   }
+
   event.preventDefault()
   if (canDropImage(event)) {
     const range = getDragSelection(event)
