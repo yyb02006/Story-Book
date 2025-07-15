@@ -42,6 +42,7 @@ const SelectedColorInput = ({
     const hexColorRegex = /^#([0-9A-Fa-f]*)?$/
     if (hashValue.length > 7 || !hexColorRegex.test(hashValue)) return
     setCurrentHexString(hashValue)
+
     const { success } = z
       .string()
       .length(7)
@@ -135,7 +136,7 @@ const SLPicker = ({
     const x = hsv.s * containerRect.width
     const y = (1 - hsv.v) * containerRect.height
     setPosition({ x, y })
-  }, [hsv, onThumbMove])
+  }, [hsv.s, hsv.v, onThumbMove])
 
   useEffect(() => {
     const thumb = thumbRef.current
@@ -226,7 +227,7 @@ const HuePicker = ({
     const containerRect = container.getBoundingClientRect()
     const x = (hsv.h / 360) * containerRect.width
     setPosition({ x })
-  }, [hsv, onThumbMove])
+  }, [hsv.h, onThumbMove])
 
   useEffect(() => {
     const thumb = thumbRef.current
