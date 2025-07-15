@@ -491,7 +491,7 @@ const $updateOriginalNode = (node: SlicedNode) => {
 
 const isInvalidNode = (nodes: LexicalNode[]) => {
   return nodes.some((node) => {
-    if (node.getType() !== 'text') return true
+    if (node.getType() !== 'extended-text') return true
 
     const parent = node.getParent()
     if (!parent || parent.getType() !== 'paragraph') return true
