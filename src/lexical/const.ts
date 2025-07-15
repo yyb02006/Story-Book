@@ -32,3 +32,8 @@ export const basicColorGroups = [
     { utilityClass: 'bg-[#6919ff]', colorHex: '#6919ff' },
   ],
 ]
+
+export const initialFontColor = {
+  dark: { hex: '#ffffff', hsv: { h: 0, s: 0, v: 1 } },
+  light: { hex: '#000000', hsv: { h: 0, s: 0, v: 1 } },
+}
