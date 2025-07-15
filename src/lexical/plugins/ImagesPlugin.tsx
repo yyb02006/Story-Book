@@ -13,13 +13,12 @@ import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import {
   $createParagraphNode,
   $createRangeSelection,
-  $getNodeByKey,
-  $getRoot,
   $getSelection,
   $insertNodes,
   $isNodeSelection,
   $isRootOrShadowRoot,
   $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
@@ -362,6 +361,20 @@ export default function ImagesPlugin({
           return true
         },
         COMMAND_PRIORITY_EDITOR,
+      ),
+      editor.registerCommand<DragEvent>(
+        DRAGSTART_COMMAND,
+        (event) => {
+          const selection = $getSelection()
+          const nodes = selection?.getNodes()
+          if (!nodes) return true
+          if (nodes.length > 1 && nodes?.some((node) => node.getType() === 'image')) {
+            event.preventDefault()
+            return true
+          }
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand<DragEvent>(
         DRAGSTART_COMMAND,
