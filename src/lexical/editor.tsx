@@ -6,7 +6,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
-import { ComponentProps, ReactNode, useState } from 'react'
+import { ComponentProps, Dispatch, ReactNode, SetStateAction, useState } from 'react'
 import { nodes } from '#/lexical/nodes/EditorNodes'
 import { ToolbarPlugin } from '#/lexical/plugins/toolbarPlugin'
 import theme from '#/lexical/styles/editorTheme'
@@ -24,6 +24,7 @@ import ElementAlignToolbarPlugin from '#/lexical/plugins/ElementAlignToolbarPlug
 import ImageListPlugin from '#/lexical/plugins/ImageListPlugin'
 import SubmitPlugin from '#/lexical/plugins/SubmitPlugin'
 import { cls } from '#/libs/client/utils'
+import { BlockType } from '#/lexical/plugins/blockTypes'
 
 export type SubmitStatus = {
   error: { title: string[]; editor: string }
@@ -46,6 +47,32 @@ const PlaceHolder = ({ children }: { children: ReactNode }) => {
   return (
     <div className="font-S-CoreDream-400 text-light-placeholder dark:text-dark-placeholder pointer-events-none absolute top-0 left-1">
       {children}
+    </div>
+  )
+}
+
+const ToolbarContainer = ({
+  setIsLinkEditMode,
+}: {
+  setIsLinkEditMode: Dispatch<SetStateAction<boolean>>
+}) => {
+  const [selectedBlockType, setSelectedBlockType] = useState<BlockType>('paragraph')
+  return (
+    <div className="relative z-[1] flex h-8 items-center gap-x-3">
+      <ToolbarPlugin
+        selectedBlockType={selectedBlockType}
+        setSelectedBlockType={setSelectedBlockType}
+      />
+      {selectedBlockType !== 'code' && (
+        <>
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
+          <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
+          <AssetToolbarPlugin />
+          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
+          <ElementAlignToolbarPlugin />
+        </>
+      )}
     </div>
   )
 }
@@ -105,15 +132,7 @@ export function Editor() {
         ) : null}
       </div>
       <TextEditorContainer>
-        <div className="relative z-[1] flex h-8 items-center gap-x-3">
-          <ToolbarPlugin />
-          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
-          <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
-          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
-          <AssetToolbarPlugin />
-          <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
-          <ElementAlignToolbarPlugin />
-        </div>
+        <ToolbarContainer setIsLinkEditMode={setIsLinkEditMode} />
         <div className="relative z-0 grow">
           <RichTextPlugin
             contentEditable={
