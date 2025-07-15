@@ -13,9 +13,9 @@ import {
 import { $setBlocksType, $isAtNodeEnd } from '@lexical/selection'
 import { BlockType, HeadingNodeType, quoteNode } from '#/lexical/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
-import { $createCodeNode } from '@lexical/code'
 import { $isImageNode, ImageNode } from '#/lexical/nodes/ImageNode'
 import { ColorInput, TinyColor } from '@ctrl/tinycolor'
+import { $createExtendedCodeNode } from '#/lexical/nodes/extendedCodeNode'
 
 /**
  * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 paragraph로 변환
@@ -97,11 +97,11 @@ export const formatCode = (editor: LexicalEditor, blockType: string) => {
       const selection = $getSelection()
       if (!selection) return
       if (!$isRangeSelection(selection) || selection.isCollapsed()) {
-        $setBlocksType(selection, () => $createCodeNode())
+        $setBlocksType(selection, () => $createExtendedCodeNode())
       } else {
         const textContent = selection.getTextContent()
         selection.insertText(textContent)
-        $setBlocksType(selection, () => $createCodeNode())
+        $setBlocksType(selection, () => $createExtendedCodeNode())
       }
     })
   } else {
