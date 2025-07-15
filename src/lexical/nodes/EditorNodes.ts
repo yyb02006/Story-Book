@@ -1,11 +1,12 @@
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListItemNode, ListNode } from '@lexical/list'
 import { KlassConstructor, LexicalNode, LexicalNodeReplacement, TextNode } from 'lexical'
-import { CodeNode, CodeHighlightNode } from '@lexical/code'
+import { CodeHighlightNode } from '@lexical/code'
 import { LinkNode } from '@lexical/link'
 import { StickyNode } from '#/lexical/nodes/StickyNode'
 import { ImageNode } from '#/lexical/nodes/ImageNode'
 import { ExtendedTextNode } from '#/lexical/nodes/extendedTextNode'
+import { ExtendedCodeNode } from '#/lexical/nodes/extendedCodeNode'
 
 //
 // Klass<T> : 제네릭 T 타입의 클래스의 인스턴스를 생성할 수 있는 클래스만 허용하는 유틸리티 타입
@@ -23,7 +24,7 @@ export const nodes:
   QuoteNode,
   ListNode,
   ListItemNode,
-  CodeNode,
+  ExtendedCodeNode,
   CodeHighlightNode,
   LinkNode,
   StickyNode,
