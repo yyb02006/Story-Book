@@ -1,3 +1,5 @@
+import { getHsvWithoutAlpha, tinycolor } from '#/lexical/plugins/utils'
+
 export const basicColorGroups = [
   [
     { utilityClass: 'bg-[#eaeaea]', colorHex: '#eaeaea' },
@@ -34,6 +36,12 @@ export const basicColorGroups = [
 ]
 
 export const initialFontColor = {
-  dark: { hex: '#ffffff', hsv: { h: 0, s: 0, v: 1 } },
-  light: { hex: '#000000', hsv: { h: 0, s: 0, v: 1 } },
+  dark: {
+    text: { hex: '#ffffff', hsv: { h: 0, s: 0, v: 1 } },
+    quote: { hex: '#909090', hsv: getHsvWithoutAlpha(tinycolor('#909090').toHsv()) },
+  },
+  light: {
+    text: { hex: '#000000', hsv: { h: 0, s: 0, v: 0 } },
+    quote: { hex: '#505050', hsv: getHsvWithoutAlpha(tinycolor('#505050').toHsv()) },
+  },
 }
