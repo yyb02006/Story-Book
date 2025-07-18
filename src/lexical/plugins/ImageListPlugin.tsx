@@ -29,7 +29,13 @@ export default function ImageListPlugin() {
       const imageNodes = Array.from(nodes.values()).filter(
         (node) => node.getType() === 'image',
       ) as ImageNode[]
-      setImageDatas(imageNodes.map((node) => ({ fileName: node.__altText, key: node.__key })))
+      setImageDatas(
+        imageNodes.map((node) => ({
+          fileName: node.__altText,
+          key: node.__key,
+          storageUrl: node.__storageUrl,
+        })),
+      )
     })
   }, [editor])
 
