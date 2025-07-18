@@ -24,7 +24,6 @@ import {
   RangeSelection,
   LexicalEditor,
   LexicalNode,
-  CONTROLLED_TEXT_INSERTION_COMMAND,
 } from 'lexical'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { $isCodeNode } from '@lexical/code'
@@ -35,6 +34,7 @@ import ColorPicker, { Hsv } from '#/lexical/components/ui/ColorPicker'
 import { $patchStyleText } from '@lexical/selection'
 import { mergeRegister } from '@lexical/utils'
 import { initialFontColor } from '#/lexical/const'
+import { BlockType } from '#/lexical/plugins/blockTypes'
 
 declare global {
   interface Document {
@@ -106,8 +106,10 @@ const ColorPickerDropdown = ({
 }
 
 export default function InlineToolbarPlugin({
+  selectedBlockType,
   setIsLinkEditMode,
 }: {
+  selectedBlockType: BlockType
   setIsLinkEditMode: Dispatch<SetStateAction<boolean>>
 }) {
   const [editor] = useLexicalComposerContext()
@@ -127,7 +129,7 @@ export default function InlineToolbarPlugin({
 
   const [onTextFormats, setOnTextFormats] = useState(initialOnTextFormatState)
   const [onLink, setOnLink] = useState(false)
-  const [hsv, setHsv] = useState<Hsv>(initialFontColor.dark.hsv)
+  const [hsv, setHsv] = useState<Hsv>(initialFontColor.dark.text.hsv)
 
   const insertLinkHandler = () => {
     if (!onLink) {
@@ -144,6 +146,8 @@ export default function InlineToolbarPlugin({
       activeEditor.update(
         () => {
           const selection = $getSelection()
+
+          if (!$isRangeSelection(selection)) return
 
           if (selection !== null) {
             $patchStyleText(selection, styles)
@@ -210,30 +214,6 @@ export default function InlineToolbarPlugin({
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
-        CONTROLLED_TEXT_INSERTION_COMMAND,
-        () => {
-          const selection = $getSelection()
-
-          if (!$isRangeSelection(selection)) return false
-
-          const node = getSelectedNode(selection)
-
-          if ($isTextNode(node)) return false
-
-          const style = node.getStyle()
-
-          const match = style?.match(/color\s*:\s*([^;]+)/)
-          const color = match?.[1]?.trim()
-
-          if (color) return false
-
-          colorChange(initialFontColor.dark.hex, true)
-
-          return false
-        },
-        COMMAND_PRIORITY_HIGH,
-      ),
-      editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_payload, newEditor) => {
           setActiveEditor(newEditor)
@@ -257,11 +237,12 @@ export default function InlineToolbarPlugin({
             const match = style?.match(/color\s*:\s*([^;]+)/)
             const color = match?.[1]?.trim() // ex: 'red', '#ff0000', 'rgb(255,0,0)' 등
 
-            console.log(color)
-
             if (!color) {
-              colorChange(initialFontColor.dark.hex, true)
-              setHsv(initialFontColor.dark.hsv)
+              if (selectedBlockType === 'quote') {
+                setHsv(initialFontColor.dark.quote.hsv)
+                return false
+              }
+              setHsv(initialFontColor.dark.text.hsv)
               return false
             }
             setHsv(getHsvWithoutAlpha(tinycolor(color).toHsv()))
@@ -285,7 +266,7 @@ export default function InlineToolbarPlugin({
         COMMAND_PRIORITY_HIGH,
       ),
     )
-  }, [editor, colorChange])
+  }, [editor, colorChange, selectedBlockType])
 
   return (
     <div className="flex space-x-3">
@@ -493,11 +474,11 @@ const isInvalidNode = (nodes: LexicalNode[]) => {
   return nodes.some((node) => {
     if (node.getType() !== 'extended-text') return true
 
-    const parent = node.getParent()
+    /*     const parent = node.getParent()
     if (!parent || parent.getType() !== 'paragraph') return true
 
     const grandParent = parent.getParent()
-    if (!grandParent || grandParent.getType() !== 'root') return true
+    if (!grandParent || grandParent.getType() !== 'root') return true */
 
     return false
   })

@@ -57,6 +57,7 @@ const ToolbarContainer = ({
   setIsLinkEditMode: Dispatch<SetStateAction<boolean>>
 }) => {
   const [selectedBlockType, setSelectedBlockType] = useState<BlockType>('paragraph')
+
   return (
     <div className="relative z-[1] flex h-8 items-center gap-x-3">
       <ToolbarPlugin
@@ -66,7 +67,10 @@ const ToolbarContainer = ({
       {selectedBlockType !== 'code' && (
         <>
           <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
-          <InlineToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+          <InlineToolbarPlugin
+            selectedBlockType={selectedBlockType}
+            setIsLinkEditMode={setIsLinkEditMode}
+          />
           <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
           <AssetToolbarPlugin />
           <div className="bg-midnight-gray mx-1 h-[70%] w-[3px]" />
