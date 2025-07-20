@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { registerCodeHighlighting, $isCodeNode, CodeNode } from '@lexical/code'
+import { registerCodeHighlighting, $isCodeNode } from '@lexical/code'
 import {
   $getSelection,
   $isRangeSelection,
@@ -9,6 +9,7 @@ import {
   createCommand,
 } from 'lexical'
 import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
+import { ExtendedCodeNode } from '#/lexical/nodes/extendedCodeNode'
 
 export const CODE_LANGUAGE_COMMAND = createCommand<string>()
 
@@ -19,9 +20,11 @@ const registerCodeLanguageSelecting = (editor: LexicalEditor) => {
       const selection = $getSelection()
       if (!$isRangeSelection(selection)) return false
       const ancherNode = selection.anchor.getNode()
+
       const targetNode = $isCodeNode(ancherNode)
         ? ancherNode
-        : $getNearestNodeOfType(ancherNode, CodeNode) // CodeNode가 자식 노드를 가질 수 있나? TextNode?
+        : $getNearestNodeOfType(ancherNode, ExtendedCodeNode)
+
       if (!targetNode) return false
 
       editor.update(() => {

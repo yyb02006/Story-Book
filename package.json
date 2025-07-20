@@ -10,11 +10,15 @@
     "analyze": "cross-env ANALYZE=true npm run build"
   },
   "dependencies": {
+    "@ctrl/tinycolor": "^4.1.0",
     "@lexical/react": "^0.31.1",
     "@next/bundle-analyzer": "^15.3.1",
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
+    "@supabase/supabase-js": "^2.50.1",
     "@types/bcrypt": "^5.0.2",
+    "@types/sanitize-html": "^2.16.0",
     "bcrypt": "^6.0.0",
+    "browser-image-compression": "^2.0.2",
     "framer-motion": "^11.11.10",
     "iron-session": "^8.0.4",
     "lexical": "^0.31.1",
@@ -22,6 +26,7 @@
     "openai": "^4.58.1",
     "react": "^18",
     "react-dom": "^18",
+    "sanitize-html": "^2.17.0",
     "zod": "^3.25.57"
   },
   "devDependencies": {
@@ -49,7 +54,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.1",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.4",
     "typed-css-modules": "^0.9.1",

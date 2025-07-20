@@ -13,7 +13,7 @@ const BaseInput = ({
   className = '',
   ...rest
 }: InputProps & InputHTMLAttributes<HTMLInputElement>) => {
-  const baseInputStyles = 'w-full placeholder:pl-1 text-smooth-white font-S-CoreDream-400'
+  const baseInputStyles = 'placeholder:pl-1 text-smooth-white font-S-CoreDream-400'
 
   return (
     <input

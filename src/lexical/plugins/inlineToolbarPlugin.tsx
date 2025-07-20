@@ -1,12 +1,60 @@
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical'
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import {
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $parseSerializedNode,
+  $insertNodes,
+  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_HIGH,
+  DRAGSTART_COMMAND,
+  DROP_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  HISTORIC_TAG,
+  SELECTION_CHANGE_COMMAND,
+  getDOMSelectionFromTarget,
+  $createRangeSelection,
+  $setSelection,
+  $createTextNode,
+  $getNodeByKey,
+  SerializedTextNode,
+  TextNode,
+  RangeSelection,
+  LexicalEditor,
+  LexicalNode,
+} from 'lexical'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { $isCodeNode } from '@lexical/code'
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link'
 import { cls, sanitizeUrl } from '#/libs/client/utils'
-import { getSelectedNode } from '#/lexical/plugins/utils'
+import { getHsvWithoutAlpha, getSelectedNode, tinycolor } from '#/lexical/plugins/utils'
+import ColorPicker, { Hsv } from '#/lexical/components/ui/ColorPicker'
+import { $patchStyleText } from '@lexical/selection'
+import { mergeRegister } from '@lexical/utils'
+import { initialFontColor } from '#/lexical/const'
+import { BlockType } from '#/lexical/plugins/blockTypes'
+
+declare global {
+  interface Document {
+    caretPositionFromPoint?(
+      x: number,
+      y: number,
+    ): {
+      offsetNode: Node
+      offset: number
+    } | null
+  }
+}
+
+type SlicedNode = {
+  serialized: SerializedTextNode
+  originalKey: string
+  isPartial: boolean
+  startOffset: number
+  endOffset: number
+}
 
 const SupportedInlineTypes = [
   'code',
@@ -18,12 +66,54 @@ const SupportedInlineTypes = [
   'subscript',
 ] as const
 
+const ColorPickerDropdown = ({
+  onChange,
+  hsv,
+  setHsv,
+}: {
+  onChange: (value: string, skipHistoryStack: boolean) => void
+  hsv: Hsv
+  setHsv: Dispatch<SetStateAction<Hsv>>
+}) => {
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false)
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => {
+          setIsColorPickerOpen((p) => !p)
+        }}
+        aria-label="Color Picker"
+        title={`Color Picker`}
+        type="button"
+        className="relative flex items-center"
+      >
+        <ToolbarIcon
+          svgId={'color-picker'}
+          size={buttonSizes['md']}
+          className={cls(
+            'hover:text-bright-blue',
+            'dark:text-dark-disabled-icon text-light-disabled-icon',
+          )}
+        />
+        <svg className="dark:text-dark-disabled-icon text-light-disabled-icon size-[12px]">
+          <use href={`icons/toolbarButtons.svg#chevron-down`} />
+        </svg>
+      </button>
+      {isColorPickerOpen && <ColorPicker onChange={onChange} hsv={hsv} setHsv={setHsv} />}
+    </div>
+  )
+}
+
 export default function InlineToolbarPlugin({
+  selectedBlockType,
   setIsLinkEditMode,
 }: {
+  selectedBlockType: BlockType
   setIsLinkEditMode: Dispatch<SetStateAction<boolean>>
 }) {
   const [editor] = useLexicalComposerContext()
+  const [activeEditor, setActiveEditor] = useState(editor)
 
   const initialOnTextFormatState = useMemo(() => {
     return {
@@ -39,9 +129,45 @@ export default function InlineToolbarPlugin({
 
   const [onTextFormats, setOnTextFormats] = useState(initialOnTextFormatState)
   const [onLink, setOnLink] = useState(false)
+  const [hsv, setHsv] = useState<Hsv>(initialFontColor.dark.text.hsv)
+
+  const insertLinkHandler = () => {
+    if (!onLink) {
+      setIsLinkEditMode(true)
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl('https://'))
+    } else {
+      setIsLinkEditMode(false)
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+    }
+  }
+
+  const applyStyleText = useCallback(
+    (styles: Record<string, string>, skipHistoryStack?: boolean) => {
+      activeEditor.update(
+        () => {
+          const selection = $getSelection()
+
+          if (!$isRangeSelection(selection)) return
+
+          if (selection !== null) {
+            $patchStyleText(selection, styles)
+          }
+        },
+        skipHistoryStack ? { tag: HISTORIC_TAG } : {},
+      )
+    },
+    [activeEditor],
+  )
+
+  const colorChange = useCallback(
+    (value: string, skipHistoryStack: boolean) => {
+      applyStyleText({ color: value }, skipHistoryStack)
+    },
+    [applyStyleText],
+  )
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    return activeEditor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection()
 
@@ -83,17 +209,64 @@ export default function InlineToolbarPlugin({
         setOnTextFormats(newTextFormats)
       })
     })
-  }, [editor])
+  }, [activeEditor])
 
-  const insertLinkHandler = () => {
-    if (!onLink) {
-      setIsLinkEditMode(true)
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl('https://'))
-    } else {
-      setIsLinkEditMode(false)
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-    }
-  }
+  useEffect(() => {
+    return mergeRegister(
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        (_payload, newEditor) => {
+          setActiveEditor(newEditor)
+
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          const selection = $getSelection()
+
+          if (!$isRangeSelection(selection)) return false
+
+          const node = getSelectedNode(selection)
+
+          if ($isTextNode(node)) {
+            const style = node.getStyle() // style은 string (ex: 'color: red; font-size: 12px')
+
+            const match = style?.match(/color\s*:\s*([^;]+)/)
+            const color = match?.[1]?.trim() // ex: 'red', '#ff0000', 'rgb(255,0,0)' 등
+
+            if (!color) {
+              if (selectedBlockType === 'quote') {
+                setHsv(initialFontColor.dark.quote.hsv)
+                return false
+              }
+              setHsv(initialFontColor.dark.text.hsv)
+              return false
+            }
+            setHsv(getHsvWithoutAlpha(tinycolor(color).toHsv()))
+          }
+          return false
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+      editor.registerCommand(
+        DRAGSTART_COMMAND,
+        (event) => {
+          return $onDragStart(event)
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+      editor.registerCommand(
+        DROP_COMMAND,
+        (event, editor) => {
+          return $onDrop(event, editor)
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+    )
+  }, [editor, colorChange, selectedBlockType])
 
   return (
     <div className="flex space-x-3">
@@ -136,6 +309,177 @@ export default function InlineToolbarPlugin({
           )}
         />
       </button>
+      <ColorPickerDropdown onChange={colorChange} hsv={hsv} setHsv={setHsv} />
     </div>
   )
+}
+
+const $onDragStart = (event: DragEvent): boolean => {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection)) return false
+  const dataTransfer = event.dataTransfer
+  if (!dataTransfer) return false
+
+  const nodes = selection.getNodes()
+
+  if (isInvalidNode(nodes)) return false
+
+  const textNodes = nodes.filter($isTextNode)
+
+  const slicedNodes: SlicedNode[] = textNodes.map((node) => {
+    const { slicedText, endOffset, startOffset, isPartial } = $sliceTextNodeBySelection(
+      node,
+      selection,
+    )
+
+    const newNode = $createSlicedTextNode(node, slicedText)
+
+    return {
+      serialized: newNode.exportJSON(),
+      originalKey: node.getKey(),
+      isPartial,
+      startOffset,
+      endOffset,
+    }
+  })
+
+  dataTransfer.setData('application/x-lexical-drag', JSON.stringify(slicedNodes))
+
+  return true
+}
+
+const $onDrop = (event: DragEvent, editor: LexicalEditor): boolean => {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection)) return false
+  if (!$isTextNode(getSelectedNode(selection))) return false
+
+  const nodes = selection.getNodes()
+
+  if (isInvalidNode(nodes)) return false
+
+  const json = event.dataTransfer?.getData('application/x-lexical-drag')
+  if (!json) return false
+
+  const serializedNodes: SlicedNode[] = JSON.parse(json)
+
+  event.preventDefault()
+
+  const range = getCaretRangeFromDropPoint(event)
+
+  editor.update(() => {
+    $applyDropNode(range, serializedNodes)
+  })
+
+  return true
+}
+
+const $sliceTextNodeBySelection = (node: TextNode, selection: RangeSelection) => {
+  const text = node.getTextContent()
+  const nodeKey = node.getKey()
+
+  let slicedText = text
+  let startOffset: number = 0
+  let endOffset: number = text.length
+
+  // 항상 뒤부터 잘라야함
+  if (selection.isBackward()) {
+    if (nodeKey === selection.anchor.key) {
+      slicedText = slicedText.slice(0, selection.anchor.offset)
+      endOffset = selection.anchor.offset
+    }
+    if (nodeKey === selection.focus.key) {
+      slicedText = slicedText.slice(selection.focus.offset)
+      startOffset = selection.focus.offset
+    }
+  } else {
+    if (nodeKey === selection.focus.key) {
+      slicedText = slicedText.slice(0, selection.focus.offset)
+      endOffset = selection.focus.offset
+    }
+    if (nodeKey === selection.anchor.key) {
+      slicedText = slicedText.slice(selection.anchor.offset)
+      startOffset = selection.anchor.offset
+    }
+  }
+
+  const isPartial = startOffset !== 0 || endOffset !== text.length
+
+  return { slicedText, startOffset, endOffset, isPartial }
+}
+
+const $createSlicedTextNode = (node: TextNode, slicedText: string) => {
+  const newNode = $createTextNode(slicedText)
+  newNode.setStyle(node.getStyle())
+  newNode.setFormat(node.getFormat())
+
+  return newNode
+}
+
+const getCaretRangeFromDropPoint = (event: DragEvent) => {
+  const domSelection = getDOMSelectionFromTarget(event.target)
+  let range: Range | null = null
+
+  // 크로스 브라우징
+  if (document.caretPositionFromPoint) {
+    const pos = document.caretPositionFromPoint(event.clientX, event.clientY)
+    if (pos) {
+      range = document.createRange()
+      range.setStart(pos.offsetNode, pos.offset)
+      range.collapse(true)
+    }
+  } else if (document.caretRangeFromPoint) {
+    range = document.caretRangeFromPoint(event.clientX, event.clientY)
+  } else if (event.rangeParent && domSelection !== null) {
+    domSelection.collapse(event.rangeParent, event.rangeOffset || 0)
+    range = domSelection.getRangeAt(0)
+  }
+
+  if (!range) {
+    throw Error(`Cannot get the selection when dragging`)
+  }
+
+  return range
+}
+
+const $applyDropNode = (range: Range, serializedNodes: SlicedNode[]) => {
+  $setDOMRangetoEditorSelection(range)
+
+  serializedNodes.forEach($updateOriginalNode)
+  const nodes = serializedNodes.map((node) => {
+    return $parseSerializedNode(node.serialized)
+  })
+
+  $insertNodes(nodes)
+}
+
+const $setDOMRangetoEditorSelection = (range: Range) => {
+  const selection = $createRangeSelection()
+  if (range) selection.applyDOMRange(range)
+  $setSelection(selection)
+}
+
+const $updateOriginalNode = (node: SlicedNode) => {
+  const originalNode = $getNodeByKey(node.originalKey)
+  if (originalNode && $isTextNode(originalNode)) {
+    if (node.isPartial) {
+      const text = originalNode.getTextContent()
+      originalNode.setTextContent(text.slice(0, node.startOffset) + text.slice(node.endOffset))
+    } else {
+      originalNode.remove()
+    }
+  }
+}
+
+const isInvalidNode = (nodes: LexicalNode[]) => {
+  return nodes.some((node) => {
+    if (node.getType() !== 'extended-text') return true
+
+    /*     const parent = node.getParent()
+    if (!parent || parent.getType() !== 'paragraph') return true
+
+    const grandParent = parent.getParent()
+    if (!grandParent || grandParent.getType() !== 'root') return true */
+
+    return false
+  })
 }

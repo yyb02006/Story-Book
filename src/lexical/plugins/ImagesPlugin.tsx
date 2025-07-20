@@ -18,6 +18,7 @@ import {
   $isNodeSelection,
   $isRootOrShadowRoot,
   $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
@@ -29,6 +30,7 @@ import {
   isHTMLElement,
   LexicalCommand,
   LexicalEditor,
+  NodeKey,
 } from 'lexical'
 import { useEffect, useState } from 'react'
 import * as React from 'react'
@@ -36,14 +38,30 @@ import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from '../node
 import { FileInput } from '#/components/Inputs/index'
 import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import { buttonSizes } from '#/lexical/components/Buttons/buttonTypes'
+import { supabase } from '#/libs/client/supabase'
+import { cls } from '#/libs/client/utils'
+import imageCompression from 'browser-image-compression'
+import { forEachImageNodes } from '#/lexical/plugins/utils'
 
 export type InsertImagePayload = Readonly<ImagePayload>
 
+type UploadStatus = 'pending' | 'uploading' | 'uploaded' | 'failed'
+
+interface ThumbnailPayload {
+  nodeKey: NodeKey
+  isThumbnail: boolean
+  editor: LexicalEditor
+}
+
 export type EditorImageData = {
-  src: string
+  id: string
+  file: File
+  previewSrc: string // Dialog에서 미리보기용 Base64 URL
+  storageUrl: string | null // 스토리지 업로드 후 받을 영구 URL
   fileName: string
-  height: number
   width: number
+  height: number
+  uploadStatus: UploadStatus // 업로드 상태
 }
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
@@ -53,6 +71,46 @@ export const INSERT_IMAGE_ARRAY_COMMAND: LexicalCommand<InsertImagePayload[]> = 
   'INSERT_IMAGE_ARRAY_COMMAND',
 )
 
+export const SET_THUMBNAIL_COMMAND: LexicalCommand<ThumbnailPayload> =
+  createCommand('SET_THUMBNAIL_COMMAND')
+
+async function uploadImageToSupabase(file: File, id: string) {
+  const fileExtension = file.name.split('.').pop()
+  const imagePath = `${id}-${file.lastModified}.${fileExtension}`
+  const thumbnailImage = await imageCompression(file, {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 100,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+  })
+  // const { error } = await supabase.storage.from('temp-images').upload(contentImagePath, file)
+  const [contentResult, thumbnailResult] = await Promise.all([
+    supabase.storage.from('temp-images').upload(`content/${imagePath}`, file),
+    supabase.storage.from('temp-images').upload(`thumbnail/${imagePath}`, thumbnailImage),
+  ])
+  const projectId = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID
+  if (contentResult.error || thumbnailResult.error) {
+    throw new Error(
+      `contentImageError: ${contentResult.error?.message || ''} thumbnailImageError:  ${thumbnailResult.error?.message || ''}`,
+    )
+  } else {
+    return `https://${projectId}.supabase.co/storage/v1/object/public/temp-images/content/${imagePath}`
+  }
+}
+
+const uploadStatusTag = (uploadStatus: UploadStatus) => {
+  switch (uploadStatus) {
+    case 'failed':
+      return <div className="rounded-md border border-red-400 px-2 text-red-400">실패</div>
+    case 'uploaded':
+      return <div className="rounded-md border border-green-600 px-2 text-green-600">성공</div>
+    default:
+      return (
+        <div className="border-white-gray text-white-gray rounded-md border px-2">업로드 중</div>
+      )
+  }
+}
+
 export function InsertImageUploadedDialog({
   activeEditor,
   onClose,
@@ -61,51 +119,101 @@ export function InsertImageUploadedDialog({
   onClose: () => void
 }) {
   const [images, setImages] = useState<EditorImageData[]>([])
+  const [uploadButtonStatus, setUploadButtonStatus] = useState<
+    '업로드중' | '업로드 불가' | '업로드' | null
+  >(null)
 
-  const isDisabled = images.length === 0
+  useEffect(() => {
+    switch (true) {
+      case images.length === 0:
+        setUploadButtonStatus(null)
+        break
+      case images.some((image) => image.uploadStatus === 'uploading'):
+        setUploadButtonStatus('업로드중')
+        break
+      case images.some((image) => image.uploadStatus === 'failed'):
+        setUploadButtonStatus('업로드 불가')
+        break
+      default:
+        setUploadButtonStatus('업로드')
+        break
+    }
+  }, [images])
 
   const loadImage = (files: FileList | null) => {
     if (files === null) return
 
     const fileArray = Array.from(files)
-    const srcPromises = fileArray.map(
-      (file) =>
-        new Promise<EditorImageData>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              const img = new Image()
-              const result = reader.result
-              img.onload = () => {
-                resolve({
-                  src: result,
-                  fileName: file.name,
-                  width: img.width,
-                  height: img.height,
-                })
-              }
-              img.onerror = () => {
-                reject(new Error('Failed to load image'))
-              }
-              img.src = result
-            } else {
-              reject(new Error('Failed to read file'))
-            }
-          }
-          reader.onerror = () => {
-            reject(new Error('Failed to read file'))
-          }
-          reader.readAsDataURL(file)
-        }),
-    )
+    fileArray.forEach((file) => {
+      const id = crypto.randomUUID()
 
-    Promise.all(srcPromises)
-      .then((results) => {
-        setImages(results)
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+      setImages((prev) => [
+        ...prev,
+        {
+          id,
+          file,
+          previewSrc: '',
+          storageUrl: null,
+          fileName: file.name,
+          height: 0,
+          width: 0,
+          uploadStatus: 'uploading',
+        },
+      ])
+
+      const reader = new FileReader()
+
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          const previewDataUrl = URL.createObjectURL(file)
+          const img = new Image()
+          img.onload = () => {
+            setImages((prev) =>
+              prev.map((item) =>
+                item.id === id
+                  ? { ...item, previewSrc: previewDataUrl, width: img.width, height: img.height }
+                  : item,
+              ),
+            )
+            URL.revokeObjectURL(previewDataUrl)
+          }
+          img.onerror = () => {
+            console.error('Failed to load image for preview:', file.name)
+            setImages((prev) =>
+              prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+            )
+            URL.revokeObjectURL(previewDataUrl)
+          }
+          img.src = previewDataUrl
+        } else {
+          console.error('Failed to read file as string:', file.name)
+          setImages((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+          )
+        }
+      }
+      reader.onerror = () => {
+        console.error('FileReader error:', file.name)
+        setImages((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+        )
+      }
+      reader.readAsDataURL(file)
+      uploadImageToSupabase(file, id)
+        .then((storageUrl) => {
+          setImages((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, storageUrl, uploadStatus: 'uploaded' } : item,
+            ),
+          )
+        })
+        .catch((err) => {
+          console.log('Image upload to Supabase failed:', file.name, err)
+          setImages((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, uploadStatus: 'failed' } : item)),
+          )
+        })
+    })
   }
 
   const submitImages = (payloads: InsertImagePayload[]) => {
@@ -120,11 +228,13 @@ export function InsertImageUploadedDialog({
     const files = event.dataTransfer.files
     if (files.length > 0) {
       loadImage(files)
+      event.dataTransfer.clearData()
     }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     loadImage(e.target.files)
+    e.target.value = ''
   }
 
   return (
@@ -147,37 +257,47 @@ export function InsertImageUploadedDialog({
       />
       {images.length > 0 ? (
         <ul className="font-S-CoreDream-400 space-y-2 text-sm">
-          {images.map(({ fileName }) => (
-            <li key={fileName} className="flex justify-between">
-              {fileName}
-              <button
-                onClick={() => {
-                  setImages((p) => p.filter((image) => image.fileName !== fileName))
-                }}
-              >
-                <ToolbarIcon size={buttonSizes.xs} svgId="cancel" />
-              </button>
+          {images.map(({ fileName, id, uploadStatus }) => (
+            <li key={id} className="font-S-CoreDream-200 flex justify-between">
+              <span>{fileName}</span>
+              <div className="flex space-x-2">
+                <span>{uploadStatusTag(uploadStatus)}</span>
+                <button
+                  onClick={() => {
+                    setImages((p) => p.filter((image) => image.fileName !== fileName))
+                  }}
+                >
+                  <ToolbarIcon size={buttonSizes.xs} svgId="cancel" />
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       ) : null}
       <button
-        disabled={isDisabled}
+        disabled={images.length === 0 || images.some((img) => img.uploadStatus !== 'uploaded')}
         onClick={() => {
+          if (images.some((img) => img.uploadStatus !== 'uploaded')) return
           submitImages(
-            images.map<InsertImagePayload>(({ fileName, src, width, height }) => ({
+            images.map<InsertImagePayload>(({ fileName, storageUrl, width, height, id, file }) => ({
+              id,
               altText: fileName,
-              src,
+              src: URL.createObjectURL(file),
               maxWidth: contentAreaWidth,
               width: contentAreaWidth && width >= 500 ? 500 : width,
               height:
                 contentAreaWidth && width >= 500 ? Math.round((height * 500) / width) : height,
+              isThumbnail: false,
+              storageUrl: storageUrl || '',
             })),
           )
         }}
-        className="bg-bright-blue cursor-pointer rounded-md px-4 py-2"
+        className={cls(
+          uploadButtonStatus === '업로드' ? 'bg-bright-blue' : 'bg-charcoal-gray',
+          'cursor-pointer rounded-md px-4 py-2',
+        )}
       >
-        업로드
+        {uploadButtonStatus === null ? '업로드' : uploadButtonStatus}
       </button>
     </div>
   )
@@ -226,6 +346,36 @@ export default function ImagesPlugin({
         },
         COMMAND_PRIORITY_EDITOR,
       ),
+      editor.registerCommand<ThumbnailPayload>(
+        SET_THUMBNAIL_COMMAND,
+        ({ nodeKey, isThumbnail, editor }) => {
+          forEachImageNodes(editor, (node) => {
+            const isCurrentImage = node.getKey() === nodeKey
+            if (isThumbnail && !isCurrentImage) {
+              node.setIsThumbnail(false)
+            }
+            if (node.getKey() === nodeKey) {
+              node.setIsThumbnail(isThumbnail)
+            }
+          })
+          return true
+        },
+        COMMAND_PRIORITY_EDITOR,
+      ),
+      editor.registerCommand<DragEvent>(
+        DRAGSTART_COMMAND,
+        (event) => {
+          const selection = $getSelection()
+          const nodes = selection?.getNodes()
+          if (!nodes) return true
+          if (nodes.length > 1 && nodes?.some((node) => node.getType() === 'image')) {
+            event.preventDefault()
+            return true
+          }
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
       editor.registerCommand<DragEvent>(
         DRAGSTART_COMMAND,
         (event) => {
@@ -271,6 +421,7 @@ function $onDragStart(event: DragEvent): boolean {
   if (!dataTransfer) {
     return false
   }
+
   dataTransfer.setData('text/plain', '_')
   dataTransfer.setDragImage(img, 0, 0)
   dataTransfer.setData(
@@ -285,6 +436,9 @@ function $onDragStart(event: DragEvent): boolean {
         showCaption: node.__showCaption,
         src: node.__src,
         width: node.__width,
+        id: node.__id,
+        isThumbnail: node.__isThumbnail,
+        storageUrl: node.__storageUrl,
       },
       type: 'image',
     }),
@@ -313,6 +467,7 @@ function $onDrop(event: DragEvent, editor: LexicalEditor): boolean {
   if (!data) {
     return false
   }
+
   event.preventDefault()
   if (canDropImage(event)) {
     const range = getDragSelection(event)

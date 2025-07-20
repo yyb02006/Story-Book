@@ -1,7 +1,7 @@
 'use client'
 
 import BaseInput from '#/components/Inputs/baseInput'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, InputHTMLAttributes } from 'react'
 
 interface InputProps {
   name: string
@@ -19,7 +19,7 @@ const TextInput = ({
   value,
   className = '',
   ...rest
-}: InputProps) => {
+}: InputProps & Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'>) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange?.(event.target.value, event)
   }

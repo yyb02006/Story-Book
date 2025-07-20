@@ -30,12 +30,13 @@ const CodeDropDown = ({
 }: CodeDropDownProps) => {
   const isLanguageSelected = (value: string) => {
     // formatCode로 코드 블럭을 만들었을 때 language의 기본값은 javascript임
-    // 그러나 codeLanguagesOptions에는 javascript가 아닌 js를 사용함
+    // 그러나 CODE_LANGUAGE_FRIENDLY_NAME_MAP에는 javascript가 아닌 js를 사용함
     // javascript !== js 값 불일치 발생 => 현재 선택된 리스트에 제대로 반영되지 못함
-    // 거시기 렉시컬 레포지토리에 PR 올려봐야할듯
+    // 렉시컬에서 CODE_LANGUAGE_FRIENDLY_NAME_MAP에 js가 아닌 javascript를 사용하도록 레포지토리에 PR 올려봐야할듯
     const normalizedLanguage = codeLanguage === 'javascript' ? 'js' : codeLanguage
     return normalizedLanguage === value && selectedBlockType === 'code'
   }
+
   return (
     <div className="relative">
       <button
@@ -99,10 +100,10 @@ export default function CodeButton({
   }, [editor])
 
   const handleLanguageClick = (value: string) => {
-    editor.dispatchCommand(CODE_LANGUAGE_COMMAND, value)
     if (selectedBlockType !== 'code') {
       formatCode(editor, selectedBlockType)
     }
+    editor.dispatchCommand(CODE_LANGUAGE_COMMAND, value)
     setIsDropdownListOpen(false)
   }
 

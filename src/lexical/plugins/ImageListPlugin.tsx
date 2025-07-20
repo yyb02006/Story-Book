@@ -8,7 +8,12 @@ import ToolbarIcon from '#/lexical/components/Buttons/toolbarIcon'
 import useModal from '#/hooks/useModal'
 import Image from 'next/image'
 
-type OmitedImageData = Omit<EditorImageData, 'src' | 'width' | 'height'> & { key: string }
+type OmitedImageData = Omit<
+  EditorImageData,
+  'uploadStatus' | 'permanentSrc' | 'previewSrc' | 'width' | 'height' | 'id' | 'file'
+> & {
+  key: string
+}
 
 export default function ImageListPlugin() {
   const [editor] = useLexicalComposerContext()
@@ -24,7 +29,13 @@ export default function ImageListPlugin() {
       const imageNodes = Array.from(nodes.values()).filter(
         (node) => node.getType() === 'image',
       ) as ImageNode[]
-      setImageDatas(imageNodes.map((node) => ({ fileName: node.__altText, key: node.__key })))
+      setImageDatas(
+        imageNodes.map((node) => ({
+          fileName: node.__altText,
+          key: node.__key,
+          storageUrl: node.__storageUrl,
+        })),
+      )
     })
   }, [editor])
 

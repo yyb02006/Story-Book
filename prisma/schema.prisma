@@ -23,4 +23,18 @@ model User {
   avatar     String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  Post       Post[]
+}
+
+model Post {
+  id              Int      @id @default(autoincrement())
+  title           String
+  htmlContent     String
+  previewImageUrl String?
+  previewText     String?
+  editorState     Json
+  user            User     @relation(fields: [userId], references: [id])
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  userId          Int
 }

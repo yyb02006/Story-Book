@@ -1,4 +1,4 @@
-import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/app/api/auth/github/route'
+import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/libs/server/utils'
 import prisma from '#/libs/server/prisma'
 import { notFound } from 'next/navigation'
 import { NextRequest } from 'next/server'
@@ -33,7 +33,6 @@ const getGoogleAccessToken = async (code: string) => {
     await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
-        // URLSearchParams객체같은 URL 데이터를 body에 담아서 보낼 때는 x-www-form-urlencoded
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({

@@ -6,11 +6,16 @@ import {
   ElementNode,
   RangeSelection,
   TextNode,
+  $getRoot,
+  LexicalNode,
+  $isElementNode,
 } from 'lexical'
 import { $setBlocksType, $isAtNodeEnd } from '@lexical/selection'
 import { BlockType, HeadingNodeType, quoteNode } from '#/lexical/plugins/blockTypes'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
-import { $createCodeNode } from '@lexical/code'
+import { $isImageNode, ImageNode } from '#/lexical/nodes/ImageNode'
+import { ColorInput, TinyColor } from '@ctrl/tinycolor'
+import { $createExtendedCodeNode } from '#/lexical/nodes/extendedCodeNode'
 
 /**
  * 파라미터로 받은 에디터에서 선택된 텍스트 블록을 paragraph로 변환
@@ -92,11 +97,11 @@ export const formatCode = (editor: LexicalEditor, blockType: string) => {
       const selection = $getSelection()
       if (!selection) return
       if (!$isRangeSelection(selection) || selection.isCollapsed()) {
-        $setBlocksType(selection, () => $createCodeNode())
+        $setBlocksType(selection, () => $createExtendedCodeNode())
       } else {
         const textContent = selection.getTextContent()
         selection.insertText(textContent)
-        $setBlocksType(selection, () => $createCodeNode())
+        $setBlocksType(selection, () => $createExtendedCodeNode())
       }
     })
   } else {
@@ -147,4 +152,75 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     // 앵커가 노드 끝에 있으면 앵커 노드 반환, 그렇지 않으면 포커스 노드 반환
     return $isAtNodeEnd(anchor) ? anchorNode : focusNode
   }
+}
+
+/**
+ * 현재 Lexical 에디터 문서 내의 모든 ImageNode 인스턴스를 찾아 반환
+ *
+ * 이 함수는 에디터 상태를 읽기 전용으로 탐색하며, 트리 구조를 재귀적으로 순회하여
+ * 사용자가 정의한 `ImageNode` 클래스의 모든 인스턴스를 수집
+ *
+ * @param editor - 이미지 노드를 가져올 대상인 LexicalEditor 인스턴스
+ * @returns 에디터 문서 내에서 발견된 모든 ImageNode 객체들의 배열
+ *
+ * @example
+ * const imageNodes = getAllImageNodes(editor);
+ * imageNodes.forEach((node) => {
+ *   console.log(node.getSrc());
+ * });
+ */
+export function forEachImageNodes(
+  editor: LexicalEditor,
+  callback: (node: ImageNode, index: number) => void,
+): void {
+  editor.update(() => {
+    const root = $getRoot()
+    let index = 0
+
+    const traverse = (node: LexicalNode) => {
+      if ($isImageNode(node)) {
+        callback(node, index++)
+      }
+
+      if ($isElementNode(node)) {
+        for (const child of node.getChildren()) {
+          traverse(child)
+        }
+      }
+    }
+
+    traverse(root)
+  })
+}
+
+/**
+ * 주어진 colorHex가 6자리 hex 코드가 맞는지 여부를 반환
+ *
+ * @param {string} colorHex - 색상 값
+ * @returns {boolean}
+ */
+export function isHexColor(colorHex: string): boolean {
+  const hexColorRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+  return hexColorRegex.test(colorHex)
+}
+
+/**
+ * 주어진 색상 값을 TinyColor 객체로 변환
+ *
+ * @param {ColorInput} color - 변환할 색상 값
+ * @returns {TinyColor} 변환된 TinyColor 객체
+ */
+export function tinycolor(color: ColorInput) {
+  return new TinyColor(color)
+}
+
+/**
+ * 주어진 색상 값을 HSV 포맷으로 변환하고, a 값을 제외한 h, s, v 프로퍼티만 반환
+ *
+ * @param {string} color - 변환할 색상 값
+ * @returns {{ h: number, s: number, v: number }} - h, s, v 프로퍼티를 포함한 객체.
+ */
+export function getHsvWithoutAlpha(color: ColorInput) {
+  const { h, s, v } = tinycolor(color).toHsv()
+  return { h, s, v }
 }

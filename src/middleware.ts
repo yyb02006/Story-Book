@@ -6,26 +6,32 @@ interface Routes {
 }
 
 const publicOnlyUrls: Routes = {
-  '/': true,
   '/login': true,
   '/signup': true,
-  '/find': true,
-  '/github/start': true,
-  '/github/complete': true,
-  '/sns_auth/github/start': true,
+}
+
+const signedOnlyUrls: Routes = {
+  '/write': true,
+  '/favortie': true,
+  '/story': true,
+  '/search': true,
 }
 
 export async function middleware(request: NextRequest) {
   const session = await getSession()
+  const {
+    nextUrl: { pathname },
+    url,
+  } = request
   if (!session.id) {
-    if (!publicOnlyUrls[request.nextUrl.pathname]) {
-      return NextResponse.redirect(new URL('/', request.url))
+    if (signedOnlyUrls[pathname]) {
+      return NextResponse.redirect(new URL('/login', url))
     }
   } else {
+    if (publicOnlyUrls[pathname]) {
+      return NextResponse.redirect(new URL('/', url))
+    }
   }
-  /*   console.log(request.nextUrl)
-  console.log(publicOnlyUrls[request.nextUrl.pathname])
-  console.log(request.url) */
 }
 
 export const config = {

@@ -1,4 +1,4 @@
-import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/app/api/auth/github/route'
+import { createUniqueUserAndRedirect, getCookieAndRedirect } from '#/libs/server/utils'
 import prisma from '#/libs/server/prisma'
 import { notFound } from 'next/navigation'
 import { NextRequest } from 'next/server'

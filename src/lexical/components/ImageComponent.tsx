@@ -42,6 +42,7 @@ import { $isImageNode } from '#/lexical/nodes/ImageNode'
 import NextImage from 'next/image'
 import ImageResizer from '#/lexical/components/ImageResizer'
 import { cls } from '#/libs/client/utils'
+import { SET_THUMBNAIL_COMMAND } from '#/lexical/plugins/ImagesPlugin'
 
 const imageCache = new Map<string, Promise<boolean> | boolean>()
 
@@ -97,6 +98,7 @@ function LazyImage({
     height: number
   } | null>(null)
   const isSVGImage = isSVG(src)
+  const [loading, setLoading] = useState(true)
 
   // Set initial dimensions for SVG images
   useEffect(() => {
@@ -163,26 +165,37 @@ function LazyImage({
   const imageStyle = calculateDimensions()
 
   return (
-    <NextImage
-      className={className || undefined}
-      src={src}
-      alt={altText}
-      ref={imageRef}
-      width={typeof imageStyle.width === 'number' ? imageStyle.width : 200}
-      height={typeof imageStyle.height === 'number' ? imageStyle.height : 200}
-      style={imageStyle}
-      onError={onError}
-      draggable="false"
-      onLoad={(e) => {
-        if (isSVGImage) {
-          const img = e.currentTarget
-          setDimensions({
-            height: img.naturalHeight,
-            width: img.naturalWidth,
-          })
-        }
-      }}
-    />
+    <>
+      {loading && (
+        <div
+          style={{ width, height }}
+          className="bg-charcoal-gray/50 absolute flex items-center justify-center rounded-md"
+        >
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-4 border-gray-200 border-t-transparent" />
+        </div>
+      )}
+      <NextImage
+        className={className || undefined}
+        src={src}
+        alt={altText}
+        ref={imageRef}
+        width={typeof imageStyle.width === 'number' ? imageStyle.width : 200}
+        height={typeof imageStyle.height === 'number' ? imageStyle.height : 200}
+        style={imageStyle}
+        onError={onError}
+        draggable="false"
+        onLoad={(e) => {
+          if (isSVGImage) {
+            const img = e.currentTarget
+            setDimensions({
+              height: img.naturalHeight,
+              width: img.naturalWidth,
+            })
+          }
+          setLoading(false)
+        }}
+      />
+    </>
   )
 }
 
@@ -213,6 +226,7 @@ export default function ImageComponent({
   showCaption,
   caption,
   captionsEnabled,
+  isThumbnail,
 }: {
   altText: string
   caption: LexicalEditor
@@ -224,6 +238,7 @@ export default function ImageComponent({
   src: string
   width: 'inherit' | number
   captionsEnabled: boolean
+  isThumbnail: boolean
 }): JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
@@ -234,6 +249,7 @@ export default function ImageComponent({
   const activeEditorRef = useRef<LexicalEditor | null>(null)
   const [isLoadError, setIsLoadError] = useState<boolean>(false)
   const isEditable = useLexicalEditable()
+  const [isHovered, setIsHovered] = useState(false)
 
   const $onEnter = useCallback(
     (event: KeyboardEvent) => {
@@ -402,6 +418,10 @@ export default function ImageComponent({
     setIsResizing(true)
   }
 
+  const setThumbnail = (isThumbnail: boolean) => {
+    editor.dispatchCommand(SET_THUMBNAIL_COMMAND, { nodeKey, isThumbnail, editor })
+  }
+
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing
   const isFocused = (isSelected || isResizing) && isEditable
 
@@ -421,7 +441,15 @@ export default function ImageComponent({
           {isLoadError ? (
             <BrokenImage />
           ) : (
-            <div className="relative z-1">
+            <div
+              className="relative z-1"
+              onMouseEnter={() => {
+                setIsHovered(true)
+              }}
+              onMouseLeave={() => {
+                setIsHovered(false)
+              }}
+            >
               <LazyImage
                 className={cls(
                   isFocused
@@ -448,6 +476,21 @@ export default function ImageComponent({
                   onResizeEnd={onResizeEnd}
                   captionsEnabled={!isLoadError && captionsEnabled}
                 />
+              )}
+              {(isHovered || isThumbnail) && (
+                <button
+                  onClick={() => {
+                    setThumbnail(!isThumbnail)
+                  }}
+                  className={cls(
+                    isThumbnail
+                      ? 'bg-bright-blue/60'
+                      : 'bg-charcoal-gray/60 border-white-gray hover:border-bright-blue border',
+                    'font-S-CoreDream-200 absolute top-3 left-1/2 -translate-x-1/2 rounded-md px-3 py-2 text-xs',
+                  )}
+                >
+                  {isThumbnail ? '썸네일' : '썸네일로 설정'}
+                </button>
               )}
             </div>
           )}

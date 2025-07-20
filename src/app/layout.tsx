@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Patrick_Hand } from 'next/font/google'
 import './globals.css'
 import RootThemeProvider from '#/components/rootThemeProvider'
+import { cls } from '#/libs/client/utils'
+import { spoqaHanSansNeo } from '#/fonts/spoqa'
 
 const patrick_hand = Patrick_Hand({
   subsets: ['latin'],
@@ -20,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={patrick_hand.variable}>
+    <html lang="en" className={cls(patrick_hand.variable, spoqaHanSansNeo.variable)}>
       <body>
         <RootThemeProvider>{children}</RootThemeProvider>
       </body>
