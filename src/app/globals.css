@@ -83,6 +83,9 @@
       }
     }
   }
+  .post > blockquote {
+    @apply font-normal;
+  }
 }
 
 :root {
@@ -143,6 +146,7 @@
 body {
   color: rgb(var(--foreground-rgb));
   font-family: var(--font-S-CoreDream-200);
+  background-color: var(--color-smooth-black);
 }
 
 input {
